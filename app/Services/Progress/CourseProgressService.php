@@ -80,4 +80,42 @@ class CourseProgressService
             ->where('course_id', $course->id)
             ->value('completed') ?? false;
     }
+
+    public function updateFromLesson(Child $child, $lesson)
+{
+    $course = $lesson->module->course;
+
+    $total = $course->modules()
+        ->with('lessons')
+        ->get()
+        ->pluck('lessons')
+        ->flatten()
+        ->count();
+
+    $completed = $child->lessonProgress()
+        ->whereHas('lesson', function ($q) use ($course) {
+            $q->whereHas('module', function ($q2) use ($course) {
+                $q2->where('course_id', $course->id);
+            });
+        })
+        ->where('completed', true)
+        ->count();
+
+    $percentage = $total > 0
+        ? ($completed / $total) * 100
+        : 0;
+
+    return $child->courseProgress()->updateOrCreate(
+        [
+            'course_id' => $course->id,
+        ],
+        [
+            'completed_lessons' => $completed,
+            'total_lessons' => $total,
+            'progress_percentage' => $percentage,
+            'completed' => $percentage >= 100,
+            'completed_at' => $percentage >= 100 ? now() : null,
+        ]
+    );
+}
 }

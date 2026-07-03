@@ -59,4 +59,35 @@ class LessonProgressService
 
         return $progress;
     }
+
+    public function updateFromActivity(Child $child, $activity)
+    {
+        $lesson = $activity->lesson;
+
+        $total = $lesson->activities()->count();
+
+        $completed = $child->activityProgress()
+            ->whereHas('activity', function ($q) use ($lesson) {
+                $q->where('lesson_id', $lesson->id);
+            })
+            ->where('completed', true)
+            ->count();
+
+        $percentage = $total > 0
+            ? ($completed / $total) * 100
+            : 0;
+
+        return $child->lessonProgress()->updateOrCreate(
+            [
+                'lesson_id' => $lesson->id,
+            ],
+            [
+                'completed_activities' => $completed,
+                'total_activities' => $total,
+                'progress_percentage' => $percentage,
+                'completed' => $percentage >= 100,
+                'completed_at' => $percentage >= 100 ? now() : null,
+            ]
+        );
+    }
 }

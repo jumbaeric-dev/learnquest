@@ -11,6 +11,8 @@ use App\Services\StreakService;
 class ActivityProgressService
 {
     public function __construct(
+        protected StreakService $streakService,
+        protected AchievementService $achievementService,
         protected SkillProgressService $skillProgressService,
         protected LessonProgressService $lessonProgressService,
         protected CourseProgressService $courseProgressService,
@@ -42,7 +44,7 @@ class ActivityProgressService
         if ($completed && ($progress->wasRecentlyCreated || $progress->wasChanged('completed'))) {
             $child->addXp($activity->xp_reward);
             $this->skillProgressService->awardFromActivity($child, $activity);
-            StreakService::recordActivity($child);
+            $this->streakService->recordActivity($child);
         }
 
         $lesson = $activity->lesson;
@@ -57,8 +59,33 @@ class ActivityProgressService
             }
         }
 
-        AchievementService::evaluate($child);
+        $this->achievementService->evaluate($child);
 
         return $progress;
     }
+
+    public function record(Child $child, $activity, int $score)
+    {
+        return $child->activityProgress()->updateOrCreate(
+            [
+                'activity_id' => $activity->id,
+            ],
+            [
+                'completed' => true,
+                'score' => $score,
+                'xp_earned' => $this->calculateXp($score),
+                'completed_at' => now(),
+            ]
+        );
+    }
+
+    protected function calculateXp(int $score): int
+    {
+        $passScore = config('learnquest.activity_pass_score');
+
+        return $score >= $passScore
+            ? config('learnquest.activity_completion_xp', 25)
+            : 5;
+    }
+
 }

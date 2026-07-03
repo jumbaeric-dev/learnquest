@@ -89,4 +89,37 @@ class SkillProgressService
             $this->getProgress($child, $skill)
         )->progress_percentage >= 100;
     }
+
+    public function updateFromActivity(Child $child, $activity)
+    {
+        foreach ($activity->skills as $skill) {
+
+            $progress = $child->skillProgress()->updateOrCreate(
+                [
+                    'skill_id' => $skill->id,
+                ],
+                [
+                    'xp' => 0,
+                    'level' => 1,
+                ]
+            );
+
+            $progress->increment(
+                'xp',
+                $activity->xp_reward ?? 10
+            );
+
+            $maxXp = config('learnquest.max_skill_xp');
+
+            if ($progress->xp > $maxXp) {
+                $progress->xp = $maxXp;
+            }
+
+            $progress->level = (int) ceil($progress->xp / 200);
+
+            $progress->save();
+        }
+
+        return true;
+    }
 }

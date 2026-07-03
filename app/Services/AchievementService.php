@@ -7,230 +7,197 @@ use App\Models\Child;
 
 class AchievementService
 {
-    public static function evaluate(Child $child): void
+    public function evaluate(Child $child): array
     {
-        self::checkFirstLesson($child);
+        $awarded = [];
 
-        self::checkAiExplorer($child);
+        $checks = [
+            'firstLesson',
+            'aiExplorer',
+            'promptMaster',
+            'aiSafetyChampion',
+            'futureInnovator',
+            'criticalThinker',
+            'problemSolver',
+            'learnQuestLegend',
+            'streakBadges',
+        ];
 
-        self::checkPromptMaster($child);
+        foreach ($checks as $check) {
+            $result = $this->$check($child);
 
-        self::checkAiSafetyChampion($child);
+            if ($result) {
+                $awarded = array_merge($awarded, $result);
+            }
+        }
 
-        self::checkFutureInnovator($child);
-
-        self::checkCriticalThinker($child);
-
-        self::checkProblemSolver($child);
-
-        self::checkLearnQuestLegend($child);
-
-        self::checkStreakBadges($child);
+        return $awarded;
     }
 
-    protected static function awardBadge(
-        Child $child,
-        string $badgeSlug
-    ): void {
+    /**
+     * CORE: safe badge awarding (prevents duplicates)
+     */
+    protected function awardBadge(Child $child, string $badgeSlug): ?Badge
+    {
         $badge = Badge::where('slug', $badgeSlug)->first();
 
         if (! $badge) {
-            return;
+            return null;
         }
 
-        $child->awardBadge($badge);
+        if ($child->badges()->where('badge_id', $badge->id)->exists()) {
+            return null;
+        }
+
+        $child->badges()->attach($badge->id, [
+            'earned_at' => now(),
+        ]);
+
+        return $badge;
     }
 
-    protected static function checkFirstLesson(
-        Child $child
-    ): void {
+    // ------------------------------------------------------------
+    // ACHIEVEMENT RULES
+    // ------------------------------------------------------------
+
+    protected function firstLesson(Child $child): array
+    {
+        if ($child->lessonProgress()->where('completed', true)->count() >= 1) {
+            return array_filter([
+                $this->awardBadge($child, 'first-lesson'),
+            ]);
+        }
+
+        return [];
+    }
+
+    protected function aiExplorer(Child $child): array
+    {
+        if ($child->courseProgress()->where('completed', true)->count() >= 1) {
+            return array_filter([
+                $this->awardBadge($child, 'ai-explorer'),
+            ]);
+        }
+
+        return [];
+    }
+
+    protected function promptMaster(Child $child): array
+    {
         if (
             $child->lessonProgress()
-            ->where('completed', true)
-            ->count() >= 1
+                ->whereHas('lesson', fn($q) =>
+                    $q->where('title', 'like', '%prompt%')
+                )
+                ->where('completed', true)
+                ->exists()
         ) {
-            self::awardBadge(
-                $child,
-                'first-lesson'
-            );
+            return array_filter([
+                $this->awardBadge($child, 'prompt-master'),
+            ]);
         }
+
+        return [];
     }
 
-    protected static function checkAiExplorer(
-        Child $child
-    ): void {
+    protected function aiSafetyChampion(Child $child): array
+    {
         if (
-            $child->courseProgress()
-            ->where('completed', true)
-            ->count() >= 1
+            $child->lessonProgress()
+                ->whereHas('lesson', fn($q) =>
+                    $q->where('title', 'like', '%safety%')
+                )
+                ->where('completed', true)
+                ->exists()
         ) {
-            self::awardBadge(
-                $child,
-                'ai-explorer'
-            );
+            return array_filter([
+                $this->awardBadge($child, 'ai-safety-champion'),
+            ]);
         }
+
+        return [];
     }
 
-    protected static function checkPromptMaster(
-        Child $child
-    ): void {
-
-        $completed = $child
-            ->lessonProgress()
-            ->whereHas(
-                'lesson',
-                fn($q) =>
-                $q->where(
-                    'title',
-                    'like',
-                    '%prompt%'
-                )
-            )
-            ->where('completed', true)
-            ->exists();
-
-        if ($completed) {
-            self::awardBadge(
-                $child,
-                'prompt-master'
-            );
-        }
-    }
-
-    protected static function checkAiSafetyChampion(
-        Child $child
-    ): void {
-
-        $completed = $child
-            ->lessonProgress()
-            ->whereHas(
-                'lesson',
-                fn($q) =>
-                $q->where(
-                    'title',
-                    'like',
-                    '%safety%'
-                )
-            )
-            ->where('completed', true)
-            ->exists();
-
-        if ($completed) {
-            self::awardBadge(
-                $child,
-                'ai-safety-champion'
-            );
-        }
-    }
-
-    protected static function checkFutureInnovator(
-        Child $child
-    ): void {
+    protected function futureInnovator(Child $child): array
+    {
         if ($child->xp >= 500) {
-
-            self::awardBadge(
-                $child,
-                'future-innovator'
-            );
+            return array_filter([
+                $this->awardBadge($child, 'future-innovator'),
+            ]);
         }
+
+        return [];
     }
 
-    protected static function checkCriticalThinker(
-        Child $child
-    ): void {
-
-        $completedQuizzes = $child
-            ->activityProgress()
+    protected function criticalThinker(Child $child): array
+    {
+        $count = $child->activityProgress()
             ->where('completed', true)
-            ->whereHas(
-                'activity',
-                fn($q) =>
-                $q->where(
-                    'activity_type',
-                    'quiz'
-                )
+            ->whereHas('activity', fn($q) =>
+                $q->where('activity_type', 'quiz')
             )
             ->count();
 
-        if ($completedQuizzes >= 10) {
-
-            self::awardBadge(
-                $child,
-                'critical-thinker'
-            );
+        if ($count >= 10) {
+            return array_filter([
+                $this->awardBadge($child, 'critical-thinker'),
+            ]);
         }
+
+        return [];
     }
 
-    protected static function checkProblemSolver(
-        Child $child
-    ): void {
-
-        $completedProjects = $child
-            ->activityProgress()
+    protected function problemSolver(Child $child): array
+    {
+        $count = $child->activityProgress()
             ->where('completed', true)
-            ->whereHas(
-                'activity',
-                fn($q) =>
-                $q->where(
-                    'activity_type',
-                    'project'
-                )
+            ->whereHas('activity', fn($q) =>
+                $q->where('activity_type', 'project')
             )
             ->count();
 
-        if ($completedProjects >= 3) {
-
-            self::awardBadge(
-                $child,
-                'problem-solver'
-            );
+        if ($count >= 3) {
+            return array_filter([
+                $this->awardBadge($child, 'problem-solver'),
+            ]);
         }
+
+        return [];
     }
 
-    protected static function checkLearnQuestLegend(
-        Child $child
-    ): void {
-
-        if (
-            $child->badges()
-            ->count() >= 10
-        ) {
-            self::awardBadge(
-                $child,
-                'learnquest-legend'
-            );
+    protected function learnQuestLegend(Child $child): array
+    {
+        if ($child->badges()->count() >= 10) {
+            return array_filter([
+                $this->awardBadge($child, 'learnquest-legend'),
+            ]);
         }
+
+        return [];
     }
 
-    protected static function checkStreakBadges(
-        Child $child
-    ): void {
-
+    protected function streakBadges(Child $child): array
+    {
         $streak = $child->streak;
 
         if (! $streak) {
-            return;
+            return [];
         }
 
+        $awarded = [];
+
         if ($streak->current_streak >= 7) {
-            self::awardBadge(
-                $child,
-                '7-day-streak'
-            );
+            $awarded[] = $this->awardBadge($child, '7-day-streak');
         }
 
         if ($streak->current_streak >= 30) {
-            self::awardBadge(
-                $child,
-                '30-day-streak'
-            );
+            $awarded[] = $this->awardBadge($child, '30-day-streak');
         }
 
         if ($streak->current_streak >= 100) {
-            self::awardBadge(
-                $child,
-                '100-day-streak'
-            );
+            $awarded[] = $this->awardBadge($child, '100-day-streak');
         }
+
+        return array_filter($awarded);
     }
 }
