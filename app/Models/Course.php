@@ -24,7 +24,7 @@ class Course extends Model
 
     public function modules()
     {
-        return $this->hasMany(CourseModule::class);
+        return $this->hasMany(CourseModule::class)->orderBy('position');
     }
 
     public function courseProgress()

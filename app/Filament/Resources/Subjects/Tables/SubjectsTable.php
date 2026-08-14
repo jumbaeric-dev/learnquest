@@ -5,46 +5,71 @@ namespace App\Filament\Resources\Subjects\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables;
+use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Tables\Filters\TernaryFilter;
+
 class SubjectsTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->columns([
+
+                ImageColumn::make('cover_image')
+                    ->label('')
+                    ->square()
+                    ->defaultImageUrl(asset('images/world-placeholder.png')),
+
                 TextColumn::make('name')
+                    ->label('Learning World')
                     ->searchable()
                     ->sortable()
                     ->weight('bold'),
+
+                TextColumn::make('difficulty')
+                    ->badge()
+                    ->colors([
+                        'success' => 'beginner',
+                        'warning' => 'intermediate',
+                        'danger' => 'advanced',
+                    ]),
+
+                ColorColumn::make('theme_color')
+                    ->label('Theme'),
+
                 TextColumn::make('courses_count')
                     ->counts('courses')
                     ->label('Courses')
                     ->sortable(),
-                TextColumn::make('slug')
-                    ->badge(),
-                TextColumn::make('icon')
-                    ->searchable(),
-                IconColumn::make('is_active')
+
+                IconColumn::make('is_featured')
+                    ->label('Featured')
                     ->boolean(),
-                TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+
+                IconColumn::make('is_seasonal')
+                    ->label('Seasonal')
+                    ->boolean(),
+
+                IconColumn::make('is_active')
+                    ->label('Active')
+                    ->boolean(),
+
             ])
+
+            ->defaultSort('sort_order')
+
             ->filters([
-                TernaryFilter::make('is_active')
-                    ->label('Active'),
+
             ])
+
             ->recordActions([
                 EditAction::make(),
             ])
+
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

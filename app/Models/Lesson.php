@@ -26,7 +26,7 @@ class Lesson extends Model
 
     public function activities()
     {
-        return $this->hasMany(LessonActivity::class);
+        return $this->hasMany(LessonActivity::class)->orderBy('position');
     }
 
     public function progress()

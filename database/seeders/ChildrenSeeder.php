@@ -5,15 +5,17 @@ namespace Database\Seeders;
 use App\Models\Child;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class ChildrenSeeder extends Seeder
 {
     public function run(): void
     {
-        $parents = User::all();
+        $parents = User::role('parent')->get();
 
         if ($parents->isEmpty()) {
-            $this->command->warn('No users found. Seed users first.');
+            $this->command->warn('No parent users found. Seed parents first.');
 
             return;
         }
@@ -55,19 +57,51 @@ class ChildrenSeeder extends Seeder
 
         ];
 
-        foreach ($children as $child) {
+        foreach ($children as [$firstName, $lastName]) {
 
             $xp = rand(50, 5000);
 
+            $parent = $parents->random();
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create Child Login Account
+            |--------------------------------------------------------------------------
+            */
+
+            $user = User::create([
+
+                'name' => "{$firstName} {$lastName}",
+
+                'email' => Str::slug($firstName)
+                    . '.'
+                    . Str::lower(Str::random(5))
+                    . '@learnquest.test',
+
+                'password' => Hash::make('password'),
+
+            ]);
+
+            $user->assignRole('child');
+
+            /*
+            |--------------------------------------------------------------------------
+            | Create Child Profile
+            |--------------------------------------------------------------------------
+            */
+
             Child::create([
 
-                'parent_id' => $parents->random()->id,
+                'user_id' => $user->id,
 
-                'first_name' => $child[0],
+                'parent_id' => $parent->id,
 
-                'last_name' => $child[1],
+                'first_name' => $firstName,
 
-                'date_of_birth' => now()->subYears(rand(6, 14))
+                'last_name' => $lastName,
+
+                'date_of_birth' => now()
+                    ->subYears(rand(6, 14))
                     ->subDays(rand(0, 365)),
 
                 'avatar' => null,

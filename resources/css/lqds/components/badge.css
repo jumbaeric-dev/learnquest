@@ -1,0 +1,94 @@
+/*
+|--------------------------------------------------------------------------
+| LQDS Badge
+|--------------------------------------------------------------------------
+*/
+
+.lq-badge {
+    @apply inline-flex items-center justify-center;
+    @apply whitespace-nowrap;
+    @apply rounded-full;
+    @apply font-medium;
+    @apply transition-all duration-200;
+    @apply select-none;
+}
+
+.lq-badge__label {
+    @apply leading-none;
+}
+
+.lq-badge__icon {
+    @apply shrink-0;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Badge Sizes
+|--------------------------------------------------------------------------
+*/
+
+.lq-badge--sm {
+    @apply gap-1;
+    @apply px-2 py-1;
+    @apply text-xs;
+}
+
+.lq-badge--md {
+    @apply gap-1.5;
+    @apply px-3 py-1.5;
+    @apply text-sm;
+}
+
+.lq-badge--lg {
+    @apply gap-2;
+    @apply px-4 py-2;
+    @apply text-base;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Badge Variants
+|--------------------------------------------------------------------------
+*/
+
+.lq-badge--neutral {
+    @apply bg-slate-100 text-slate-700;
+}
+
+.lq-badge--primary {
+    @apply bg-sky-100 text-sky-700;
+}
+
+.lq-badge--success {
+    @apply bg-green-100 text-green-700;
+}
+
+.lq-badge--achievement {
+    @apply bg-amber-100 text-amber-800;
+}
+
+.lq-badge--locked {
+    @apply bg-slate-200 text-slate-500;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Focus States
+|--------------------------------------------------------------------------
+*/
+.lq-badge:focus-visible {
+    @apply outline-none;
+    @apply ring-2 ring-offset-2 ring-sky-500;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Motion States
+|--------------------------------------------------------------------------
+*/
+.lq-badge {
+    transition:
+        background-color 150ms ease,
+        color 150ms ease,
+        transform 150ms ease;
+}

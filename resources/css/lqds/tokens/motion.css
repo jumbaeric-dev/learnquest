@@ -1,0 +1,27 @@
+:root {
+
+
+    --lq-motion-fast:
+
+        150ms;
+
+
+
+    --lq-motion-normal:
+
+        200ms;
+
+
+
+    --lq-motion-slow:
+
+        300ms;
+
+
+
+    --lq-ease-standard:
+
+        ease;
+
+
+}

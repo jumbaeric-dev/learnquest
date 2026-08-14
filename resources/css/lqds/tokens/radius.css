@@ -1,0 +1,22 @@
+:root {
+
+    --lq-radius-sm:
+        .5rem;
+
+
+    --lq-radius-md:
+        .75rem;
+
+
+    --lq-radius-lg:
+        1rem;
+
+
+    --lq-radius-xl:
+        1.25rem;
+
+
+    --lq-radius-pill:
+        9999px;
+
+}

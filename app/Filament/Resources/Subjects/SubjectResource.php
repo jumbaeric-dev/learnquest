@@ -27,12 +27,12 @@ class SubjectResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Curriculum';
 
-    protected static ?string $navigationLabel = 'Subjects';
+    protected static ?string $navigationLabel = 'Subjects - Learning Worlds';
 
     protected static ?int $navigationSort = 1;
     protected static ?string $model = Subject::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
     protected static ?string $recordTitleAttribute = 'Subject';
 

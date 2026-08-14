@@ -44,6 +44,11 @@ class User extends Authenticatable implements FilamentUser
         ]);
     }
 
+    public function child()
+    {
+        return $this->hasOne(Child::class);
+    }
+
     public function isAdmin(): bool
     {
         return $this->hasRole('admin');

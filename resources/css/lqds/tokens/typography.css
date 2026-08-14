@@ -1,0 +1,38 @@
+:root {
+
+
+    --lq-font-family:
+
+        Inter,
+        system-ui,
+        sans-serif;
+
+
+
+    --lq-heading-xl:
+
+        2rem;
+
+
+    --lq-heading-lg:
+
+        1.5rem;
+
+
+    --lq-heading-md:
+
+        1.25rem;
+
+
+
+    --lq-body:
+
+        1rem;
+
+
+    --lq-small:
+
+        .875rem;
+
+
+}

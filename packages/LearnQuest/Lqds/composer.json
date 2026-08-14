@@ -1,0 +1,19 @@
+{
+    "name": "learnquest/lqds",
+    "description": "LearnQuest Design System",
+    "type": "library",
+    "autoload": {
+        "psr-4": {
+            "LearnQuest\\Lqds\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LearnQuest\\Lqds\\LqdsServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "require": {}
+}

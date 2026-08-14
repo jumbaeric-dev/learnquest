@@ -1,0 +1,59 @@
+/*
+|--------------------------------------------------------------------------
+| LQDS Section Title
+|--------------------------------------------------------------------------
+*/
+
+
+.lq-section-title {
+
+    @apply flex flex-col;
+
+}
+
+
+.lq-section-title__heading {
+
+    @apply font-bold;
+
+}
+
+
+.lq-section-title__subtitle {
+
+    @apply mt-1;
+
+    @apply text-slate-600;
+
+}
+
+
+.lq-section-title--sm 
+.lq-section-title__heading {
+    @apply text-lg;
+}
+
+
+.lq-section-title--md 
+.lq-section-title__heading {
+    @apply text-xl;
+}
+
+
+.lq-section-title--lg 
+.lq-section-title__heading {
+    @apply text-2xl;
+}
+
+.lq-section-title--center {
+
+    @apply items-center text-center;
+
+}
+
+
+.lq-section-title--left {
+
+    @apply items-start text-left;
+
+}

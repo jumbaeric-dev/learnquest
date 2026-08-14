@@ -1,0 +1,99 @@
+/*
+|--------------------------------------------------------------------------
+| LQDS Button
+|--------------------------------------------------------------------------
+*/
+
+.lq-button {
+    @apply inline-flex items-center justify-center;
+    @apply gap-2;
+    @apply rounded-xl;
+    @apply font-semibold;
+    @apply transition-all duration-200;
+    @apply whitespace-nowrap;
+    @apply select-none;
+    @apply cursor-pointer;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Sizes
+|--------------------------------------------------------------------------
+*/
+
+.lq-button--sm {
+    @apply px-3 py-2;
+    @apply text-sm;
+    min-height: 36px;
+}
+
+.lq-button--md {
+    @apply px-5 py-3;
+    @apply text-base;
+    min-height: 44px;
+}
+
+.lq-button--lg {
+    @apply px-6 py-4;
+    @apply text-lg;
+    min-height: 52px;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Primary
+|--------------------------------------------------------------------------
+*/
+
+.lq-button--primary {
+    @apply bg-sky-600 text-white;
+}
+
+.lq-button--primary:hover:not(:disabled) {
+    @apply bg-sky-700;
+}
+
+.lq-button--primary:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Secondary
+|--------------------------------------------------------------------------
+*/
+
+.lq-button--secondary {
+    @apply bg-white text-slate-700;
+    @apply border border-slate-300;
+}
+
+.lq-button--secondary:hover:not(:disabled) {
+    @apply bg-slate-100;
+}
+
+.lq-button--secondary:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Disabled
+|--------------------------------------------------------------------------
+*/
+
+.lq-button:disabled {
+    @apply opacity-50;
+    @apply cursor-not-allowed;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Focus
+|--------------------------------------------------------------------------
+*/
+
+.lq-button:focus-visible {
+    @apply outline-none;
+    @apply ring-2 ring-sky-500 ring-offset-2;
+}

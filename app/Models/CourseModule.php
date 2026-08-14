@@ -26,6 +26,6 @@ class CourseModule extends Model
 
     public function lessons()
     {
-        return $this->hasMany(Lesson::class, Lesson::FOREIGN_KEY);
+        return $this->hasMany(Lesson::class, Lesson::FOREIGN_KEY)->orderBy('position');
     }
 }
