@@ -1,17 +1,15 @@
 <x-child.layout.app-shell theme="sky">
-    <!-- <div class="min-h-screen pb-24">
 
-        <div class="space-y-6"> -->
+    <x-child.layout.section-stack spacing="relaxed">
 
-            <x-child.explore.explore-header />
+        <x-child.explore.explore-header />
 
-            <livewire:child.explore.components.featured-adventure />
+        <livewire:child.explore.components.featured-adventure />
 
-            <livewire:child.explore.components.learning-worlds />
+        <livewire:child.explore.components.learning-worlds />
 
-            <livewire:child.explore.components.recommended-lessons />
+        <livewire:child.explore.components.recommended-lessons />
 
-        <!-- </div>
+    </x-child.layout.section-stack>
 
-    </div> -->
 </x-child.layout.app-shell>

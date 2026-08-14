@@ -1,21 +1,23 @@
 <x-child.layout.app-shell theme="space">
 
-    <x-child.worlds.world-hero
-        :hero="$world['hero']"
-    />
+    <x-child.layout.section-stack>
 
-    @if($world['journey'])
+        <x-child.worlds.world-hero
+            :hero="$world['hero']" />
+
+        <livewire:child.worlds.components.adventure-path />
+
+        <!-- @if($world['journey'])
         <x-child.worlds.continue-journey
-            :journey="$world['journey']"
-        />
-    @endif
+            :journey="$world['journey']" />
+        @endif
 
-    <x-child.worlds.world-progress
-        :progress="$world['progress']"
-    />
+        <x-child.worlds.world-progress
+            :progress="$world['progress']" />
 
-    <x-child.worlds.course-grid
-        :courses="$world['courses']"
-    />
+        <x-child.worlds.course-grid
+            :courses="$world['courses']" /> -->
+
+    </x-child.layout.section-stack>
 
 </x-child.layout.app-shell>

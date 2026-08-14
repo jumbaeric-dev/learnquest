@@ -16,6 +16,9 @@ Route::get('/', function () {
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::get('/child', Dashboard::class)
+        ->name('child');
+
     Route::get('/child/my-universe', Dashboard::class)
         ->name('child.dashboard');
 

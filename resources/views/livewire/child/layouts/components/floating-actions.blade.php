@@ -1,6 +1,6 @@
 <div
     x-data="{ open: false }"
-    class="fixed bottom-28 right-6 z-[100]">
+    class="fixed bottom-16 right-5 z-[100]">
 
     {{-- Actions --}}
     <div

@@ -16,7 +16,7 @@ class Background extends Component
     {
         return match ($this->theme) {
 
-            'space' => 'from-slate-900 via-indigo-900 to-purple-900',
+            'space' => 'from-slate-950 via-indigo-950 to-violet-950',
 
             'forest' => 'from-green-100 via-emerald-50 to-lime-100',
 
