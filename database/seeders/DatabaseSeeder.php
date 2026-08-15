@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $admin->syncRoles(['admin']);
+        $admin->syncRoles(['admin','parent']);
 
         $contentCreator = User::firstOrCreate(
             ['email' => 'creator@learnquest.test'],
