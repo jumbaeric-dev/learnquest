@@ -5,87 +5,126 @@ namespace App\Services\Progress;
 use App\Models\ActivityProgress;
 use App\Models\Child;
 use App\Models\LessonActivity;
-use App\Services\AchievementService;
-use App\Services\StreakService;
+use InvalidArgumentException;
 
 class ActivityProgressService
 {
-    public function __construct(
-        protected StreakService $streakService,
-        protected AchievementService $achievementService,
-        protected SkillProgressService $skillProgressService,
-        protected LessonProgressService $lessonProgressService,
-        protected CourseProgressService $courseProgressService,
-    ) {}
+    /**
+     * Get existing progress for a child/activity pair.
+     */
+    public function getProgress(
+        Child $child,
+        LessonActivity $activity
+    ): ?ActivityProgress {
+        return $child
+            ->activityProgress()
+            ->where('activity_id', $activity->id)
+            ->first();
+    }
 
     /**
      * Record or update a child's progress for an activity.
+     *
+     * This service owns activity-level state only.
+     *
+     * It does NOT:
+     * - award XP
+     * - update skill progress
+     * - update lesson progress
+     * - update course progress
+     * - update streaks
+     * - award badges
+     * - award achievements
+     *
+     * Those responsibilities belong to the learning
+     * orchestration layer and their respective services.
      */
     public function complete(
         Child $child,
         LessonActivity $activity,
         int $score
     ): ActivityProgress {
-        $completed = $score >= config('learnquest.activity_pass_score');
+        $this->validateScore($score);
 
-        $progress = ActivityProgress::updateOrCreate(
-            [
-                'child_id' => $child->id,
-                'activity_id' => $activity->id,
-            ],
-            [
-                'completed' => $completed,
-                'score' => $score,
-                'xp_earned' => $completed ? $activity->xp_reward : 0,
-                'completed_at' => $completed ? now() : null,
-            ]
-        );
+        $progress = $child
+            ->activityProgress()
+            ->where('activity_id', $activity->id)
+            ->first();
 
-        if ($completed && ($progress->wasRecentlyCreated || $progress->wasChanged('completed'))) {
-            $child->addXp($activity->xp_reward);
-            $this->skillProgressService->awardFromActivity($child, $activity);
-            $this->streakService->recordActivity($child);
+        /*
+         * Completion is permanent.
+         *
+         * Once the activity has transitioned to completed,
+         * later attempts cannot modify the completion state.
+         *
+         * Most importantly, returning the existing row allows
+         * the orchestration layer to distinguish an existing
+         * completion from a newly-created completion event.
+         */
+        if ($progress?->completed) {
+            return $progress->refresh();
         }
 
-        $lesson = $activity->lesson;
+        $completed = $this->isPassing($score);
 
-        if ($lesson) {
-            $this->lessonProgressService->update($child, $lesson);
-
-            $course = $lesson->module?->course;
-
-            if ($course) {
-                $this->courseProgressService->update($child, $course);
-            }
-        }
-
-        $this->achievementService->evaluate($child);
-
-        return $progress;
-    }
-
-    public function record(Child $child, $activity, int $score)
-    {
         return $child->activityProgress()->updateOrCreate(
             [
                 'activity_id' => $activity->id,
             ],
             [
-                'completed' => true,
+                'completed' => $completed,
                 'score' => $score,
-                'xp_earned' => $this->calculateXp($score),
-                'completed_at' => now(),
+                'xp_earned' => $completed
+                    ? $this->xpRewardFor($activity)
+                    : 0,
+                'completed_at' => $completed
+                    ? now()
+                    : null,
             ]
         );
     }
 
-    protected function calculateXp(int $score): int
+    /**
+     * Determine whether a score passes the configured threshold.
+     */
+    public function isPassing(int $score): bool
     {
-        $passScore = config('learnquest.activity_pass_score');
-
-        return $score >= $passScore
-            ? config('learnquest.activity_completion_xp', 25)
-            : 5;
+        return $score >= (int) config(
+            'learnquest.activity_pass_score',
+            70
+        );
     }
 
+    /**
+     * Get the XP reward associated with an activity.
+     *
+     * Activity-specific reward takes precedence.
+     * Application-level default is used as fallback.
+     */
+    public function xpRewardFor(
+        LessonActivity $activity
+    ): int {
+        $reward = $activity->xp_reward;
+
+        if ($reward === null) {
+            return (int) config(
+                'learnquest.activity_completion_xp',
+                25
+            );
+        }
+
+        return max(0, (int) $reward);
+    }
+
+    /**
+     * Validate the submitted activity score.
+     */
+    protected function validateScore(int $score): void
+    {
+        if ($score < 0 || $score > 100) {
+            throw new InvalidArgumentException(
+                'Activity score must be between 0 and 100.'
+            );
+        }
+    }
 }

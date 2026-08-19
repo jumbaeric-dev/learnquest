@@ -10,7 +10,20 @@ use App\Models\LessonProgress;
 class LessonProgressService
 {
     /**
-     * Recalculate lesson progress for a child.
+     * Recalculate and persist a child's progress for a lesson.
+     *
+     * This service owns lesson-progress state only.
+     *
+     * It does NOT:
+     * - award XP
+     * - update course progress
+     * - update skill progress
+     * - update streaks
+     * - award badges
+     * - award achievements
+     *
+     * Those responsibilities belong to the appropriate
+     * orchestration/domain services.
      */
     public function update(
         Child $child,
@@ -39,7 +52,7 @@ class LessonProgressService
             $totalActivities > 0 &&
             $completedActivities === $totalActivities;
 
-        $progress = LessonProgress::updateOrCreate(
+        return LessonProgress::updateOrCreate(
             [
                 'child_id' => $child->id,
                 'lesson_id' => $lesson->id,
@@ -49,45 +62,41 @@ class LessonProgressService
                 'total_activities' => $totalActivities,
                 'progress_percentage' => $progressPercentage,
                 'completed' => $completed,
-                'completed_at' => $completed ? now() : null,
+                'completed_at' => $completed
+                    ? now()
+                    : null,
             ]
         );
-
-        if ($progress->completed && $progress->wasChanged('completed')) {
-            $child->addXp($lesson->xp_reward);
-        }
-
-        return $progress;
     }
 
-    public function updateFromActivity(Child $child, $activity)
-    {
-        $lesson = $activity->lesson;
-
-        $total = $lesson->activities()->count();
-
-        $completed = $child->activityProgress()
-            ->whereHas('activity', function ($q) use ($lesson) {
-                $q->where('lesson_id', $lesson->id);
-            })
-            ->where('completed', true)
-            ->count();
-
-        $percentage = $total > 0
-            ? ($completed / $total) * 100
-            : 0;
-
-        return $child->lessonProgress()->updateOrCreate(
-            [
-                'lesson_id' => $lesson->id,
-            ],
-            [
-                'completed_activities' => $completed,
-                'total_activities' => $total,
-                'progress_percentage' => $percentage,
-                'completed' => $percentage >= 100,
-                'completed_at' => $percentage >= 100 ? now() : null,
-            ]
+    /**
+     * Recalculate lesson progress from an activity.
+     *
+     * Kept as a compatibility wrapper for existing callers.
+     *
+     * This method does not contain a second implementation of the
+     * progress calculation. The canonical implementation is update().
+     */
+    public function updateFromActivity(
+        Child $child,
+        $activity
+    ): LessonProgress {
+        return $this->update(
+            $child,
+            $activity->lesson
         );
+    }
+
+    /**
+     * Determine whether the lesson has been completed.
+     */
+    public function isCompleted(
+        Child $child,
+        Lesson $lesson
+    ): bool {
+        return LessonProgress::query()
+            ->where('child_id', $child->id)
+            ->where('lesson_id', $lesson->id)
+            ->value('completed') ?? false;
     }
 }

@@ -3603,7 +3603,7 @@
             "dist": {
                 "type": "path",
                 "url": "packages/LearnQuest/Lqds",
-                "reference": "d738dc51c1a1545c2041db65c3726b2a4544dfee"
+                "reference": "fe429f12e7099f7a7f043cd448e30c91816fb909"
             },
             "type": "library",
             "extra": {
@@ -12050,5 +12050,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

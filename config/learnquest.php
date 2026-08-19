@@ -59,6 +59,40 @@ return [
 
     'future_readiness_max_score' => 100,
 
+    'future_readiness' => [
+
+    'levels' => [
+        [
+            'min_score' => 90,
+            'title' => 'Future Ready',
+        ],
+        [
+            'min_score' => 75,
+            'title' => 'Visionary',
+        ],
+        [
+            'min_score' => 60,
+            'title' => 'Creator',
+        ],
+        [
+            'min_score' => 45,
+            'title' => 'Builder',
+        ],
+        [
+            'min_score' => 25,
+            'title' => 'Innovator',
+        ],
+        [
+            'min_score' => 0,
+            'title' => 'Explorer',
+        ],
+    ],
+
+    'strongest_skills_limit' => 5,
+
+    'weakest_skills_limit' => 5,
+],
+
     /*
     |--------------------------------------------------------------------------
     | AI Tutor

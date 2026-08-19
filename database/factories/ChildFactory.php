@@ -15,8 +15,11 @@ class ChildFactory extends Factory
 
     public function definition(): array
     {
+        $user = User::factory();
+
         return [
-            'parent_id' => User::factory(),
+            'user_id' => $user,
+            'parent_id' => $user,
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'date_of_birth' => fake()->date(),

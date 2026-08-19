@@ -29,40 +29,64 @@ class SkillProgressService
             ]
         );
 
-        $progress->xp += $xp;
+        $maxXp = (int) config(
+            'learnquest.max_skill_xp',
+            1000
+        );
 
-        $progress->level = floor(
-            $progress->xp / config('learnquest.xp_per_level')
-        ) + 1;
+        $progress->xp = min(
+            $maxXp,
+            $progress->xp + max(0, $xp)
+        );
+
+        $xpPerLevel = (int) config(
+            'learnquest.xp_per_level',
+            100
+        );
+
+        $progress->level = max(
+            1,
+            (int) floor($progress->xp / $xpPerLevel) + 1
+        );
 
         $progress->progress_percentage = min(
+            100,
             round(
-                (
-                    $progress->xp /
-                    config('learnquest.max_skill_xp')
-                ) * 100,
+                ($progress->xp / $maxXp) * 100,
                 2
-            ),
-            100
+            )
         );
 
         $progress->save();
 
-        return $progress;
+        return $progress->refresh();
     }
 
     /**
      * Award skill XP based on activity completion.
+     *
+     * Returns the affected skill progress records so the
+     * learning engine can expose them in its result.
+     *
+     * @return array<int, ChildSkillProgress>
      */
     public function awardFromActivity(
         Child $child,
         LessonActivity $activity
-    ): void {
+    ): array {
         $activity->loadMissing('skills');
 
+        $progress = [];
+
         foreach ($activity->skills as $skill) {
-            $this->awardXp($child, $skill, $activity->xp_reward);
+            $progress[] = $this->awardXp(
+                $child,
+                $skill,
+                $activity->xp_reward
+            );
         }
+
+        return $progress;
     }
 
     /**
@@ -90,34 +114,27 @@ class SkillProgressService
         )->progress_percentage >= 100;
     }
 
-    public function updateFromActivity(Child $child, $activity)
-    {
+    /**
+     * Update skill progress from an activity.
+     *
+     * Kept as the orchestration-facing method, but delegates
+     * to the canonical awardXp() implementation.
+     */
+    public function updateFromActivity(
+        Child $child,
+        LessonActivity $activity
+    ): bool {
+        $activity->loadMissing('skills');
+
         foreach ($activity->skills as $skill) {
-
-            $progress = $child->skillProgress()->updateOrCreate(
-                [
-                    'skill_id' => $skill->id,
-                ],
-                [
-                    'xp' => 0,
-                    'level' => 1,
-                ]
+            $this->awardXp(
+                $child,
+                $skill,
+                $activity->xp_reward ?? config(
+                    'learnquest.activity_completion_xp',
+                    25
+                )
             );
-
-            $progress->increment(
-                'xp',
-                $activity->xp_reward ?? 10
-            );
-
-            $maxXp = config('learnquest.max_skill_xp');
-
-            if ($progress->xp > $maxXp) {
-                $progress->xp = $maxXp;
-            }
-
-            $progress->level = (int) ceil($progress->xp / 200);
-
-            $progress->save();
         }
 
         return true;

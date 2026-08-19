@@ -1,115 +1,173 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Progress;
 
 use App\Models\Child;
 use App\Models\LessonActivity;
-use App\Services\Progress\ActivityProgressService;
-use App\Services\Progress\CourseProgressService;
-use App\Services\Progress\LessonProgressService;
-use App\Services\Progress\SkillProgressService;
+use App\Services\AchievementService;
+use App\Services\BadgeService;
+use App\Services\FutureReadinessService;
+use App\Services\LevelService;
+use App\Services\StreakService;
+use App\Services\XPService;
 use Illuminate\Support\Facades\DB;
 
 class LearningEngineService
 {
-    public function __construct(
-        protected ActivityProgressService $activityProgressService,
-        protected LessonProgressService $lessonProgressService,
-        protected CourseProgressService $courseProgressService,
-        protected SkillProgressService $skillProgressService,
-        protected XPService $xpService,
-        protected LevelService $levelService,
-        protected StreakService $streakService,
-        protected BadgeService $badgeService,
-        protected AchievementService $achievementService,
-        protected FutureReadinessService $futureReadinessService,
-    ) {}
+  public function __construct(
+    protected ActivityProgressService $activityProgressService,
+    protected LessonProgressService $lessonProgressService,
+    protected CourseProgressService $courseProgressService,
+    protected SkillProgressService $skillProgressService,
+    protected XPService $xpService,
+    protected LevelService $levelService,
+    protected StreakService $streakService,
+    protected BadgeService $badgeService,
+    protected AchievementService $achievementService,
+    protected FutureReadinessService $futureReadinessService
+  ) {
+  }
 
-    /**
-     * MAIN ENTRY POINT
-     */
-    public function completeActivity(
-        Child $child,
-        LessonActivity $activity,
-        int $score
-    ): array {
-        return DB::transaction(function () use ($child, $activity, $score) {
+  /**
+   * Main learning orchestration entry point.
+   */
+  public function completeActivity(
+    Child $child,
+    LessonActivity $activity,
+    int $score
+  ): array {
+    return DB::transaction(function () use ($child, $activity, $score) {
+      /*
+       * Lock the child row for the duration of the
+       * progression transaction.
+       *
+       * This serializes competing learning events for
+       * the same child.
+       *
+       * SQLite does not provide the same row-lock semantics
+       * as MySQL/PostgreSQL, but the query remains portable
+       * and the transaction gives us the correct production
+       * behavior on row-locking databases.
+       */
+      $child = Child::query()
+        ->whereKey($child->id)
+        ->lockForUpdate()
+        ->firstOrFail();
 
-            // --------------------------------------------------
-            // 1. ACTIVITY PROGRESS
-            // --------------------------------------------------
-            $activityProgress = $this->activityProgressService
-                ->record($child, $activity, $score);
+      // Determine whether this call creates a new completion event.
+      $existingProgress = $this->activityProgressService->getProgress(
+        $child,
+        $activity
+      );
 
-            // --------------------------------------------------
-            // 2. LESSON PROGRESS
-            // --------------------------------------------------
-            $lessonProgress = $this->lessonProgressService
-                ->updateFromActivity($child, $activity);
+      $wasAlreadyCompleted = $existingProgress?->completed === true;
 
-            // --------------------------------------------------
-            // 3. COURSE PROGRESS
-            // --------------------------------------------------
-            $courseProgress = $this->courseProgressService
-                ->updateFromLesson($child, $activity->lesson);
+      /*
+       * 1. Activity progress
+       */
+      $activityProgress = $this->activityProgressService->complete(
+        $child,
+        $activity,
+        $score
+      );
 
-            // --------------------------------------------------
-            // 4. SKILL PROGRESS
-            // --------------------------------------------------
-            $skillProgress = $this->skillProgressService
-                ->updateFromActivity($child, $activity);
+      $justCompleted = $activityProgress->completed && !$wasAlreadyCompleted;
+      /*
+       * 2. Lesson progress
+       */
+      $lessonProgress = $this->lessonProgressService->update(
+        $child,
+        $activity->lesson
+      );
 
-            // --------------------------------------------------
-            // 5. STREAK
-            // --------------------------------------------------
-            $streak = $this->streakService
-                ->recordActivity($child);
+      /*
+       * 3. Course progress
+       */
+      $courseProgress = $this->courseProgressService->update(
+        $child,
+        $activity->lesson->module->course
+      );
 
-            // --------------------------------------------------
-            // 6. XP
-            // --------------------------------------------------
-            $this->xpService->awardForActivity($child);
+      /*
+       * 4. Skill progress
+       *
+       * Skill progress is only awarded for successful
+       * activity completion.
+       */
+      $skillProgress = [];
 
-            // --------------------------------------------------
-            // 7. LEVEL
-            // --------------------------------------------------
-            $levelResult = $this->levelService->update($child);
+      if ($justCompleted) {
+        $skillProgress = $this->skillProgressService->awardFromActivity(
+          $child,
+          $activity
+        );
+      }
 
-            // --------------------------------------------------
-            // 8. BADGES
-            // --------------------------------------------------
-            $badges = $this->badgeService->evaluate($child);
+      /*
+       * 5. Streak
+       */
+      $streak = null;
 
-            // --------------------------------------------------
-            // 9. ACHIEVEMENTS
-            // --------------------------------------------------
-            $achievements = $this->achievementService->evaluate($child);
+      if ($justCompleted) {
+        $streak = $this->streakService->recordActivity($child);
+      }
 
-            // --------------------------------------------------
-            // 10. FUTURE READINESS
-            // --------------------------------------------------
-            $futureReadiness = $this->futureReadinessService
-                ->build($child);
+      /*
+       * 6. Child XP
+       *
+       * This is the canonical XP reward for completing an
+       * activity. It is intentionally configuration-driven.
+       *
+       * The activity's xp_reward belongs to the activity/
+       * skill progression system and should not determine
+       * the global child completion XP.
+       */
+      if ($justCompleted) {
+        $completionXp = $this->activityProgressService->xpRewardFor($activity);
 
-            // --------------------------------------------------
-            // RETURN SUMMARY
-            // --------------------------------------------------
-            return [
-                'activity_progress' => $activityProgress,
-                'lesson_progress' => $lessonProgress,
-                'course_progress' => $courseProgress,
-                'skill_progress' => $skillProgress,
+        $this->xpService->award($child, $completionXp);
+      }
 
-                'streak' => $streak,
+      /*
+       * 7. Level
+       */
+      $levelResult = $this->levelService->update($child);
 
-                'xp' => $child->xp,
-                'level' => $levelResult,
+      /*
+       * 8. Badges
+       *
+       * Badge evaluation happens after XP and level updates
+       * so XP/level-based badges can become eligible
+       * immediately.
+       */
+      $badges = $this->badgeService->evaluate($child);
 
-                'badges' => $badges,
-                'achievements' => $achievements,
+      /*
+       * 9. Achievements
+       */
+      $achievements = $this->achievementService->evaluate($child);
 
-                'future_readiness' => $futureReadiness,
-            ];
-        });
-    }
+      /*
+       * 10. Future readiness
+       */
+      $futureReadiness = $this->futureReadinessService->build($child);
+
+      return [
+        "activity_progress" => $activityProgress,
+        "lesson_progress" => $lessonProgress,
+        "course_progress" => $courseProgress,
+        "skill_progress" => $skillProgress,
+
+        "streak" => $streak,
+
+        "xp" => $child->fresh()->xp,
+        "level" => $levelResult,
+
+        "badges" => $badges,
+        "achievements" => $achievements,
+
+        "future_readiness" => $futureReadiness,
+      ];
+    });
+  }
 }
