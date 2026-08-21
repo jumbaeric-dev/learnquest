@@ -3,6 +3,7 @@
 namespace App\Livewire\Child\Missions;
 
 use Livewire\Component;
+use App\Services\Child\Context\CurrentChildService;
 use App\Services\Child\Learning\MissionDiscoveryService;
 
 class Index extends Component
@@ -12,6 +13,13 @@ class Index extends Component
     protected $listeners = [
         'mission-category-selected' => 'changeCategory',
     ];
+
+    public function mount(CurrentChildService $currentChild): void
+    {
+        if (! $currentChild->current()) {
+            abort(403);
+        }
+    }
 
     public function render()
     {

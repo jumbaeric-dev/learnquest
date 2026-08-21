@@ -69,17 +69,16 @@ class FutureReadinessService
   {
     $score = self::calculateScore($child);
 
-    $levels = config("learnquest.future_readiness.levels", []);
+    $levels = collect(config("learnquest.future_readiness.levels", []));
 
-    foreach ($levels as $level) {
-      if ($score >= $level["min_score"]) {
-        return $level["title"];
-      }
-    }
+    $matchingLevel = $levels
+      ->filter(fn($level) => $score >= (float) $level["min_score"])
+      ->sortByDesc("min_score")
+      ->first();
 
-    return "Explorer";
+    return $matchingLevel["title"] ?? "Explorer";
   }
-
+  
   /**
    * Strongest skills for a specific child.
    *

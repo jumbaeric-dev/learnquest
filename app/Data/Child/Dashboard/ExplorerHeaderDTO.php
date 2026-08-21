@@ -11,7 +11,7 @@ final readonly class ExplorerHeaderDTO extends DTO
         public ?string $avatar,
         public int $level,
         public int $xp,
-        public int $nextLevelXp,
+        public ?int $nextLevelXp,
         public int $xpPercentage,
         public int $futureReadiness,
         public int $streak,
