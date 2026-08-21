@@ -269,7 +269,7 @@ class ChildLearningActivityTest extends TestCase
         [, , , $activity] = $this->createActivity();
 
         $this->get("/learn/activity/{$activity->id}")
-            ->assertForbidden();
+            ->assertRedirect("/login");
     }
 
     public function test_authenticated_user_without_child_cannot_access_activity(): void

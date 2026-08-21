@@ -83,22 +83,26 @@ class EnsureChildContextTest extends TestCase
     }
   }
 
-  public function test_guest_is_forbidden_by_child_context(): void
+  public function test_guest_is_redirected_to_login(): void
   {
     $request = Request::create("/child/my-universe", "GET");
 
     $middleware = app(EnsureChildContext::class);
 
-    try {
-      $middleware->handle(
-        $request,
-        fn(Request $request) => response("should not be reached"),
-        app(CurrentChildService::class)
-      );
+    $response = $middleware->handle(
+      $request,
+      fn(Request $request) => response("should not be reached"),
+      app(CurrentChildService::class)
+    );
 
-      $this->fail("Expected EnsureChildContext to reject a guest.");
-    } catch (HttpException $exception) {
-      $this->assertSame(Response::HTTP_FORBIDDEN, $exception->getStatusCode());
-    }
+    $this->assertSame(
+      Response::HTTP_FOUND,
+      $response->getStatusCode()
+    );
+
+    $this->assertSame(
+      route("login"),
+      $response->headers->get("Location")
+    );
   }
 }
