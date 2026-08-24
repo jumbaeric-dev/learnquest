@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Child extends Model
 {
   use HasFactory;
-  protected $appends = ["full_name", "future_readiness_score"];
+  protected $appends = ["full_name"];
   protected $fillable = [
     "user_id",
     "parent_id",
@@ -136,7 +136,22 @@ class Child extends Model
 
   public function getFutureReadinessScoreAttribute(): float
   {
+    if (! $this->relationLoaded('skillProgress')) {
+      $this->load('skillProgress');
+    }
+
     return FutureReadinessService::calculateScore($this);
+  }
+
+  /**
+   * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
+   * @return \Illuminate\Database\Eloquent\Builder<self>
+   */
+  public function scopeOrderByFutureReadiness($query, string $direction = 'desc')
+  {
+    return $query
+      ->withAvg('skillProgress as future_readiness_avg', 'progress_percentage')
+      ->orderBy('future_readiness_avg', $direction);
   }
 
   public function strongestSkills(int $limit = 3)

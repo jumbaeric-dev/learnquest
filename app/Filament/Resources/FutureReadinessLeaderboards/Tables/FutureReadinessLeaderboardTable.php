@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\FutureReadinessLeaderboards\Tables;
 
 use App\Models\Child;
+use App\Services\FutureReadinessService;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -12,39 +13,30 @@ class FutureReadinessLeaderboardTable
         Table $table
     ): Table {
         return $table
-            ->defaultSort('xp', 'desc')
+            ->defaultSort('future_readiness_avg', 'desc')
             ->columns([
-
                 TextColumn::make('rank')
                     ->label('#')
-                    ->state(function ($record) {
-
-                        return \App\Models\Child::all()
-                            ->sortByDesc(
-                                fn($child) =>
-                                $child->future_readiness_score
-                            )
-                            ->values()
-                            ->search(
-                                fn($child) =>
-                                $child->id === $record->id
-                            ) + 1;
-                    }),
+                    ->rowIndex(isFromZero: false),
 
                 TextColumn::make('full_name')
                     ->label('Learner')
                     ->searchable(),
 
-                TextColumn::make('future_readiness_score')
+                TextColumn::make('future_readiness_avg')
                     ->label('Future Readiness')
+                    ->formatStateUsing(fn (?float $state): string => (string) round($state ?? 0, 1))
                     ->suffix('%')
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('xp')
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('level')
-                    ->badge(),
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('badges_count')
                     ->counts('badges')
@@ -53,8 +45,7 @@ class FutureReadinessLeaderboardTable
                 TextColumn::make('strongest_skill')
                     ->label('Strongest Skill')
                     ->state(
-                        fn(Child $record) =>
-                        \App\Services\FutureReadinessService::strongestSkill($record)
+                        fn (Child $record): ?string => FutureReadinessService::strongestSkill($record)
                     )
                     ->badge()
                     ->color('success'),
@@ -62,8 +53,7 @@ class FutureReadinessLeaderboardTable
                 TextColumn::make('weakest_skill')
                     ->label('Weakest Skill')
                     ->state(
-                        fn(Child $record) =>
-                        \App\Services\FutureReadinessService::weakestSkill($record)
+                        fn (Child $record): ?string => FutureReadinessService::weakestSkill($record)
                     )
                     ->badge()
                     ->color('warning'),

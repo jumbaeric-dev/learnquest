@@ -22,6 +22,7 @@ use App\Models\Child;
 use App\Services\Child\Learning\LearningJourneyService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
+use App\Services\FutureReadinessService;
 use App\Services\LevelService;
 
 class UniverseDashboardService
@@ -112,7 +113,7 @@ class UniverseDashboardService
 
       xpPercentage: $percentage,
 
-      futureReadiness: (int) round($child->future_readiness_score),
+      futureReadiness: (int) round(FutureReadinessService::calculateScore($child)),
 
       streak: $child->streak?->current_streak ?? 0
     );

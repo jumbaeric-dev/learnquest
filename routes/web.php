@@ -1,25 +1,24 @@
 <?php
 
+use App\Http\Controllers\Auth\ChildLoginController;
 use App\Livewire\Child\Dashboard\Index as Dashboard;
 use App\Livewire\Child\Explore\Index as Explore;
+use App\Livewire\Child\Learning\Activity as LearningActivity;
+use App\Livewire\Child\Learning\Course as LearningCourse;
+use App\Livewire\Child\Learning\Lesson as LearningLesson;
 use App\Livewire\Child\Missions\Index as Missions;
 use App\Livewire\Child\Missions\Journey\Show as MissionJourneyShow;
 use App\Livewire\Child\Worlds\Show as SubjectsWorld;
-use App\Livewire\Child\Learning\Course as LearningCourse;
-use App\Livewire\Child\Learning\Lesson as LearningLesson;
-use App\Livewire\Child\Learning\Activity as LearningActivity;
 use Illuminate\Support\Facades\Route;
 
 Route::get("/", function () {
   return view("welcome");
 });
 
-Route::get("/login", function () {
-  return view("login");
-})->name("login");
-
-Route::get("/register", function () {
-  return view("register");
+// Guest Login Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [ChildLoginController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [ChildLoginController::class, 'login']);
 });
 
 /*

@@ -38,6 +38,18 @@ class ChildLearningCourseTest extends TestCase
       "is_published" => true,
     ]);
 
+    // The course must be the child's active learning journey
+    // course for LearningContentAccessService to allow access.
+    CourseProgress::create([
+      "child_id" => $child->id,
+      "course_id" => $course->id,
+      "completed_lessons" => 0,
+      "total_lessons" => 1,
+      "progress_percentage" => 0,
+      "completed" => false,
+      "completed_at" => null,
+    ]);
+
     $this->actingAs($user)
       ->get(route("learn.course", $course))
       ->assertOk()
@@ -132,6 +144,19 @@ class ChildLearningCourseTest extends TestCase
       "completed_at" => now(),
     ]);
 
+    // The acting child needs their own (fresh) progress row for
+    // the course to resolve as their current course — this is
+    // what the test is actually verifying stays isolated.
+    CourseProgress::create([
+      "child_id" => $child->id,
+      "course_id" => $course->id,
+      "completed_lessons" => 0,
+      "total_lessons" => 10,
+      "progress_percentage" => 0,
+      "completed" => false,
+      "completed_at" => null,
+    ]);
+
     $this->actingAs($user)
       ->get(route("learn.course", $course))
       ->assertOk()
@@ -161,7 +186,7 @@ class ChildLearningCourseTest extends TestCase
   {
     $user = User::factory()->create();
 
-    Child::factory()->create([
+    $child = Child::factory()->create([
       "user_id" => $user->id,
       "is_active" => true,
     ]);
@@ -182,6 +207,16 @@ class ChildLearningCourseTest extends TestCase
     $unpublishedLesson = Lesson::factory()->create([
       "learning_module_id" => $module->id,
       "is_published" => false,
+    ]);
+
+    CourseProgress::create([
+      "child_id" => $child->id,
+      "course_id" => $course->id,
+      "completed_lessons" => 0,
+      "total_lessons" => 1,
+      "progress_percentage" => 0,
+      "completed" => false,
+      "completed_at" => null,
     ]);
 
     $this->actingAs($user)

@@ -8,6 +8,7 @@ use App\Filament\Resources\FutureReadinessLeaderboards\Tables\FutureReadinessLea
 use App\Models\Child;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
@@ -30,6 +31,16 @@ class FutureReadinessLeaderboardResource extends Resource
     public static function table(Table $table): Table
     {
         return FutureReadinessLeaderboardTable::configure($table);
+    }
+
+    /**
+     * @return Builder<Child>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['skillProgress', 'badges'])
+            ->withAvg('skillProgress as future_readiness_avg', 'progress_percentage');
     }
 
     public static function getPages(): array

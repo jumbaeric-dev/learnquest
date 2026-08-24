@@ -6,7 +6,7 @@ use App\Models\Course;
 use App\Models\CourseModule;
 use Illuminate\Database\Seeder;
 
-class LearningModuleSeeder extends Seeder
+class CourseModuleSeeder extends Seeder
 {
     public function run(): void
     {

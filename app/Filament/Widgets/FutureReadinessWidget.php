@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Child;
+use App\Services\FutureReadinessService;
 use DB;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -12,12 +13,7 @@ class FutureReadinessWidget extends StatsOverviewWidget
     // protected int|string|array $columnSpan = 1;
     protected function getStats(): array
     {
-        $children = Child::with('badges', 'skillProgress')->get();
-
-        $averageReadiness = round(
-            $children->avg('future_readiness_score') ?? 0,
-            1
-        );
+        $averageReadiness = FutureReadinessService::platformAverage();
 
         return [
 
