@@ -10,30 +10,51 @@ use Illuminate\Support\Facades\Hash;
 
 class ChildLoginController extends Controller
 {
-    public function showLoginForm()
-    {
-        return view('auth.child-login');
+  public function showLoginForm()
+  {
+    return view("auth.child-login");
+  }
+
+  public function login(Request $request)
+  {
+    $credentials = $request->validate([
+      "username" => ["required", "string"],
+      "pin" => ["required", "numeric", "digits:4"],
+    ]);
+
+    $child = Child::where("username", $credentials["username"])->first();
+
+    if (
+      $child &&
+      $child->is_active &&
+      Hash::check($credentials["pin"], $child->pin)
+    ) {
+      Auth::login($child->user);
+
+      $request->session()->regenerate();
+
+      session([
+        "active_child_id" => $child->id,
+      ]);
+
+      return redirect()->intended(route("child.dashboard"));
     }
 
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'username' => ['required', 'string'],
-            'pin'      => ['required', 'numeric', 'digits:4'],
-        ]);
+    return back()
+      ->withErrors([
+        "username" => "Invalid username or PIN code.",
+      ])
+      ->onlyInput("username");
+  }
 
-        $child = Child::where('username', $credentials['username'])->first();
+  public function logout(Request $request)
+  {
+    Auth::logout();
 
-        if ($child && Hash::check($credentials['pin'], $child->pin)) {
-            Auth::login($child->user);
-            session(['active_child_id' => $child->id]);
-            $request->session()->regenerate();
+    $request->session()->invalidate();
 
-            return redirect()->intended(route('child.dashboard'));
-        }
+    $request->session()->regenerateToken();
 
-        return back()->withErrors([
-            'username' => 'Invalid username or PIN code.',
-        ])->onlyInput('username');
-    }
+    return redirect()->route("login");
+  }
 }

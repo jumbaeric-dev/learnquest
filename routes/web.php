@@ -16,11 +16,17 @@ Route::get("/", function () {
 });
 
 // Guest Login Routes
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [ChildLoginController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [ChildLoginController::class, 'login']);
-});
+Route::get("/login", [ChildLoginController::class, "showLoginForm"])->name(
+  "login"
+);
 
+Route::post("/login", [ChildLoginController::class, "login"])->name(
+  "child.login"
+);
+
+Route::post("/logout", [ChildLoginController::class, "logout"])
+  ->middleware("auth")
+  ->name("logout");
 /*
 |--------------------------------------------------------------------------
 | Authenticated Child Routes

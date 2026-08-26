@@ -15,6 +15,8 @@ class Child extends Model
     "parent_id",
     "first_name",
     "last_name",
+    "username",
+    "pin",
     "date_of_birth",
     "avatar",
     "xp",
@@ -45,6 +47,11 @@ class Child extends Model
   public function parent()
   {
     return $this->belongsTo(User::class, "parent_id");
+  }
+
+  public function children(): HasMany
+  {
+    return $this->hasMany(Child::class, "parent_id");
   }
 
   public function activityProgress()
@@ -136,8 +143,8 @@ class Child extends Model
 
   public function getFutureReadinessScoreAttribute(): float
   {
-    if (! $this->relationLoaded('skillProgress')) {
-      $this->load('skillProgress');
+    if (!$this->relationLoaded("skillProgress")) {
+      $this->load("skillProgress");
     }
 
     return FutureReadinessService::calculateScore($this);
@@ -147,11 +154,13 @@ class Child extends Model
    * @param  \Illuminate\Database\Eloquent\Builder<self>  $query
    * @return \Illuminate\Database\Eloquent\Builder<self>
    */
-  public function scopeOrderByFutureReadiness($query, string $direction = 'desc')
-  {
+  public function scopeOrderByFutureReadiness(
+    $query,
+    string $direction = "desc"
+  ) {
     return $query
-      ->withAvg('skillProgress as future_readiness_avg', 'progress_percentage')
-      ->orderBy('future_readiness_avg', $direction);
+      ->withAvg("skillProgress as future_readiness_avg", "progress_percentage")
+      ->orderBy("future_readiness_avg", $direction);
   }
 
   public function strongestSkills(int $limit = 3)
