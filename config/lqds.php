@@ -68,7 +68,7 @@ return [
       "status" => "Development",
       "version" => "1.0.0",
       "description" =>
-        "Compact visual indicator used for achievements, status, identity, and categories.",
+      "Compact visual indicator used for achievements, status, identity, and categories.",
     ],
 
     [
@@ -79,7 +79,7 @@ return [
       "status" => "Experimental",
       "version" => "1.0.0",
       "description" =>
-        "Reusable button component for primary and secondary actions.",
+      "Reusable button component for primary and secondary actions.",
     ],
 
     [
@@ -90,7 +90,7 @@ return [
       "status" => "Experimental",
       "version" => "1.0.0",
       "description" =>
-        "Compact component for displaying a statistic with an optional icon.",
+      "Compact component for displaying a statistic with an optional icon.",
     ],
 
     [
@@ -111,7 +111,7 @@ return [
       "status" => "Development",
       "version" => "1.0.0",
       "description" =>
-        "Displays a progress label, value, and progress bar as a reusable learning pattern.",
+      "Displays a progress label, value, and progress bar as a reusable learning pattern.",
     ],
   ],
 
@@ -191,7 +191,17 @@ return [
       "status" => "Development",
       "version" => "1.0.0",
       "description" =>
-        "Reusable empty-state presentation for sections with no available content.",
+      "Reusable empty-state presentation for sections with no available content.",
+    ],
+
+    [
+      'id' => 'action_link',
+      'name' => 'Action Link',
+      'tag' => 'x-lq.action-link',
+      'category' => 'Pattern',
+      'status' => 'Development',
+      'version' => '1.0.0',
+      'description' => 'Reusable directional action link for navigation and contextual actions.',
     ],
   ],
 ];
