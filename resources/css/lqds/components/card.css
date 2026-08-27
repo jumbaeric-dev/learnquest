@@ -1,0 +1,121 @@
+/*
+|--------------------------------------------------------------------------
+| LearnQuest Design System — Card
+|--------------------------------------------------------------------------
+*/
+
+.lq-card {
+  border: 1px solid var(--lq-border);
+
+  border-radius: var(--lq-radius-xl);
+
+  background: var(--lq-theme-surface);
+
+  box-shadow: var(--lq-shadow-md);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Glass
+|--------------------------------------------------------------------------
+*/
+
+.lq-card--glass {
+  border-color: rgba(255, 255, 255, 0.55);
+
+  background: color-mix(in srgb, var(--lq-theme-surface) 82%, transparent);
+
+  backdrop-filter: blur(18px);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Soft
+|--------------------------------------------------------------------------
+*/
+
+.lq-card--soft {
+  border-color: color-mix(
+    in srgb,
+    var(--lq-theme-primary) 12%,
+    var(--lq-border)
+  );
+
+  background: var(--lq-theme-soft);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Hero
+|--------------------------------------------------------------------------
+*/
+
+.lq-card--hero {
+  border: 0;
+
+  color: var(--lq-on-primary);
+
+  background:
+    radial-gradient(
+      circle at 86% 20%,
+      rgba(255, 255, 255, 0.22),
+      transparent 9rem
+    ),
+    var(--lq-theme-gradient);
+
+  box-shadow: var(--lq-theme-shadow);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Interactive
+|--------------------------------------------------------------------------
+*/
+
+.lq-card--interactive {
+  transition:
+    transform var(--lq-motion-normal) var(--lq-ease-standard),
+    box-shadow var(--lq-motion-normal) var(--lq-ease-standard);
+}
+
+.lq-card--interactive:hover {
+  transform: translateY(-2px);
+
+  box-shadow: var(--lq-shadow-lg);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Padding
+|--------------------------------------------------------------------------
+*/
+
+.lq-card--padding-sm {
+  padding: var(--lq-space-3);
+}
+
+.lq-card--padding-md {
+  padding: var(--lq-space-5);
+}
+
+.lq-card--padding-lg {
+  padding: var(--lq-space-8);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Radius
+|--------------------------------------------------------------------------
+*/
+
+.lq-card--radius-lg {
+  border-radius: var(--lq-radius-lg);
+}
+
+.lq-card--radius-xl {
+  border-radius: var(--lq-radius-xl);
+}
+
+.lq-card--radius-full {
+  border-radius: var(--lq-radius-pill);
+}

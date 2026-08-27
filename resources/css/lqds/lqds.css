@@ -1,11 +1,144 @@
+/*
+|--------------------------------------------------------------------------
+| LearnQuest Design System
+|--------------------------------------------------------------------------
+*/
+
 @import "./tokens.css";
+
+@import "./themes.css";
 
 @import "./animations.css";
 
 @import "./components/badge.css";
-
 @import "./components/button.css";
-
 @import "./components/stat-chip.css";
-
 @import "./components/section-title.css";
+@import "./components/card.css";
+@import "./components/avatar.css";
+@import "./components/progress.css";
+@import "./components/world-tile.css";
+
+.lq-app-shell {
+  min-height: 100vh;
+
+  background:
+    radial-gradient(
+      circle at 8% 4%,
+      color-mix(in srgb, var(--lq-theme-primary) 12%, transparent),
+      transparent 28rem
+    ),
+    radial-gradient(
+      circle at 92% 10%,
+      color-mix(in srgb, var(--lq-theme-secondary) 12%, transparent),
+      transparent 24rem
+    ),
+    var(--lq-theme-background);
+}
+
+/* ==========================================================================
+   Progress Bar
+   ========================================================================== */
+
+.lq-progress-bar {
+  width: 100%;
+}
+
+.lq-progress-bar__labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  color: rgb(100 116 139);
+}
+
+.lq-progress__fill {
+  display: block;
+  height: 100%;
+  width: 0;
+  transition: width 300ms ease;
+}
+
+/* ==========================================================================
+   Button
+   ========================================================================== */
+
+.lq-button--full {
+  width: 100%;
+}
+
+/* ==========================================================================
+   Stat Chip
+   ========================================================================== */
+
+.lq-stat-chip__icon-svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lq-stat-chip__icon-content {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.lq-progress-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.lq-progress-summary__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.lq-progress-summary__label,
+.lq-progress-summary__value {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.lq-progress-summary__label {
+  color: var(--lq-text-muted);
+}
+
+.lq-progress-summary__value {
+  color: var(--lq-text);
+}
+
+.lq-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 140px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.lq-empty-state__icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.lq-empty-state__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--lq-text);
+}
+
+.lq-empty-state__message {
+  max-width: 28rem;
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--lq-text-muted);
+}

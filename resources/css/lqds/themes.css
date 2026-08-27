@@ -1,0 +1,167 @@
+/*
+|--------------------------------------------------------------------------
+| LearnQuest Design System — Themes
+|--------------------------------------------------------------------------
+|
+| Components consume semantic theme variables.
+| Pages select themes with:
+|
+| <div data-lq-theme="sky">
+|
+|--------------------------------------------------------------------------
+*/
+
+:root,
+[data-lq-theme="sky"] {
+  --lq-theme-primary: var(--lq-blue-600);
+  --lq-theme-primary-hover: var(--lq-blue-700);
+
+  --lq-theme-secondary: var(--lq-cyan-500);
+  --lq-theme-accent: var(--lq-amber-500);
+
+  --lq-theme-background: #f7faff;
+  --lq-theme-surface: rgba(255, 255, 255, 0.94);
+
+  --lq-theme-hero-start: var(--lq-blue-700);
+  --lq-theme-hero-mid: var(--lq-blue-600);
+  --lq-theme-hero-end: var(--lq-cyan-500);
+
+  --lq-theme-soft: var(--lq-blue-50);
+  --lq-theme-soft-accent: var(--lq-cyan-50);
+
+  --lq-theme-gradient: linear-gradient(
+    135deg,
+    var(--lq-theme-primary),
+    var(--lq-theme-secondary)
+  );
+
+  --lq-theme-shadow: 0 18px 42px rgba(37, 99, 235, 0.18);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Explorer
+|--------------------------------------------------------------------------
+*/
+
+[data-lq-theme="explorer"] {
+  --lq-theme-primary: var(--lq-indigo-600);
+  --lq-theme-primary-hover: var(--lq-indigo-700);
+
+  --lq-theme-secondary: var(--lq-cyan-500);
+  --lq-theme-accent: var(--lq-orange-500);
+
+  --lq-theme-background: #f7f8ff;
+  --lq-theme-surface: rgba(255, 255, 255, 0.94);
+
+  --lq-theme-hero-start: var(--lq-indigo-700);
+  --lq-theme-hero-mid: var(--lq-indigo-600);
+  --lq-theme-hero-end: var(--lq-cyan-500);
+
+  --lq-theme-soft: #eef2ff;
+  --lq-theme-soft-accent: var(--lq-cyan-50);
+
+  --lq-theme-gradient: linear-gradient(
+    135deg,
+    var(--lq-theme-primary),
+    var(--lq-theme-secondary)
+  );
+
+  --lq-theme-shadow: 0 18px 42px rgba(79, 70, 229, 0.18);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Finance
+|--------------------------------------------------------------------------
+*/
+
+[data-lq-theme="finance"] {
+  --lq-theme-primary: var(--lq-green-600);
+  --lq-theme-primary-hover: #047857;
+
+  --lq-theme-secondary: var(--lq-cyan-500);
+  --lq-theme-accent: var(--lq-amber-500);
+
+  --lq-theme-background: #f6fffb;
+  --lq-theme-surface: rgba(255, 255, 255, 0.95);
+
+  --lq-theme-hero-start: var(--lq-green-600);
+  --lq-theme-hero-mid: var(--lq-green-500);
+  --lq-theme-hero-end: var(--lq-cyan-500);
+
+  --lq-theme-soft: #ecfdf5;
+  --lq-theme-soft-accent: #ecfeff;
+
+  --lq-theme-gradient: linear-gradient(
+    135deg,
+    var(--lq-theme-primary),
+    var(--lq-theme-secondary)
+  );
+
+  --lq-theme-shadow: 0 18px 42px rgba(5, 150, 105, 0.18);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Science
+|--------------------------------------------------------------------------
+*/
+
+[data-lq-theme="science"] {
+  --lq-theme-primary: var(--lq-purple-600);
+  --lq-theme-primary-hover: #6d28d9;
+
+  --lq-theme-secondary: var(--lq-indigo-500);
+  --lq-theme-accent: var(--lq-cyan-500);
+
+  --lq-theme-background: #faf8ff;
+  --lq-theme-surface: rgba(255, 255, 255, 0.95);
+
+  --lq-theme-hero-start: var(--lq-purple-600);
+  --lq-theme-hero-mid: var(--lq-indigo-600);
+  --lq-theme-hero-end: var(--lq-cyan-500);
+
+  --lq-theme-soft: #f5f3ff;
+  --lq-theme-soft-accent: var(--lq-cyan-50);
+
+  --lq-theme-gradient: linear-gradient(
+    135deg,
+    var(--lq-theme-primary),
+    var(--lq-theme-secondary)
+  );
+
+  --lq-theme-shadow: 0 18px 42px rgba(124, 58, 237, 0.18);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Coding
+|--------------------------------------------------------------------------
+*/
+
+[data-lq-theme="coding"] {
+  --lq-theme-primary: var(--lq-indigo-700);
+  --lq-theme-primary-hover: var(--lq-indigo-600);
+
+  --lq-theme-secondary: var(--lq-purple-500);
+  --lq-theme-accent: var(--lq-cyan-400);
+
+  --lq-theme-background: #f7f7ff;
+  --lq-theme-surface: rgba(255, 255, 255, 0.95);
+
+  --lq-theme-hero-start: var(--lq-indigo-700);
+  --lq-theme-hero-mid: var(--lq-indigo-600);
+  --lq-theme-hero-end: var(--lq-purple-500);
+
+  --lq-theme-soft: #eef2ff;
+  --lq-theme-soft-accent: #f5f3ff;
+
+  --lq-theme-gradient: linear-gradient(
+    135deg,
+    var(--lq-theme-primary),
+    var(--lq-theme-secondary)
+  );
+
+  --lq-theme-shadow: 0 18px 42px rgba(67, 56, 202, 0.18);
+}

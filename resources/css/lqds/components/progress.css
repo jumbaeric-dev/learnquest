@@ -1,0 +1,69 @@
+/*
+|--------------------------------------------------------------------------
+| LearnQuest Design System — Progress
+|--------------------------------------------------------------------------
+*/
+
+.lq-progress {
+  width: 100%;
+
+  height: 0.5rem;
+
+  overflow: hidden;
+
+  border-radius: var(--lq-radius-pill);
+
+  background: var(--lq-slate-200);
+}
+
+.lq-progress > span {
+  display: block;
+
+  width: 0;
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: linear-gradient(
+    90deg,
+    var(--lq-theme-primary),
+    var(--lq-theme-secondary)
+  );
+
+  transition: width var(--lq-motion-slow) var(--lq-ease-standard);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Color Variants
+|--------------------------------------------------------------------------
+*/
+
+.lq-progress--primary > span {
+  background: linear-gradient(
+    90deg,
+    var(--lq-theme-primary),
+    var(--lq-theme-secondary)
+  );
+}
+
+.lq-progress--cyan > span {
+  background: var(--lq-cyan-500);
+}
+
+.lq-progress--success > span {
+  background: var(--lq-success);
+}
+
+.lq-progress--warning > span {
+  background: var(--lq-warning);
+}
+
+.lq-progress--danger > span {
+  background: var(--lq-danger);
+}
+
+.lq-progress--reward > span {
+  background: var(--lq-amber-500);
+}

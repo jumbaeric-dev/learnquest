@@ -1,18 +1,57 @@
 /*
 |--------------------------------------------------------------------------
-| LQDS Button
+| LearnQuest Design System — Button
 |--------------------------------------------------------------------------
 */
 
 .lq-button {
-    @apply inline-flex items-center justify-center;
-    @apply gap-2;
-    @apply rounded-xl;
-    @apply font-semibold;
-    @apply transition-all duration-200;
-    @apply whitespace-nowrap;
-    @apply select-none;
-    @apply cursor-pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.5rem;
+
+  min-height: 2.5rem;
+
+  border: 1px solid transparent;
+  border-radius: var(--lq-radius-md);
+
+  padding: 0.625rem 0.95rem;
+
+  font-size: 0.875rem;
+  font-weight: 800;
+  line-height: 1;
+
+  text-decoration: none;
+
+  cursor: pointer;
+
+  user-select: none;
+
+  transition:
+    transform var(--lq-motion-fast) var(--lq-ease-standard),
+    background-color var(--lq-motion-fast) var(--lq-ease-standard),
+    border-color var(--lq-motion-fast) var(--lq-ease-standard),
+    box-shadow var(--lq-motion-fast) var(--lq-ease-standard),
+    color var(--lq-motion-fast) var(--lq-ease-standard);
+}
+
+.lq-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.lq-button:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.lq-button:focus-visible {
+  outline: 3px solid var(--lq-focus-ring);
+  outline-offset: 2px;
+}
+
+.lq-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 /*
@@ -22,21 +61,21 @@
 */
 
 .lq-button--sm {
-    @apply px-3 py-2;
-    @apply text-sm;
-    min-height: 36px;
+  min-height: 2.125rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
 }
 
 .lq-button--md {
-    @apply px-5 py-3;
-    @apply text-base;
-    min-height: 44px;
+  min-height: 2.5rem;
+  padding: 0.625rem 0.95rem;
+  font-size: 0.875rem;
 }
 
 .lq-button--lg {
-    @apply px-6 py-4;
-    @apply text-lg;
-    min-height: 52px;
+  min-height: 2.875rem;
+  padding: 0.75rem 1.15rem;
+  font-size: 0.95rem;
 }
 
 /*
@@ -46,15 +85,16 @@
 */
 
 .lq-button--primary {
-    @apply bg-sky-600 text-white;
+  color: var(--lq-on-primary);
+
+  background: var(--lq-theme-primary);
+
+  box-shadow: 0 8px 20px
+    color-mix(in srgb, var(--lq-theme-primary) 20%, transparent);
 }
 
 .lq-button--primary:hover:not(:disabled) {
-    @apply bg-sky-700;
-}
-
-.lq-button--primary:active:not(:disabled) {
-    transform: translateY(1px);
+  background: var(--lq-theme-primary-hover);
 }
 
 /*
@@ -64,36 +104,95 @@
 */
 
 .lq-button--secondary {
-    @apply bg-white text-slate-700;
-    @apply border border-slate-300;
+  border-color: var(--lq-border);
+
+  color: var(--lq-text-primary);
+
+  background: var(--lq-theme-surface);
 }
 
 .lq-button--secondary:hover:not(:disabled) {
-    @apply bg-slate-100;
-}
+  border-color: color-mix(
+    in srgb,
+    var(--lq-theme-primary) 30%,
+    var(--lq-border)
+  );
 
-.lq-button--secondary:active:not(:disabled) {
-    transform: translateY(1px);
-}
+  color: var(--lq-theme-primary);
 
-/*
-|--------------------------------------------------------------------------
-| Disabled
-|--------------------------------------------------------------------------
-*/
-
-.lq-button:disabled {
-    @apply opacity-50;
-    @apply cursor-not-allowed;
+  background: var(--lq-theme-soft);
 }
 
 /*
 |--------------------------------------------------------------------------
-| Focus
+| Ghost
 |--------------------------------------------------------------------------
 */
 
-.lq-button:focus-visible {
-    @apply outline-none;
-    @apply ring-2 ring-sky-500 ring-offset-2;
+.lq-button--ghost {
+  color: var(--lq-text-secondary);
+
+  background: transparent;
+}
+
+.lq-button--ghost:hover:not(:disabled) {
+  color: var(--lq-theme-primary);
+
+  background: var(--lq-theme-soft);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Soft
+|--------------------------------------------------------------------------
+*/
+
+.lq-button--soft {
+  color: var(--lq-theme-primary);
+
+  background: var(--lq-theme-soft);
+}
+
+.lq-button--soft:hover:not(:disabled) {
+  background: color-mix(
+    in srgb,
+    var(--lq-theme-primary) 15%,
+    var(--lq-theme-soft)
+  );
+}
+
+/*
+|--------------------------------------------------------------------------
+| Danger
+|--------------------------------------------------------------------------
+*/
+
+.lq-button--danger {
+  color: #fff;
+
+  background: var(--lq-danger);
+}
+
+.lq-button--danger:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--lq-danger) 85%, #000);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Outline
+|--------------------------------------------------------------------------
+*/
+
+.lq-button--outline {
+  border-color: var(--lq-theme-primary);
+
+  color: var(--lq-theme-primary);
+
+  background: transparent;
+}
+
+.lq-button--outline:hover:not(:disabled) {
+  color: var(--lq-on-primary);
+
+  background: var(--lq-theme-primary);
 }

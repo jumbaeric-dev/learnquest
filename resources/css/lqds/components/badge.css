@@ -1,94 +1,118 @@
 /*
 |--------------------------------------------------------------------------
-| LQDS Badge
+| LearnQuest Design System — Badge
 |--------------------------------------------------------------------------
 */
 
 .lq-badge {
-    @apply inline-flex items-center justify-center;
-    @apply whitespace-nowrap;
-    @apply rounded-full;
-    @apply font-medium;
-    @apply transition-all duration-200;
-    @apply select-none;
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.35rem;
+
+  border: 1px solid transparent;
+
+  border-radius: var(--lq-radius-pill);
+
+  font-weight: 750;
+  line-height: 1;
+
+  white-space: nowrap;
+
+  user-select: none;
+
+  transition:
+    background-color var(--lq-motion-fast) var(--lq-ease-standard),
+    border-color var(--lq-motion-fast) var(--lq-ease-standard),
+    color var(--lq-motion-fast) var(--lq-ease-standard),
+    transform var(--lq-motion-fast) var(--lq-ease-standard);
 }
 
-.lq-badge__label {
-    @apply leading-none;
-}
-
-.lq-badge__icon {
-    @apply shrink-0;
+.lq-badge:focus-visible {
+  outline: 3px solid var(--lq-focus-ring);
+  outline-offset: 2px;
 }
 
 /*
 |--------------------------------------------------------------------------
-| Badge Sizes
+| Sizes
 |--------------------------------------------------------------------------
 */
 
 .lq-badge--sm {
-    @apply gap-1;
-    @apply px-2 py-1;
-    @apply text-xs;
+  gap: 0.25rem;
+
+  padding: 0.3rem 0.55rem;
+
+  font-size: 0.7rem;
 }
 
 .lq-badge--md {
-    @apply gap-1.5;
-    @apply px-3 py-1.5;
-    @apply text-sm;
+  gap: 0.35rem;
+
+  padding: 0.4rem 0.7rem;
+
+  font-size: 0.78rem;
 }
 
 .lq-badge--lg {
-    @apply gap-2;
-    @apply px-4 py-2;
-    @apply text-base;
+  gap: 0.45rem;
+
+  padding: 0.55rem 0.85rem;
+
+  font-size: 0.9rem;
 }
 
 /*
 |--------------------------------------------------------------------------
-| Badge Variants
+| Variants
 |--------------------------------------------------------------------------
 */
 
 .lq-badge--neutral {
-    @apply bg-slate-100 text-slate-700;
+  border-color: var(--lq-border);
+
+  color: var(--lq-text-secondary);
+
+  background: var(--lq-slate-100);
 }
 
 .lq-badge--primary {
-    @apply bg-sky-100 text-sky-700;
+  border-color: color-mix(in srgb, var(--lq-theme-primary) 12%, transparent);
+
+  color: var(--lq-theme-primary);
+
+  background: var(--lq-theme-soft);
 }
 
 .lq-badge--success {
-    @apply bg-green-100 text-green-700;
+  color: var(--lq-green-600);
+
+  background: #ecfdf5;
 }
 
 .lq-badge--achievement {
-    @apply bg-amber-100 text-amber-800;
+  color: #92400e;
+
+  background: #fef3c7;
 }
 
 .lq-badge--locked {
-    @apply bg-slate-200 text-slate-500;
+  color: var(--lq-text-muted);
+
+  background: var(--lq-slate-200);
 }
 
-/*
-|--------------------------------------------------------------------------
-| Focus States
-|--------------------------------------------------------------------------
-*/
-.lq-badge:focus-visible {
-    @apply outline-none;
-    @apply ring-2 ring-offset-2 ring-sky-500;
+.lq-badge--warning {
+  color: #92400e;
+
+  background: #fffbeb;
 }
 
-/*
-|--------------------------------------------------------------------------
-| Motion States
-|--------------------------------------------------------------------------
-*/
-.lq-badge {
-    transition:
-        background-color 150ms ease,
-        color 150ms ease,
-        transform 150ms ease;
+.lq-badge--danger {
+  color: var(--lq-red-600);
+
+  background: #fef2f2;
 }

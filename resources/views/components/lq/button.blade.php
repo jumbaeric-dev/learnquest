@@ -4,6 +4,7 @@
     'type' => config('lqds.settings.button.defaults.type'),
     'disabled' => false,
     'fullWidth' => config('lqds.settings.button.defaults.full_width'),
+    'tag' => 'button',
 ])
 
 @php
@@ -24,18 +25,40 @@ $size = ComponentValidator::resolve(
     $settings['defaults']['size']
 );
 
+$allowedTags = [
+    'button',
+    'a',
+];
+
+$tag = in_array($tag, $allowedTags, true)
+    ? $tag
+    : 'button';
+
+$classes = [
+    'lq-button',
+    "lq-button--{$variant}",
+    "lq-button--{$size}",
+    'lq-button--full' => $fullWidth,
+];
+
 @endphp
 
-<button
-    type="{{ $type }}"
-    @disabled($disabled)
+@if($tag === 'a')
 
-    {{ $attributes->class([
-        'lq-button',
-        "lq-button--{$variant}",
-        "lq-button--{$size}",
-        'w-full' => $fullWidth,
-    ]) }}
->
-    {{ $slot }}
-</button>
+    <a
+        {{ $attributes->class($classes) }}
+    >
+        {{ $slot }}
+    </a>
+
+@else
+
+    <button
+        type="{{ $type }}"
+        @disabled($disabled)
+        {{ $attributes->class($classes) }}
+    >
+        {{ $slot }}
+    </button>
+
+@endif

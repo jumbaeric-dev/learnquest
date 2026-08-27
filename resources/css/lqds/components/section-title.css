@@ -1,59 +1,69 @@
 /*
 |--------------------------------------------------------------------------
-| LQDS Section Title
+| LearnQuest Design System — Section Title
 |--------------------------------------------------------------------------
 */
 
-
 .lq-section-title {
+  display: flex;
 
-    @apply flex flex-col;
-
+  flex-direction: column;
 }
-
 
 .lq-section-title__heading {
+  margin: 0;
 
-    @apply font-bold;
+  color: var(--lq-text-primary);
 
+  font-weight: 900;
+
+  letter-spacing: -0.025em;
+
+  line-height: 1.15;
 }
-
 
 .lq-section-title__subtitle {
+  margin: 0.35rem 0 0;
 
-    @apply mt-1;
+  color: var(--lq-text-secondary);
 
-    @apply text-slate-600;
+  font-size: 0.875rem;
 
+  line-height: 1.45;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Sizes
+|--------------------------------------------------------------------------
+*/
 
-.lq-section-title--sm 
-.lq-section-title__heading {
-    @apply text-lg;
+.lq-section-title--sm .lq-section-title__heading {
+  font-size: 1.125rem;
 }
 
-
-.lq-section-title--md 
-.lq-section-title__heading {
-    @apply text-xl;
+.lq-section-title--md .lq-section-title__heading {
+  font-size: 1.35rem;
 }
 
-
-.lq-section-title--lg 
-.lq-section-title__heading {
-    @apply text-2xl;
+.lq-section-title--lg .lq-section-title__heading {
+  font-size: 1.65rem;
 }
+
+/*
+|--------------------------------------------------------------------------
+| Alignment
+|--------------------------------------------------------------------------
+*/
 
 .lq-section-title--center {
+  align-items: center;
 
-    @apply items-center text-center;
-
+  text-align: center;
 }
 
-
 .lq-section-title--left {
+  align-items: flex-start;
 
-    @apply items-start text-left;
-
+  text-align: left;
 }

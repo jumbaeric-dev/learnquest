@@ -1,68 +1,131 @@
 /*
 |--------------------------------------------------------------------------
-| LQDS Stat Chip
+| LearnQuest Design System — Stat Chip
 |--------------------------------------------------------------------------
 */
 
 .lq-stat-chip {
-    @apply inline-flex items-center gap-3;
-    @apply rounded-xl;
-    @apply px-4 py-3;
-    @apply transition-all duration-200;
-    @apply select-none;
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.75rem;
+
+  border: 1px solid transparent;
+
+  border-radius: var(--lq-radius-lg);
+
+  padding: 0.7rem 0.9rem;
+
+  user-select: none;
+
+  transition:
+    transform var(--lq-motion-fast) var(--lq-ease-standard),
+    box-shadow var(--lq-motion-fast) var(--lq-ease-standard);
+}
+
+.lq-stat-chip:hover {
+  transform: translateY(-1px);
 }
 
 .lq-stat-chip__icon {
-    @apply flex items-center justify-center;
-    @apply text-xl;
+  display: grid;
+
+  width: 2rem;
+  height: 2rem;
+
+  place-items: center;
+
+  flex: 0 0 auto;
+
+  font-size: 1.2rem;
 }
 
 .lq-stat-chip__content {
-    @apply flex flex-col;
+  display: flex;
+
+  min-width: 0;
+
+  flex-direction: column;
+
+  gap: 0.15rem;
 }
 
 .lq-stat-chip__value {
-    @apply font-bold;
-    @apply leading-none;
+  color: inherit;
+
+  font-weight: 900;
+  line-height: 1;
 }
 
 .lq-stat-chip__label {
-    @apply text-sm;
-    @apply opacity-80;
+  color: inherit;
+
+  font-size: 0.75rem;
+
+  opacity: 0.78;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Sizes
+|--------------------------------------------------------------------------
+*/
+
 .lq-stat-chip--sm {
-    @apply text-sm;
+  font-size: 0.78rem;
 }
 
 .lq-stat-chip--md {
-    @apply text-base;
+  font-size: 0.9rem;
 }
 
 .lq-stat-chip--lg {
-    @apply text-lg;
+  font-size: 1rem;
 }
 
+/*
+|--------------------------------------------------------------------------
+| Variants
+|--------------------------------------------------------------------------
+*/
+
 .lq-stat-chip--neutral {
-    @apply bg-slate-100 text-slate-800;
+  border-color: var(--lq-border);
+
+  color: var(--lq-text-primary);
+
+  background: var(--lq-slate-100);
 }
 
 .lq-stat-chip--primary {
-    @apply bg-sky-100 text-sky-800;
+  border-color: color-mix(in srgb, var(--lq-theme-primary) 12%, transparent);
+
+  color: var(--lq-theme-primary);
+
+  background: var(--lq-theme-soft);
 }
 
 .lq-stat-chip--success {
-    @apply bg-green-100 text-green-800;
+  color: var(--lq-green-600);
+
+  background: #ecfdf5;
 }
 
 .lq-stat-chip--warning {
-    @apply bg-amber-100 text-amber-800;
+  color: #92400e;
+
+  background: #fffbeb;
 }
 
 .lq-stat-chip--danger {
-    @apply bg-red-100 text-red-800;
+  color: var(--lq-red-600);
+
+  background: #fef2f2;
 }
 
 .lq-stat-chip--reward {
-    @apply bg-yellow-100 text-yellow-800;
+  color: #92400e;
+
+  background: #fef3c7;
 }

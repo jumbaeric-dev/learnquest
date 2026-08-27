@@ -1,42 +1,33 @@
+@props([
+    'image' => null,
+    'size' => 'md',
+    'alt' => 'Learner avatar',
+])
+
 @php
-
-$sizes = [
-    'sm' => 'h-10 w-10 text-lg',
-    'md' => 'h-16 w-16 text-2xl',
-    'lg' => 'h-24 w-24 text-4xl',
-];
-
+    $sizes = [
+        'sm' => 'lq-avatar--sm',
+        'md' => 'lq-avatar--md',
+        'lg' => 'lq-avatar--lg',
+    ];
 @endphp
 
-
 <div
-    class="
-    {{ $sizes[$size] }}
-    flex
-    items-center
-    justify-center
-    rounded-full
-    bg-gradient-to-br
-    from-purple-500
-    to-cyan-400
-    font-bold
-    text-white
-    shadow-lg
-    ">
-
-
+    {{ $attributes->class([
+        'lq-avatar',
+        $sizes[$size] ?? $sizes['md'],
+    ]) }}
+>
     @if($image)
 
         <img
             src="{{ $image }}"
-            class="h-full w-full rounded-full object-cover"
+            alt="{{ $alt }}"
         >
 
     @else
 
-        👨‍🚀
+        {{ $slot ?: '👨‍🚀' }}
 
     @endif
-
-
 </div>

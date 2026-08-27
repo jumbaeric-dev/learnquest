@@ -1,69 +1,81 @@
+/*
+|--------------------------------------------------------------------------
+| LearnQuest Design System — Color Tokens
+|--------------------------------------------------------------------------
+|
+| Primitive colors are intentionally separated from semantic colors.
+| Components should prefer semantic/theme tokens.
+|--------------------------------------------------------------------------
+*/
+
 :root {
+  /* Primitive brand palette */
 
-    /*
-    |--------------------------------------------------------------------------
-    | Brand
-    |--------------------------------------------------------------------------
-    */
+  --lq-blue-50: #eff6ff;
+  --lq-blue-100: #dbeafe;
+  --lq-blue-500: #3b82f6;
+  --lq-blue-600: #2563eb;
+  --lq-blue-700: #1d4ed8;
 
-    --lq-primary: #0ea5e9;
+  --lq-cyan-50: #ecfeff;
+  --lq-cyan-100: #cffafe;
+  --lq-cyan-400: #22d3ee;
+  --lq-cyan-500: #06b6d4;
+  --lq-cyan-600: #0891b2;
 
-    --lq-primary-hover: #0284c7;
+  --lq-indigo-500: #6366f1;
+  --lq-indigo-600: #4f46e5;
+  --lq-indigo-700: #4338ca;
 
+  --lq-purple-500: #8b5cf6;
+  --lq-purple-600: #7c3aed;
 
+  --lq-orange-400: #fb923c;
+  --lq-orange-500: #f97316;
+  --lq-orange-600: #ea580c;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Semantic
-    |--------------------------------------------------------------------------
-    */
+  --lq-amber-400: #fbbf24;
+  --lq-amber-500: #f59e0b;
+  --lq-amber-600: #d97706;
 
+  --lq-green-500: #10b981;
+  --lq-green-600: #059669;
 
-    --lq-success: #22c55e;
+  --lq-red-500: #ef4444;
+  --lq-red-600: #dc2626;
 
-    --lq-warning: #f59e0b;
+  --lq-slate-50: #f8fafc;
+  --lq-slate-100: #f1f5f9;
+  --lq-slate-200: #e2e8f0;
+  --lq-slate-300: #cbd5e1;
+  --lq-slate-400: #94a3b8;
+  --lq-slate-500: #64748b;
+  --lq-slate-600: #475569;
+  --lq-slate-700: #334155;
+  --lq-slate-800: #1e293b;
+  --lq-slate-900: #0f172a;
 
-    --lq-danger: #ef4444;
+  /* Legacy semantic aliases */
 
+  --lq-primary: var(--lq-blue-600);
+  --lq-primary-hover: var(--lq-blue-700);
 
+  --lq-success: var(--lq-green-500);
+  --lq-warning: var(--lq-amber-500);
+  --lq-danger: var(--lq-red-500);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Surface
-    |--------------------------------------------------------------------------
-    */
+  --lq-surface: #ffffff;
+  --lq-background: var(--lq-slate-50);
 
+  --lq-text-primary: var(--lq-slate-900);
+  --lq-text-secondary: var(--lq-slate-600);
+  --lq-text-muted: var(--lq-slate-500);
 
-    --lq-surface:
+  --lq-border: var(--lq-slate-200);
 
-        #ffffff;
+  /* Theme-independent functional colors */
 
-
-    --lq-background:
-
-        #f8fafc;
-
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | Text
-    |--------------------------------------------------------------------------
-    */
-
-
-    --lq-text-primary:
-
-        #0f172a;
-
-
-    --lq-text-secondary:
-
-        #475569;
-
-
-    --lq-text-muted:
-
-        #64748b;
-
+  --lq-on-primary: #ffffff;
+  --lq-on-dark: #ffffff;
+  --lq-focus-ring: rgba(37, 99, 235, 0.35);
 }

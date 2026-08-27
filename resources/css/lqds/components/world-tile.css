@@ -1,0 +1,161 @@
+/*
+|--------------------------------------------------------------------------
+| LearnQuest Design System — World Tile
+|--------------------------------------------------------------------------
+*/
+
+.lq-world-tile {
+  position: relative;
+
+  overflow: hidden;
+
+  border: 1px solid
+    color-mix(in srgb, var(--lq-theme-primary) 10%, var(--lq-border));
+
+  border-radius: var(--lq-radius-xl);
+
+  color: var(--lq-on-primary);
+
+  background: var(--lq-theme-gradient);
+
+  box-shadow: var(--lq-shadow-md);
+
+  text-decoration: none;
+
+  transition:
+    transform var(--lq-motion-normal) var(--lq-ease-standard),
+    box-shadow var(--lq-motion-normal) var(--lq-ease-standard);
+}
+
+.lq-world-tile:hover {
+  transform: translateY(-3px);
+
+  box-shadow: var(--lq-shadow-lg);
+}
+
+.lq-world-tile::after {
+  content: "✦";
+
+  position: absolute;
+
+  top: 0.4rem;
+  right: 0.75rem;
+
+  color: rgba(255, 255, 255, 0.9);
+
+  font-size: 2.5rem;
+
+  opacity: 0.18;
+
+  pointer-events: none;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Hero
+|--------------------------------------------------------------------------
+*/
+
+.lq-world-tile__hero {
+  display: grid;
+
+  min-height: 8rem;
+
+  place-items: center;
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.12),
+    rgba(255, 255, 255, 0)
+  );
+}
+
+.lq-world-tile__icon {
+  font-size: 4rem;
+
+  filter: drop-shadow(0 8px 8px rgba(15, 23, 42, 0.18));
+
+  transition: transform var(--lq-motion-normal) var(--lq-ease-standard);
+}
+
+.lq-world-tile:hover .lq-world-tile__icon {
+  transform: scale(1.08);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Content
+|--------------------------------------------------------------------------
+*/
+
+.lq-world-tile__content {
+  padding: var(--lq-space-4);
+
+  text-align: center;
+}
+
+.lq-world-tile__title {
+  margin: 0;
+
+  color: var(--lq-text-primary);
+
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.lq-world-tile__description {
+  margin: 0.35rem 0 0;
+
+  color: var(--lq-text-secondary);
+
+  font-size: 0.78rem;
+
+  line-height: 1.5;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Footer
+|--------------------------------------------------------------------------
+*/
+
+.lq-world-tile__footer {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: var(--lq-space-3);
+
+  margin-top: var(--lq-space-4);
+}
+
+/*
+|--------------------------------------------------------------------------
+| Progress
+|--------------------------------------------------------------------------
+*/
+
+.lq-world-tile__progress {
+  height: 0.3rem;
+
+  overflow: hidden;
+
+  margin-top: var(--lq-space-3);
+
+  border-radius: var(--lq-radius-pill);
+
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.lq-world-tile__progress span {
+  display: block;
+
+  width: 0;
+
+  height: 100%;
+
+  border-radius: inherit;
+
+  background: #fff;
+}

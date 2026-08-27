@@ -1,30 +1,64 @@
+@props([
+    'value' => 0,
+    'max' => 100,
+    'color' => 'primary',
+    'showLabel' => true,
+])
+
 @php
+    $maxValue = max(1, (float) $max);
 
-$colors = [
-'indigo' => 'bg-indigo-500',
-'green' => 'bg-emerald-500',
-'yellow' => 'bg-yellow-400',
-'purple' => 'bg-purple-500',
-'cyan' => 'bg-cyan-500',
-];
+    $numericValue = (float) $value;
 
+    $percentage = max(
+        0,
+        min(
+            100,
+            ($numericValue / $maxValue) * 100
+        )
+    );
+
+    $allowedColors = [
+        'primary',
+        'cyan',
+        'success',
+        'warning',
+        'danger',
+        'reward',
+    ];
+
+    $color = in_array($color, $allowedColors, true)
+        ? $color
+        : 'primary';
 @endphp
 
-<div class="w-full">
+<div
+    {{ $attributes->class([
+        'lq-progress-bar',
+    ]) }}
+>
     <div
-        class="h-3 overflow-hidden rounded-full bg-slate-200">
-        <div
-            class="h-full rounded-full transition-all duration-700 {{ $colors[$color] ?? $colors['indigo'] }}"
-            style="width: {{ $percentage }}%;">
-        </div>
+        class="lq-progress lq-progress--{{ $color }}"
+        role="progressbar"
+        aria-valuenow="{{ $numericValue }}"
+        aria-valuemin="0"
+        aria-valuemax="{{ $max }}"
+    >
+        <span
+            class="lq-progress__fill"
+            style="width: {{ $percentage }}%;"
+        ></span>
     </div>
 
     @if($showLabel)
+        <div class="lq-progress-bar__labels">
+            <span>
+                {{ number_format($numericValue) }}
+            </span>
 
-    <div class="mt-2 flex justify-between text-xs text-slate-600">
-        <span>{{ number_format($value) }}</span>
-        <span>{{ number_format($max) }}</span>
-    </div>
-
+            <span>
+                {{ number_format($max) }}
+            </span>
+        </div>
     @endif
 </div>

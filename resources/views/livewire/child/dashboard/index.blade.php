@@ -10,15 +10,22 @@
     $recommendations = $dashboard['recommendations'];
     $challenge = $dashboard['dailyChallenge'];
 
-    $initials = strtoupper(substr($explorer['name'] ?? 'E', 0, 1));
+    $initials = strtoupper(
+        substr($explorer['name'] ?? 'E', 0, 1)
+    );
 
-    $xpPercentage = max(
-        0,
-        min(100, (int) ($explorer['xpPercentage'] ?? 0))
+    $challengeProgress = min(
+        100,
+        (
+            (float) $challenge['current']
+            /
+            max(1, (float) $challenge['target'])
+        ) * 100
     );
 @endphp
 
 <div
+    data-lq-theme="sky"
     class="lq-universe lq-universe-shell"
     x-data="{
         profileOpen: false,
@@ -60,7 +67,6 @@
         aria-label="LearnQuest navigation"
     >
 
-        {{-- Brand --}}
         <div class="lq-brand">
 
             <div
@@ -77,17 +83,17 @@
         </div>
 
 
-        {{-- Main navigation --}}
-        <nav class="lq-sidebar-nav">
+        <nav
+            class="lq-sidebar-nav"
+            aria-label="Main navigation"
+        >
 
             <a
                 href="{{ route('child.dashboard') }}"
                 class="lq-nav-link is-active"
+                aria-current="page"
             >
-                <span
-                    class="lq-nav-icon"
-                    aria-hidden="true"
-                >
+                <span class="lq-nav-icon" aria-hidden="true">
                     🌌
                 </span>
 
@@ -101,10 +107,7 @@
                 href="{{ route('child.explore') }}"
                 class="lq-nav-link"
             >
-                <span
-                    class="lq-nav-icon"
-                    aria-hidden="true"
-                >
+                <span class="lq-nav-icon" aria-hidden="true">
                     🧭
                 </span>
 
@@ -118,10 +121,7 @@
                 href="{{ route('child.missions') }}"
                 class="lq-nav-link"
             >
-                <span
-                    class="lq-nav-icon"
-                    aria-hidden="true"
-                >
+                <span class="lq-nav-icon" aria-hidden="true">
                     🌍
                 </span>
 
@@ -135,10 +135,7 @@
                 href="{{ route('child.missions') }}"
                 class="lq-nav-link"
             >
-                <span
-                    class="lq-nav-icon"
-                    aria-hidden="true"
-                >
+                <span class="lq-nav-icon" aria-hidden="true">
                     📚
                 </span>
 
@@ -150,10 +147,12 @@
         </nav>
 
 
-        {{-- Nova shortcut --}}
         <div class="lq-sidebar-bottom">
 
-            <div class="lq-card lq-card-pad">
+            <x-lq.glass-card
+                padding="sm"
+                class="lq-sidebar-nova"
+            >
 
                 <div class="lq-row">
 
@@ -175,7 +174,7 @@
 
                 </div>
 
-            </div>
+            </x-lq.glass-card>
 
         </div>
 
@@ -190,14 +189,12 @@
 
         <div class="lq-page">
 
-
             {{-- ====================================================
-                 RESPONSIVE TOP BAR
+                 TOP BAR
                  ==================================================== --}}
 
             <header class="lq-topbar">
 
-                {{-- Mobile brand --}}
                 <div class="lq-mobile-brand">
 
                     <div
@@ -208,39 +205,31 @@
                     </div>
 
                     <span>
-                        Learn<span style="color:#f59e0b">Quest</span>
+                        Learn<span>Quest</span>
                     </span>
 
                 </div>
 
 
-                {{-- Top-right actions --}}
                 <div class="lq-top-actions">
 
-
-                    {{-- Notifications --}}
-                    <button
-                        type="button"
-                        class="lq-icon-button"
+                    <x-lq.icon-button
+                        size="md"
                         aria-label="Notifications"
                     >
                         🔔
-                    </button>
+                    </x-lq.icon-button>
 
 
-                    {{-- =================================================
-                         PROFILE BUTTON + DROPDOWN
-                         ================================================= --}}
-
+                    {{-- Profile --}}
                     <div
-                        class="relative"
+                        class="lq-profile-anchor"
                         @click.outside="closeProfile()"
                     >
 
-                        {{-- Avatar --}}
                         <button
                             type="button"
-                            class="lq-avatar cursor-pointer border-0"
+                            class="lq-profile-trigger lq-avatar lq-avatar--md"
                             aria-label="Open profile menu"
                             aria-haspopup="menu"
                             :aria-expanded="profileOpen.toString()"
@@ -254,10 +243,7 @@
                         </button>
 
 
-                        {{-- =================================================
-                             PROFILE DROPDOWN
-                             ================================================= --}}
-
+                        {{-- Desktop profile menu --}}
                         <div
                             x-cloak
                             x-show="profileOpen"
@@ -267,27 +253,26 @@
                             x-transition:leave="transition ease-in duration-100"
                             x-transition:leave-start="opacity-100 scale-100"
                             x-transition:leave-end="opacity-0 scale-95"
-                            class="absolute right-0 top-12 z-[100] w-72 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+                            class="lq-profile-menu"
                             role="menu"
                             aria-label="Profile menu"
                         >
 
-                            {{-- Profile summary --}}
-                            <div class="border-b border-slate-100 bg-slate-50 px-4 py-4">
+                            <div class="lq-profile-summary">
 
-                                <div class="flex items-center gap-3">
+                                <div class="lq-row">
 
-                                    <div class="lq-avatar shrink-0">
+                                    <x-lq.avatar size="md">
                                         {{ $initials }}
-                                    </div>
+                                    </x-lq.avatar>
 
-                                    <div class="min-w-0">
+                                    <div class="lq-grow">
 
-                                        <div class="truncate text-sm font-black text-slate-900">
+                                        <div class="lq-profile-name">
                                             {{ $explorer['name'] }}
                                         </div>
 
-                                        <div class="mt-0.5 text-xs font-semibold text-slate-500">
+                                        <div class="lq-profile-level">
                                             Level {{ $explorer['level'] }} Explorer
                                         </div>
 
@@ -296,29 +281,28 @@
                                 </div>
 
 
-                                {{-- Mini progress stats --}}
-                                <div class="mt-4 grid grid-cols-2 gap-2">
+                                <div class="lq-profile-stats">
 
-                                    <div class="rounded-xl bg-white px-3 py-2 shadow-sm ring-1 ring-slate-100">
+                                    <div class="lq-profile-stat">
 
-                                        <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                                        <div class="lq-profile-stat__label">
                                             XP
                                         </div>
 
-                                        <div class="mt-0.5 text-sm font-black text-slate-900">
+                                        <div class="lq-profile-stat__value">
                                             {{ number_format($explorer['xp']) }}
                                         </div>
 
                                     </div>
 
 
-                                    <div class="rounded-xl bg-white px-3 py-2 shadow-sm ring-1 ring-slate-100">
+                                    <div class="lq-profile-stat">
 
-                                        <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                                        <div class="lq-profile-stat__label">
                                             Streak
                                         </div>
 
-                                        <div class="mt-0.5 text-sm font-black text-slate-900">
+                                        <div class="lq-profile-stat__value">
                                             🔥 {{ $explorer['streak'] }}
                                         </div>
 
@@ -329,20 +313,15 @@
                             </div>
 
 
-                            {{-- Menu items --}}
-                            <div class="p-2">
+                            <div class="lq-profile-menu__items">
 
-                                {{-- My Profile --}}
                                 <a
                                     href="#"
                                     role="menuitem"
-                                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-blue-50 hover:text-blue-700"
+                                    class="lq-profile-menu__item"
                                     @click="closeProfile()"
                                 >
-                                    <span
-                                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-lg"
-                                        aria-hidden="true"
-                                    >
+                                    <span class="lq-profile-menu__item-icon">
                                         👤
                                     </span>
 
@@ -352,17 +331,13 @@
                                 </a>
 
 
-                                {{-- Achievements --}}
                                 <a
                                     href="#"
                                     role="menuitem"
-                                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-amber-50 hover:text-amber-700"
+                                    class="lq-profile-menu__item"
                                     @click="closeProfile()"
                                 >
-                                    <span
-                                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-lg"
-                                        aria-hidden="true"
-                                    >
+                                    <span class="lq-profile-menu__item-icon">
                                         🏆
                                     </span>
 
@@ -372,17 +347,13 @@
                                 </a>
 
 
-                                {{-- Settings --}}
                                 <a
                                     href="#"
                                     role="menuitem"
-                                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-100 hover:text-slate-900"
+                                    class="lq-profile-menu__item"
                                     @click="closeProfile()"
                                 >
-                                    <span
-                                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-lg"
-                                        aria-hidden="true"
-                                    >
+                                    <span class="lq-profile-menu__item-icon">
                                         ⚙️
                                     </span>
 
@@ -394,27 +365,21 @@
                             </div>
 
 
-                            {{-- Logout --}}
-                            <div class="border-t border-slate-100 p-2">
+                            <div class="lq-profile-menu__logout">
 
                                 <button
                                     type="button"
+                                    class="lq-profile-menu__logout-button"
                                     role="menuitem"
-                                    class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-black text-red-600 transition hover:bg-red-50"
                                     @click="openLogout()"
                                 >
-
-                                    <span
-                                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-red-50 text-lg"
-                                        aria-hidden="true"
-                                    >
+                                    <span class="lq-profile-menu__item-icon">
                                         🚪
                                     </span>
 
                                     <span>
                                         Log out
                                     </span>
-
                                 </button>
 
                             </div>
@@ -441,7 +406,7 @@
 
                     <div class="lq-hero-kicker">
 
-                        <span>
+                        <span aria-hidden="true">
                             🌟
                         </span>
 
@@ -467,31 +432,38 @@
 
                         @if($mission)
 
-                            <a
+                            <x-lq.button
+                                variant="primary"
+                                size="md"
+                                tag="a"
                                 href="#current-mission"
-                                class="lq-button-primary"
                             >
                                 🚀 {{ $mission['buttonText'] }} Quest
-                            </a>
+                            </x-lq.button>
 
                         @else
 
-                            <a
+                            <x-lq.button
+                                variant="primary"
+                                size="md"
+                                tag="a"
                                 href="{{ route('child.explore') }}"
-                                class="lq-button-primary"
                             >
                                 🧭 Start Adventure
-                            </a>
+                            </x-lq.button>
 
                         @endif
 
 
-                        <a
+                        <x-lq.button
+                            variant="secondary"
+                            size="md"
+                            tag="a"
                             href="#continue-learning"
-                            class="lq-button-secondary"
+                            class="lq-hero-secondary"
                         >
                             View Progress
-                        </a>
+                        </x-lq.button>
 
                     </div>
 
@@ -509,92 +481,44 @@
                 aria-label="Your progress"
             >
 
-                {{-- XP --}}
-                <article class="lq-stat-card">
-
-                    <div class="lq-stat-card-top">
-
-                        <span>
-                            ⭐ XP
-                        </span>
-
-                        <span>
-                            Growth
-                        </span>
-
-                    </div>
-
-                    <div class="lq-stat-card-value">
-                        {{ number_format($explorer['xp']) }}
-                    </div>
-
-                </article>
+                <x-lq.stat-chip
+                    variant="reward"
+                    size="md"
+                    class="lq-stat-card"
+                    icon="⭐"
+                    :value="number_format($explorer['xp'])"
+                    label="XP · Growth"
+                />
 
 
-                {{-- Streak --}}
-                <article class="lq-stat-card">
-
-                    <div class="lq-stat-card-top">
-
-                        <span>
-                            🔥 Streak
-                        </span>
-
-                        <span>
-                            Days
-                        </span>
-
-                    </div>
-
-                    <div class="lq-stat-card-value">
-                        {{ $explorer['streak'] }}
-                    </div>
-
-                </article>
+                <x-lq.stat-chip
+                    variant="warning"
+                    size="md"
+                    class="lq-stat-card"
+                    icon="🔥"
+                    :value="$explorer['streak']"
+                    label="Streak · Days"
+                />
 
 
-                {{-- Level --}}
-                <article class="lq-stat-card">
-
-                    <div class="lq-stat-card-top">
-
-                        <span>
-                            🚀 Level
-                        </span>
-
-                        <span>
-                            Explorer
-                        </span>
-
-                    </div>
-
-                    <div class="lq-stat-card-value">
-                        {{ $explorer['level'] }}
-                    </div>
-
-                </article>
+                <x-lq.stat-chip
+                    variant="primary"
+                    size="md"
+                    class="lq-stat-card"
+                    icon="🚀"
+                    :value="$explorer['level']"
+                    label="Level · Explorer"
+                />
 
 
-                {{-- Future readiness --}}
-                <article class="lq-stat-card">
-
-                    <div class="lq-stat-card-top">
-
-                        <span>
-                            🧭 Readiness
-                        </span>
-
-                        <span>
-                            Future
-                        </span>
-
-                    </div>
-
-                    <div class="lq-stat-card-value">
-                        {{ $explorer['futureReadiness'] }}%
-                    </div>
-
-                </article>
+                <x-lq.stat-chip
+                    variant="success"
+                    size="md"
+                    class="lq-stat-card"
+                    icon="🧭"
+                    :value="$explorer['futureReadiness'] . '%'"
+                    label="Readiness · Future"
+                />
 
             </section>
 
@@ -605,18 +529,13 @@
 
             <div class="lq-dashboard-grid">
 
-
                 {{-- =================================================
                      MAIN COLUMN
                      ================================================= --}}
 
                 <div class="lq-main-column">
 
-
-                    {{-- =================================================
-                         CONTINUE LEARNING
-                         ================================================= --}}
-
+                    {{-- Continue Learning --}}
                     <section
                         id="continue-learning"
                         class="lq-section"
@@ -624,17 +543,12 @@
 
                         <div class="lq-section-head">
 
-                            <div>
-
-                                <h2 class="lq-section-title">
-                                    Continue Learning
-                                </h2>
-
-                                <p class="lq-section-subtitle">
-                                    Pick up where you left off.
-                                </p>
-
-                            </div>
+                            <x-lq.section-title
+                                size="md"
+                                subtitle="Pick up where you left off."
+                            >
+                                Continue Learning
+                            </x-lq.section-title>
 
                             <a
                                 href="{{ route('child.explore') }}"
@@ -646,7 +560,10 @@
                         </div>
 
 
-                        <article class="lq-card lq-card-pad">
+                        <x-lq.glass-card
+                            padding="md"
+                            variant="glass"
+                        >
 
                             @if($learning)
 
@@ -677,83 +594,46 @@
                                     </div>
 
 
-                                    <div>
+                                    <x-lq.progress-summary
+                                        :value="$learning['progress']"
+                                        label="Course progress"
+                                        color="primary"
+                                    />
 
-                                        <div class="lq-progress-line">
-
-                                            <span>
-                                                Course progress
-                                            </span>
-
-                                            <strong>
-                                                {{ $learning['progress'] }}%
-                                            </strong>
-
-                                        </div>
-
-
-                                        <div
-                                            class="lq-progress"
-                                            role="progressbar"
-                                            aria-valuenow="{{ $learning['progress'] }}"
-                                            aria-valuemin="0"
-                                            aria-valuemax="100"
-                                        >
-
-                                            <span
-                                                style="width: {{ $learning['progress'] }}%"
-                                            ></span>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <div>
-
-                                        <a
-                                            href="{{ route('child.explore') }}"
-                                            class="lq-action"
-                                        >
-                                            Continue Learning →
-                                        </a>
-
-                                    </div>
+                                    <a
+                                        href="{{ route('child.explore') }}"
+                                        class="lq-action"
+                                    >
+                                        Continue Learning →
+                                    </a>
 
                                 </div>
 
                             @else
 
-                                <div class="lq-empty">
-                                    Start your first course to begin your learning journey.
-                                </div>
+                                <x-lq.empty-state
+                                    icon="📚"
+                                    message="Start your first course to begin your learning journey."
+                                />
 
                             @endif
 
-                        </article>
+                        </x-lq.glass-card>
 
                     </section>
 
 
-                    {{-- =================================================
-                         SKILLS
-                         ================================================= --}}
-
+                    {{-- Skills --}}
                     <section class="lq-section">
 
                         <div class="lq-section-head">
 
-                            <div>
-
-                                <h2 class="lq-section-title">
-                                    Your Super Skills
-                                </h2>
-
-                                <p class="lq-section-subtitle">
-                                    Capabilities you're building.
-                                </p>
-
-                            </div>
+                            <x-lq.section-title
+                                size="md"
+                                subtitle="Capabilities you're building."
+                            >
+                                Your Super Skills
+                            </x-lq.section-title>
 
                             <a
                                 href="{{ route('child.explore') }}"
@@ -769,7 +649,11 @@
 
                             @forelse($skills as $skill)
 
-                                <article class="lq-card lq-skill-card">
+                                <x-lq.glass-card
+                                    padding="sm"
+                                    variant="glass"
+                                    class="lq-skill-card"
+                                >
 
                                     <div class="lq-skill-top">
 
@@ -779,7 +663,6 @@
 
                                                 <x-dynamic-component
                                                     :component="$skill['icon']"
-                                                    class="h-5 w-5 text-blue-600"
                                                 />
 
                                             @else
@@ -789,7 +672,6 @@
                                             @endif
 
                                         </div>
-
 
                                         <span class="lq-skill-xp">
                                             {{ $skill['xp'] }} XP
@@ -803,26 +685,22 @@
                                     </div>
 
 
-                                    <div class="mt-2">
+                                    <div class="lq-skill-progress">
 
-                                        <div class="lq-progress">
-
-                                            <span
-                                                style="width: {{ max(0, min(100, (int) $skill['progress'])) }}%"
-                                            ></span>
-
-                                        </div>
+                                        <x-lq.progress-bar
+                                            :value="$skill['progress']"
+                                            :max="100"
+                                            color="primary"
+                                            :show-label="false"
+                                        />
 
                                     </div>
 
-                                </article>
+                                </x-lq.glass-card>
 
                             @empty
 
-                                <div
-                                    class="lq-card lq-empty"
-                                    style="grid-column: 1 / -1;"
-                                >
+                                <div class="lq-card lq-empty lq-grid-full">
                                     Complete activities to build your first skills.
                                 </div>
 
@@ -833,25 +711,17 @@
                     </section>
 
 
-                    {{-- =================================================
-                         LEARNING WORLDS
-                         ================================================= --}}
-
+                    {{-- Learning Worlds --}}
                     <section class="lq-section">
 
                         <div class="lq-section-head">
 
-                            <div>
-
-                                <h2 class="lq-section-title">
-                                    Learning Worlds
-                                </h2>
-
-                                <p class="lq-section-subtitle">
-                                    Choose a world and start your adventure.
-                                </p>
-
-                            </div>
+                            <x-lq.section-title
+                                size="md"
+                                subtitle="Choose a world and start your adventure."
+                            >
+                                Learning Worlds
+                            </x-lq.section-title>
 
                             <a
                                 href="{{ route('child.explore') }}"
@@ -865,37 +735,32 @@
 
                         <div class="lq-world-grid">
 
-                            @forelse($worlds as $index => $world)
+                            @forelse($worlds as $world)
 
-                                <a
-                                    href="{{ route('child.missions') }}"
-                                    class="lq-world-card"
+                                <x-lq.world-tile
+                                    :icon="$world['icon'] ?? '🌎'"
+                                    :title="$world['name']"
+                                    :description="$world['description'] ?? null"
+                                    :progress="$world['progress'] ?? 0"
+                                    :xp="$world['xp'] ?? 0"
+                                    :badge="$world['badge'] ?? null"
+                                    :locked="$world['locked'] ?? false"
                                 >
 
-                                    <div class="lq-world-icon">
-                                        {{ $world['icon'] ?? '🌎' }}
-                                    </div>
+                                    <x-lq.button
+                                        variant="secondary"
+                                        size="sm"
+                                        tag="a"
+                                        href="{{ route('child.missions') }}"
+                                    >
+                                        Explore →
+                                    </x-lq.button>
 
-                                    <div class="lq-world-name">
-                                        {{ $world['name'] }}
-                                    </div>
-
-                                    <div class="lq-world-meta">
-                                        {{ $world['courses'] }} courses
-                                    </div>
-
-                                    <div class="lq-world-progress">
-                                        <span></span>
-                                    </div>
-
-                                </a>
+                                </x-lq.world-tile>
 
                             @empty
 
-                                <div
-                                    class="lq-card lq-empty"
-                                    style="grid-column: 1 / -1;"
-                                >
+                                <div class="lq-card lq-empty lq-grid-full">
                                     New learning worlds are coming soon.
                                 </div>
 
@@ -906,25 +771,17 @@
                     </section>
 
 
-                    {{-- =================================================
-                         RECOMMENDED ADVENTURES
-                         ================================================= --}}
-
+                    {{-- Recommended Adventures --}}
                     <section class="lq-section">
 
                         <div class="lq-section-head">
 
-                            <div>
-
-                                <h2 class="lq-section-title">
-                                    Recommended Adventures
-                                </h2>
-
-                                <p class="lq-section-subtitle">
-                                    A few quests picked for you.
-                                </p>
-
-                            </div>
+                            <x-lq.section-title
+                                size="md"
+                                subtitle="A few quests picked for you."
+                            >
+                                Recommended Adventures
+                            </x-lq.section-title>
 
                         </div>
 
@@ -933,7 +790,11 @@
 
                             @forelse($recommendations as $adventure)
 
-                                <article class="lq-card lq-adventure-card">
+                                <x-lq.glass-card
+                                    padding="md"
+                                    variant="glass"
+                                    class="lq-adventure-card"
+                                >
 
                                     <div class="lq-row">
 
@@ -943,7 +804,6 @@
 
                                                 <x-dynamic-component
                                                     :component="$adventure['icon']"
-                                                    class="h-5 w-5 text-orange-500"
                                                 />
 
                                             @else
@@ -970,30 +830,23 @@
                                     </div>
 
 
-                                    <p class="lq-card-meta mt-3">
+                                    <p class="lq-card-meta lq-description">
                                         {{ $adventure['description'] }}
                                     </p>
 
 
-                                    <div class="mt-3">
+                                    <a
+                                        href="{{ route('child.explore') }}"
+                                        class="lq-action"
+                                    >
+                                        Explore →
+                                    </a>
 
-                                        <a
-                                            href="{{ route('child.explore') }}"
-                                            class="lq-action"
-                                        >
-                                            Explore →
-                                        </a>
-
-                                    </div>
-
-                                </article>
+                                </x-lq.glass-card>
 
                             @empty
 
-                                <div
-                                    class="lq-card lq-empty"
-                                    style="grid-column: 1 / -1;"
-                                >
+                                <div class="lq-card lq-empty lq-grid-full">
                                     More adventures are coming soon.
                                 </div>
 
@@ -1012,31 +865,26 @@
 
                 <aside class="lq-side-column">
 
-
-                    {{-- =================================================
-                         NOVA
-                         ================================================= --}}
-
+                    {{-- Nova --}}
                     <section class="lq-section">
 
                         <div class="lq-section-head">
 
-                            <div>
-
-                                <h2 class="lq-section-title">
-                                    Nova the Explorer
-                                </h2>
-
-                                <p class="lq-section-subtitle">
-                                    Your learning companion.
-                                </p>
-
-                            </div>
+                            <x-lq.section-title
+                                size="md"
+                                subtitle="Your learning companion."
+                            >
+                                Nova the Explorer
+                            </x-lq.section-title>
 
                         </div>
 
 
-                        <article class="lq-nova">
+                        <x-lq.glass-card
+                            padding="md"
+                            variant="glass"
+                            class="lq-nova"
+                        >
 
                             <div class="lq-nova-avatar">
                                 🤖
@@ -1055,22 +903,19 @@
 
                                 <button
                                     type="button"
-                                    class="lq-action mt-3"
+                                    class="lq-action lq-action--inline"
                                 >
                                     {{ $nova['buttonText'] }} →
                                 </button>
 
                             </div>
 
-                        </article>
+                        </x-lq.glass-card>
 
                     </section>
 
 
-                    {{-- =================================================
-                         CURRENT QUEST
-                         ================================================= --}}
-
+                    {{-- Current Quest --}}
                     <section
                         id="current-mission"
                         class="lq-section"
@@ -1078,22 +923,20 @@
 
                         <div class="lq-section-head">
 
-                            <div>
-
-                                <h2 class="lq-section-title">
-                                    Current Quest
-                                </h2>
-
-                                <p class="lq-section-subtitle">
-                                    Your next step.
-                                </p>
-
-                            </div>
+                            <x-lq.section-title
+                                size="md"
+                                subtitle="Your next step."
+                            >
+                                Current Quest
+                            </x-lq.section-title>
 
                         </div>
 
 
-                        <article class="lq-card lq-card-pad">
+                        <x-lq.glass-card
+                            padding="md"
+                            variant="glass"
+                        >
 
                             @if($mission)
 
@@ -1118,7 +961,7 @@
                                 </div>
 
 
-                                <div class="mt-4">
+                                <div class="lq-quest-progress">
 
                                     <div class="lq-progress-line">
 
@@ -1135,20 +978,19 @@
                                     </div>
 
 
-                                    <div class="lq-progress">
-
-                                        <span
-                                            style="width: {{ max(0, min(100, (int) $mission['progress'])) }}%"
-                                        ></span>
-
-                                    </div>
+                                    <x-lq.progress-bar
+                                        :value="$mission['progress']"
+                                        :max="100"
+                                        color="primary"
+                                        :show-label="false"
+                                    />
 
                                 </div>
 
 
                                 <a
                                     href="{{ route('child.missions') }}"
-                                    class="lq-action mt-4 w-full"
+                                    class="lq-action lq-action--full"
                                 >
                                     {{ $mission['buttonText'] }} →
                                 </a>
@@ -1167,30 +1009,22 @@
 
                             @endif
 
-                        </article>
+                        </x-lq.glass-card>
 
                     </section>
 
 
-                    {{-- =================================================
-                         RECENT BADGES
-                         ================================================= --}}
-
+                    {{-- Recent Badges --}}
                     <section class="lq-section">
 
                         <div class="lq-section-head">
 
-                            <div>
-
-                                <h2 class="lq-section-title">
-                                    Recent Badges
-                                </h2>
-
-                                <p class="lq-section-subtitle">
-                                    Milestones you've earned.
-                                </p>
-
-                            </div>
+                            <x-lq.section-title
+                                size="md"
+                                subtitle="Milestones you've earned."
+                            >
+                                Recent Badges
+                            </x-lq.section-title>
 
                         </div>
 
@@ -1199,7 +1033,11 @@
 
                             @forelse($achievements as $achievement)
 
-                                <article class="lq-card lq-badge-card">
+                                <x-lq.glass-card
+                                    padding="sm"
+                                    variant="glass"
+                                    class="lq-badge-card"
+                                >
 
                                     <div class="lq-badge-icon">
 
@@ -1207,7 +1045,6 @@
 
                                             <x-dynamic-component
                                                 :component="$achievement['icon']"
-                                                class="h-5 w-5 text-amber-500"
                                             />
 
                                         @else
@@ -1231,14 +1068,11 @@
 
                                     </div>
 
-                                </article>
+                                </x-lq.glass-card>
 
                             @empty
 
-                                <div
-                                    class="lq-card lq-empty"
-                                    style="grid-column: 1 / -1;"
-                                >
+                                <div class="lq-card lq-empty lq-grid-full">
                                     Complete activities to unlock your first badges.
                                 </div>
 
@@ -1249,13 +1083,14 @@
                     </section>
 
 
-                    {{-- =================================================
-                         DAILY CHALLENGE
-                         ================================================= --}}
-
+                    {{-- Daily Challenge --}}
                     <section class="lq-section">
 
-                        <article class="lq-card lq-card-pad lq-challenge">
+                        <x-lq.glass-card
+                            padding="md"
+                            variant="soft"
+                            class="lq-challenge"
+                        >
 
                             <div class="lq-row">
 
@@ -1294,23 +1129,23 @@
                             </div>
 
 
-                            <div class="lq-progress mt-2">
-
-                                <span
-                                    style="width: {{ min(100, ($challenge['current'] / max(1, $challenge['target'])) * 100) }}%"
-                                ></span>
-
-                            </div>
+                            <x-lq.progress-bar
+                                :value="$challengeProgress"
+                                :max="100"
+                                color="reward"
+                                :show-label="false"
+                                class="lq-challenge-progress"
+                            />
 
 
                             <button
                                 type="button"
-                                class="lq-action mt-4 w-full"
+                                class="lq-action lq-action--full lq-challenge-action"
                             >
                                 {{ $challenge['buttonText'] }}
                             </button>
 
-                        </article>
+                        </x-lq.glass-card>
 
                     </section>
 
@@ -1335,8 +1170,9 @@
         <a
             href="{{ route('child.dashboard') }}"
             class="lq-mobile-nav-item is-active"
+            aria-current="page"
         >
-            <span>🌌</span>
+            <span aria-hidden="true">🌌</span>
             <span>My Universe</span>
         </a>
 
@@ -1345,7 +1181,7 @@
             href="{{ route('child.explore') }}"
             class="lq-mobile-nav-item"
         >
-            <span>🧭</span>
+            <span aria-hidden="true">🧭</span>
             <span>Explorer</span>
         </a>
 
@@ -1354,7 +1190,7 @@
             href="{{ route('child.missions') }}"
             class="lq-mobile-nav-item"
         >
-            <span>🌍</span>
+            <span aria-hidden="true">🌍</span>
             <span>Worlds</span>
         </a>
 
@@ -1363,15 +1199,14 @@
             href="{{ route('child.missions') }}"
             class="lq-mobile-nav-item"
         >
-            <span>📚</span>
+            <span aria-hidden="true">📚</span>
             <span>Courses</span>
         </a>
 
 
-        {{-- Mobile profile --}}
         <button
             type="button"
-            class="lq-mobile-nav-item border-0 bg-transparent"
+            class="lq-mobile-nav-item"
             @click="
                 profileOpen
                     ? closeProfile()
@@ -1380,7 +1215,7 @@
             :aria-expanded="profileOpen.toString()"
             aria-haspopup="dialog"
         >
-            <span>
+            <span aria-hidden="true">
                 👤
             </span>
 
@@ -1399,20 +1234,18 @@
     <div
         x-cloak
         x-show="profileOpen"
-        class="fixed inset-0 z-[90] lg:hidden"
+        class="lq-mobile-profile"
         role="dialog"
         aria-modal="true"
         aria-label="Profile menu"
     >
 
-        {{-- Backdrop --}}
         <div
-            class="absolute inset-0 bg-slate-950/40 backdrop-blur-sm"
+            class="lq-mobile-profile__backdrop"
             @click="closeProfile()"
         ></div>
 
 
-        {{-- Bottom sheet --}}
         <div
             x-show="profileOpen"
             x-transition:enter="transition ease-out duration-200"
@@ -1421,33 +1254,27 @@
             x-transition:leave="transition ease-in duration-150"
             x-transition:leave-start="translate-y-0"
             x-transition:leave-end="translate-y-full"
-            class="absolute inset-x-0 bottom-0 overflow-hidden rounded-t-3xl bg-white shadow-2xl"
+            class="lq-mobile-profile__sheet"
         >
 
-            {{-- Handle --}}
-            <div class="flex justify-center pt-3">
-
-                <div class="h-1.5 w-12 rounded-full bg-slate-200"></div>
-
-            </div>
+            <div class="lq-mobile-profile__handle"></div>
 
 
-            {{-- Summary --}}
-            <div class="px-5 pb-4 pt-4">
+            <div class="lq-mobile-profile__summary">
 
-                <div class="flex items-center gap-3">
+                <div class="lq-row">
 
-                    <div class="lq-avatar shrink-0">
+                    <x-lq.avatar size="md">
                         {{ $initials }}
-                    </div>
+                    </x-lq.avatar>
 
-                    <div class="min-w-0">
+                    <div class="lq-grow">
 
-                        <div class="truncate text-base font-black text-slate-900">
+                        <div class="lq-profile-name">
                             {{ $explorer['name'] }}
                         </div>
 
-                        <div class="text-xs font-semibold text-slate-500">
+                        <div class="lq-profile-level">
                             Level {{ $explorer['level'] }} Explorer
                         </div>
 
@@ -1456,28 +1283,28 @@
                 </div>
 
 
-                <div class="mt-4 grid grid-cols-2 gap-2">
+                <div class="lq-profile-stats">
 
-                    <div class="rounded-xl bg-blue-50 px-3 py-2">
+                    <div class="lq-profile-stat">
 
-                        <div class="text-[10px] font-bold uppercase tracking-wide text-blue-500">
+                        <div class="lq-profile-stat__label">
                             XP
                         </div>
 
-                        <div class="mt-0.5 text-sm font-black text-blue-900">
+                        <div class="lq-profile-stat__value">
                             {{ number_format($explorer['xp']) }}
                         </div>
 
                     </div>
 
 
-                    <div class="rounded-xl bg-orange-50 px-3 py-2">
+                    <div class="lq-profile-stat">
 
-                        <div class="text-[10px] font-bold uppercase tracking-wide text-orange-500">
+                        <div class="lq-profile-stat__label">
                             Streak
                         </div>
 
-                        <div class="mt-0.5 text-sm font-black text-orange-900">
+                        <div class="lq-profile-stat__value">
                             🔥 {{ $explorer['streak'] }}
                         </div>
 
@@ -1488,74 +1315,45 @@
             </div>
 
 
-            {{-- Mobile menu --}}
-            <div class="border-t border-slate-100 px-3 py-2">
+            <div class="lq-mobile-profile__items">
 
                 <a
                     href="#"
-                    class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-700 hover:bg-blue-50"
+                    class="lq-mobile-profile__item"
                     @click="closeProfile()"
                 >
-
-                    <span class="text-lg">
-                        👤
-                    </span>
-
-                    <span>
-                        My Profile
-                    </span>
-
+                    <span>👤</span>
+                    <span>My Profile</span>
                 </a>
 
 
                 <a
                     href="#"
-                    class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-700 hover:bg-amber-50"
+                    class="lq-mobile-profile__item"
                     @click="closeProfile()"
                 >
-
-                    <span class="text-lg">
-                        🏆
-                    </span>
-
-                    <span>
-                        My Achievements
-                    </span>
-
+                    <span>🏆</span>
+                    <span>My Achievements</span>
                 </a>
 
 
                 <a
                     href="#"
-                    class="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
+                    class="lq-mobile-profile__item"
                     @click="closeProfile()"
                 >
-
-                    <span class="text-lg">
-                        ⚙️
-                    </span>
-
-                    <span>
-                        Settings
-                    </span>
-
+                    <span>⚙️</span>
+                    <span>Settings</span>
                 </a>
 
 
                 <button
                     type="button"
-                    class="mb-2 mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-black text-red-600 hover:bg-red-50"
+                    class="lq-mobile-profile__logout"
                     @click="openLogout()"
                 >
-
-                    <span class="text-lg">
-                        🚪
-                    </span>
-
-                    <span>
-                        Log out
-                    </span>
-
+                    <span>🚪</span>
+                    <span>Log out</span>
                 </button>
 
             </div>
@@ -1572,13 +1370,12 @@
     <div
         x-cloak
         x-show="logoutOpen"
-        class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-950/50 p-5 backdrop-blur-sm"
+        class="lq-logout-overlay"
         role="dialog"
         aria-modal="true"
         aria-labelledby="logout-title"
     >
 
-        {{-- Confirmation card --}}
         <div
             x-show="logoutOpen"
             x-transition:enter="transition ease-out duration-150"
@@ -1587,46 +1384,37 @@
             x-transition:leave="transition ease-in duration-100"
             x-transition:leave-start="opacity-100 scale-100"
             x-transition:leave-end="opacity-0 scale-95"
-            class="w-full max-w-sm rounded-3xl bg-white p-6 shadow-2xl"
+            class="lq-logout-card"
         >
 
-            {{-- Icon --}}
-            <div class="flex justify-center">
-
-                <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50 text-3xl">
-                    🚀
-                </div>
-
+            <div class="lq-logout-icon">
+                🚀
             </div>
 
 
-            {{-- Message --}}
-            <div class="mt-4 text-center">
+            <div class="lq-logout-content">
 
-                <h2
-                    id="logout-title"
-                    class="text-xl font-black tracking-tight text-slate-900"
-                >
+                <h2 id="logout-title">
                     Ready to leave your adventure?
                 </h2>
 
-                <p class="mt-2 text-sm leading-6 text-slate-500">
+                <p>
                     Your progress is saved. You can come back anytime.
                 </p>
 
             </div>
 
 
-            {{-- Actions --}}
-            <div class="mt-6 grid grid-cols-2 gap-3">
+            <div class="lq-logout-actions">
 
-                <button
+                <x-lq.button
+                    variant="secondary"
+                    size="md"
                     type="button"
-                    class="min-h-11 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 transition hover:bg-slate-50"
                     @click="closeLogout()"
                 >
                     Stay
-                </button>
+                </x-lq.button>
 
 
                 <form
@@ -1636,12 +1424,13 @@
 
                     @csrf
 
-                    <button
+                    <x-lq.button
+                        variant="secondary"
+                        size="md"
                         type="submit"
-                        class="min-h-11 w-full rounded-xl bg-red-600 px-4 py-2.5 text-sm font-black text-white transition hover:bg-red-700"
                     >
                         Log out
-                    </button>
+                    </x-lq.button>
 
                 </form>
 
@@ -1652,7 +1441,6 @@
     </div>
 
 
-    {{-- Existing floating actions --}}
     <livewire:child.layouts.components.floating-actions />
 
 </div>

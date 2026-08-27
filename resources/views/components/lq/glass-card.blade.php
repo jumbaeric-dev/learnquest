@@ -1,35 +1,30 @@
+@props([
+    'padding' => 'md',
+    'radius' => 'xl',
+    'variant' => 'glass',
+])
+
 @php
+    $classes = [
+        'sm' => 'lq-card--padding-sm',
+        'md' => 'lq-card--padding-md',
+        'lg' => 'lq-card--padding-lg',
+    ];
 
-$paddings = [
-    'sm' => 'p-3',
-    'md' => 'p-5',
-    'lg' => 'p-8',
-];
-
-$radii = [
-    'lg' => 'rounded-lg',
-    'xl' => 'rounded-3xl',
-    'full' => 'rounded-full',
-];
-
+    $radii = [
+        'lg' => 'lq-card--radius-lg',
+        'xl' => 'lq-card--radius-xl',
+        'full' => 'lq-card--radius-full',
+    ];
 @endphp
 
 <div
-    {{ $attributes->merge([
-        'class' =>
-        '
-        bg-white/80
-        backdrop-blur-xl
-        border
-        border-white/40
-        shadow-xl
-        '
-        .$paddings[$padding]
-        .' '
-        .$radii[$radius]
+    {{ $attributes->class([
+        'lq-card',
+        "lq-card--{$variant}",
+        $classes[$padding] ?? $classes['md'],
+        $radii[$radius] ?? $radii['xl'],
     ]) }}
 >
-
     {{ $slot }}
-
 </div>
