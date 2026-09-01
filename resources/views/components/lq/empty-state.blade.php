@@ -1,4 +1,4 @@
-5@props([
+@props([
     'icon' => null,
     'title' => null,
     'message' => null,
