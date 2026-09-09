@@ -125,6 +125,56 @@ class Activity extends Component
     $this->submitted = true;
   }
 
+      /**
+     * Determine the next logical step after completing this activity.
+     */
+    public function getNextStep(): ?array
+    {
+        if (!$this->progress?->completed) {
+            return null;
+        }
+
+        $lesson = $this->activity->lesson;
+
+        // 1. Check for the next activity in the current lesson
+        $nextActivity = $lesson->activities()
+            ->where('position', '>', $this->activity->position)
+            ->orderBy('position')
+            ->first();
+
+        if ($nextActivity) {
+            return [
+                'type' => 'activity',
+                'url' => route('learn.activity', $nextActivity),
+                'label' => 'Next Activity',
+                'icon' => '→'
+            ];
+        }
+
+        // 2. If no more activities, check for the next lesson in the module
+        $nextLesson = $lesson->module->lessons()
+            ->where('position', '>', $lesson->position)
+            ->orderBy('position')
+            ->first();
+
+        if ($nextLesson) {
+            return [
+                'type' => 'lesson',
+                'url' => route('learn.lesson', $nextLesson),
+                'label' => 'Next Lesson',
+                'icon' => '→'
+            ];
+        }
+
+        // 3. If no more lessons, go back to the course overview
+        return [
+            'type' => 'course',
+            'url' => route('learn.course', $lesson->module->course),
+            'label' => 'Back to Course',
+            'icon' => '↗'
+        ];
+    }
+
   public function render()
   {
     return view("livewire.child.learning.activity");
