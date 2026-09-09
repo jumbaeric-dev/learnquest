@@ -16,9 +16,10 @@
         "laravel/framework": "^13.8",
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^3.0",
+        "learnquest/lqds": "dev-main",
+        "livewire/livewire": "^4.4",
         "openai-php/laravel": "^0.20.0",
-        "spatie/laravel-permission": "^8.0",
-        "learnquest/lqds": "dev-main"
+        "spatie/laravel-permission": "^8.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^4.4",
