@@ -37,6 +37,7 @@ class CourseProgressServiceTest extends TestCase
         $module->lessons()->create([
             'title' => 'Lesson One',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         $progress = $this->service->update(
@@ -63,16 +64,19 @@ class CourseProgressServiceTest extends TestCase
         $module = $course->modules()->create([
             'title' => 'Module One',
             'position' => 1,
+            // 'is_published' => true,
         ]);
 
         $lessonOne = $module->lessons()->create([
             'title' => 'Lesson One',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         $module->lessons()->create([
             'title' => 'Lesson Two',
             'position' => 2,
+            'is_published' => true,
         ]);
 
         LessonProgress::create([
@@ -114,11 +118,13 @@ class CourseProgressServiceTest extends TestCase
         $lessonOne = $module->lessons()->create([
             'title' => 'Lesson One',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         $lessonTwo = $module->lessons()->create([
             'title' => 'Lesson Two',
             'position' => 2,
+            'is_published' => true,
         ]);
 
         foreach ([$lessonOne, $lessonTwo] as $lesson) {
@@ -162,11 +168,13 @@ class CourseProgressServiceTest extends TestCase
         $lessonOne = $module->lessons()->create([
             'title' => 'Lesson One',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         $module->lessons()->create([
             'title' => 'Lesson Two',
             'position' => 2,
+            'is_published' => true,
         ]);
 
         LessonProgress::create([
@@ -214,11 +222,13 @@ class CourseProgressServiceTest extends TestCase
         $targetLesson = $module->lessons()->create([
             'title' => 'Target Lesson',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         $otherLesson = $otherModule->lessons()->create([
             'title' => 'Other Lesson',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         LessonProgress::create([
@@ -249,6 +259,72 @@ class CourseProgressServiceTest extends TestCase
         $this->assertTrue($progress->completed);
         $this->assertSame(1, $progress->completed_lessons);
         $this->assertSame(1, $progress->total_lessons);
+    }
+
+    public function test_unpublished_lessons_do_not_affect_course_progress(): void
+    {
+        $child = Child::factory()->create();
+
+        $course = Course::factory()->create();
+
+        $module = $course->modules()->create([
+            'title' => 'Module One',
+            'position' => 1,
+        ]);
+
+        $publishedLesson = $module->lessons()->create([
+            'title' => 'Published Lesson',
+            'position' => 1,
+            'is_published' => true,
+        ]);
+
+        $unpublishedLesson = $module->lessons()->create([
+            'title' => 'Unpublished Lesson',
+            'position' => 2,
+            'is_published' => false,
+        ]);
+
+        LessonProgress::create([
+            'child_id' => $child->id,
+            'lesson_id' => $publishedLesson->id,
+            'completed_activities' => 1,
+            'total_activities' => 1,
+            'progress_percentage' => 100,
+            'completed' => true,
+            'completed_at' => now(),
+        ]);
+
+        LessonProgress::create([
+            'child_id' => $child->id,
+            'lesson_id' => $unpublishedLesson->id,
+            'completed_activities' => 0,
+            'total_activities' => 1,
+            'progress_percentage' => 0,
+            'completed' => false,
+            'completed_at' => null,
+        ]);
+
+        $progress = $this->service->update(
+            $child,
+            $course
+        );
+
+        $this->assertTrue($progress->completed);
+
+        $this->assertSame(
+            1,
+            $progress->completed_lessons
+        );
+
+        $this->assertSame(
+            1,
+            $progress->total_lessons
+        );
+
+        $this->assertSame(
+            100.0,
+            (float) $progress->progress_percentage
+        );
     }
 
     public function test_empty_course_is_not_marked_completed(): void
@@ -286,6 +362,7 @@ class CourseProgressServiceTest extends TestCase
         $lesson = $module->lessons()->create([
             'title' => 'Lesson One',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         LessonProgress::create([
@@ -328,6 +405,7 @@ class CourseProgressServiceTest extends TestCase
         $lesson = $module->lessons()->create([
             'title' => 'Lesson One',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         LessonProgress::create([
@@ -383,6 +461,7 @@ class CourseProgressServiceTest extends TestCase
         $lesson = $module->lessons()->create([
             'title' => 'Lesson One',
             'position' => 1,
+            'is_published' => true,
         ]);
 
         LessonProgress::create([

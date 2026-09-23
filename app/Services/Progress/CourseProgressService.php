@@ -12,6 +12,8 @@ class CourseProgressService
     /**
      * Recalculate and persist a child's progress for a course.
      *
+     * Only published lessons contribute to course progress.
+     *
      * This service owns course-progress state only.
      *
      * It does NOT:
@@ -28,7 +30,13 @@ class CourseProgressService
     ): CourseProgress {
         $lessonIds = $course
             ->modules()
-            ->with('lessons')
+            ->with([
+                'lessons' => function ($query) {
+                    $query
+                        ->where('is_published', true)
+                        ->orderBy('position');
+                },
+            ])
             ->get()
             ->flatMap(function ($module) {
                 return $module->lessons;

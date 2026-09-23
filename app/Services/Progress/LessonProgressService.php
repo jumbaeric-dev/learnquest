@@ -31,6 +31,7 @@ class LessonProgressService
     ): LessonProgress {
         $activityIds = $lesson
             ->activities()
+            ->where('is_published', true)
             ->pluck('id');
 
         $totalActivities = $activityIds->count();

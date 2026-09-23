@@ -11,25 +11,59 @@ use App\Models\LessonActivity;
 class LearningJourneyService
 {
     /**
-     * Get the child's current course.
+     * Get the child's current published course.
+     *
+     * A child can only continue learning from:
+     * - an active World
+     * - a published Course
+     *
+     * Unpublished courses are ignored even if progress exists for them.
      */
     public function getCurrentCourse(Child $child): ?Course
     {
         $progress = CourseProgress::query()
             ->where('child_id', $child->id)
             ->where('completed', false)
+            ->whereHas('course', function ($query) {
+                $query
+                    ->where('is_published', true)
+                    ->whereHas('subject', function ($query) {
+                        $query->where('is_active', true);
+                    });
+            })
             ->orderByDesc('updated_at')
             ->first();
 
-        return $progress?->course()
+        if (! $progress) {
+            return null;
+        }
+
+        return $progress->course()
+            ->where('is_published', true)
+            ->whereHas('subject', function ($query) {
+                $query->where('is_active', true);
+            })
             ->with([
-                'modules.lessons.activities',
+                'modules.lessons' => function ($query) {
+                    $query
+                        ->where('is_published', true)
+                        ->orderBy('position');
+                },
+
+                'modules.lessons.activities' => function ($query) {
+                    $query
+                        ->where('is_published', true)
+                        ->orderBy('position');
+                },
             ])
             ->first();
     }
 
     /**
-     * Get the current lesson within the active course.
+     * Get the current published lesson within the active course.
+     *
+     * Unpublished lessons are never presented as the child's
+     * next lesson.
      */
     public function getCurrentLesson(Child $child): ?Lesson
     {
@@ -40,9 +74,7 @@ class LearningJourneyService
         }
 
         foreach ($course->modules as $module) {
-
             foreach ($module->lessons as $lesson) {
-
                 $progress = $child
                     ->lessonProgress()
                     ->where('lesson_id', $lesson->id)
@@ -58,7 +90,10 @@ class LearningJourneyService
     }
 
     /**
-     * Get the next activity the child should complete.
+     * Get the next published activity the child should complete.
+     *
+     * Unpublished activities are excluded from the course journey
+     * before this method evaluates progress.
      */
     public function getCurrentActivity(Child $child): ?LessonActivity
     {
@@ -69,7 +104,6 @@ class LearningJourneyService
         }
 
         foreach ($lesson->activities as $activity) {
-
             $progress = $child
                 ->activityProgress()
                 ->where('activity_id', $activity->id)
@@ -99,22 +133,15 @@ class LearningJourneyService
         }
 
         return [
-
             'course' => $course,
-
             'lesson' => $lesson,
-
             'activity' => $activity,
-
             'xp' => $activity->xp_reward,
-
             'minutes' => $lesson->estimated_minutes ?? 5,
-
             'progress' => $this->getCourseProgressPercentage(
                 $child,
                 $course
             ),
-
         ];
     }
 
@@ -125,7 +152,6 @@ class LearningJourneyService
         Child $child,
         Course $course
     ): int {
-
         $progress = $child
             ->courseProgress()
             ->where('course_id', $course->id)

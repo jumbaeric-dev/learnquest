@@ -365,4 +365,59 @@ class LessonProgressServiceTest extends TestCase
             )
         );
     }
+
+    public function test_unpublished_activities_do_not_affect_lesson_progress(): void
+    {
+        $child = Child::factory()->create();
+
+        $lesson = Lesson::factory()->create();
+
+        $publishedActivity = LessonActivity::factory()->create([
+            'lesson_id' => $lesson->id,
+            'is_published' => true,
+            'position' => 1,
+        ]);
+
+        $unpublishedActivity = LessonActivity::factory()->create([
+            'lesson_id' => $lesson->id,
+            'is_published' => false,
+            'position' => 2,
+        ]);
+
+        ActivityProgress::create([
+            'child_id' => $child->id,
+            'activity_id' => $publishedActivity->id,
+            'completed' => true,
+            'completed_at' => now(),
+        ]);
+
+        ActivityProgress::create([
+            'child_id' => $child->id,
+            'activity_id' => $unpublishedActivity->id,
+            'completed' => false,
+            'completed_at' => null,
+        ]);
+
+        $progress = $this->service->update(
+            $child,
+            $lesson
+        );
+
+        $this->assertTrue($progress->completed);
+
+        $this->assertSame(
+            1,
+            $progress->completed_activities
+        );
+
+        $this->assertSame(
+            1,
+            $progress->total_activities
+        );
+
+        $this->assertSame(
+            100.0,
+            (float) $progress->progress_percentage
+        );
+    }
 }
