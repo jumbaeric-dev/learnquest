@@ -28,10 +28,7 @@ class WorldService
     ): WorldDTO {
         $subject = $this->worlds->find($subject->id);
 
-        abort_if(
-            ! $subject,
-            404
-        );
+        abort_if($subject === null, 404);
 
         return new WorldDTO(
             hero: $this->hero($subject),

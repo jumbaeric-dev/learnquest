@@ -30,6 +30,7 @@ class WorldRepository
     public function find(int $id): ?Subject
     {
         return Subject::query()
+            ->where('is_active', true)
             ->with([
                 'courses' => function ($query) {
                     $query
