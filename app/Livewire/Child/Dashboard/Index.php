@@ -2,13 +2,14 @@
 
 namespace App\Livewire\Child\Dashboard;
 
-use Livewire\Component;
 use App\Models\Course;
-use App\Services\Child\Context\CurrentChildService;
 use App\Services\Child\ChildDashboardLoader;
+use App\Services\Child\Context\CurrentChildService;
 use App\Services\Child\Dashboard\UniverseDashboardService;
+use App\Services\Child\Learning\LearningContentAccessService;
 use App\Services\Child\Learning\LearningJourneyService;
 use App\Services\Progress\CourseProgressService;
+use Livewire\Component;
 
 class Index extends Component
 {
@@ -101,11 +102,16 @@ class Index extends Component
     public function explore(
         int $courseId,
         CurrentChildService $currentChild,
-        CourseProgressService $courseProgress
+        CourseProgressService $courseProgress,
+        LearningContentAccessService $access,
     ) {
         $child = $currentChild->current();
 
+        abort_unless($child, 403);
+
         $course = Course::findOrFail($courseId);
+
+        $course = $access->course($course);
 
         $courseProgress->update($child, $course);
 

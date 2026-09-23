@@ -5,6 +5,7 @@ namespace App\Livewire\Child\Explore\Components;
 use App\Models\Course;
 use App\Services\Child\Context\CurrentChildService;
 use App\Services\Child\Dashboard\UniverseDashboardService;
+use App\Services\Child\Learning\LearningContentAccessService;
 use App\Services\Progress\CourseProgressService;
 use Livewire\Component;
 
@@ -44,6 +45,7 @@ class FeaturedAdventure extends Component
     public function startAdventure(
         CurrentChildService $currentChild,
         CourseProgressService $courseProgress,
+        LearningContentAccessService $access,
     ) {
         if (! $this->adventure) {
             return;
@@ -51,7 +53,11 @@ class FeaturedAdventure extends Component
 
         $child = $currentChild->current();
 
+        abort_unless($child, 403);
+
         $course = Course::findOrFail($this->adventure['id']);
+
+        $course = $access->course($course);
 
         $courseProgress->update($child, $course);
 

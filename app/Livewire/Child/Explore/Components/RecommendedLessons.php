@@ -5,6 +5,7 @@ namespace App\Livewire\Child\Explore\Components;
 use App\Models\Course;
 use App\Services\Child\Context\CurrentChildService;
 use App\Services\Child\Dashboard\UniverseDashboardService;
+use App\Services\Child\Learning\LearningContentAccessService;
 use App\Services\Child\Learning\LearningJourneyService;
 use App\Services\Progress\CourseProgressService;
 use Livewire\Component;
@@ -54,10 +55,13 @@ class RecommendedLessons extends Component
         CurrentChildService $currentChild,
         CourseProgressService $courseProgress,
         LearningJourneyService $journey,
+        LearningContentAccessService $access,
     ) {
         $child = $currentChild->current();
 
         $course = Course::findOrFail($courseId);
+
+        $course = $access->course($course);
 
         $courseProgress->update($child, $course);
 

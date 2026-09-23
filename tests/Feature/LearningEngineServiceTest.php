@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\ActivityProgress;
 use App\Models\Badge;
 use App\Models\Child;
 use App\Models\Course;
@@ -9,13 +10,13 @@ use App\Models\CourseModule;
 use App\Models\Lesson;
 use App\Models\LessonActivity;
 use App\Models\Skill;
-use App\Models\ActivityProgress;
 use App\Services\BadgeService;
+use App\Services\Child\Learning\LearningJourneyService;
+use App\Services\Progress\ActivityProgressService;
+use App\Services\Progress\LearningEngineService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use RuntimeException;
-use App\Services\Progress\LearningEngineService;
-use App\Services\Progress\ActivityProgressService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class LearningEngineServiceTest extends TestCase
@@ -743,4 +744,56 @@ class LearningEngineServiceTest extends TestCase
      */
     $this->assertTrue($secondResult["activity_progress"]->completed);
   }
+
+  public function test_completing_final_activity_of_lesson_advances_to_next_lesson(): void
+  {
+    $child = Child::factory()->create();
+
+    $course = Course::factory()->create([
+      'is_published' => true,
+    ]);
+
+    $module = CourseModule::factory()->create([
+      'course_id' => $course->id,
+    ]);
+
+    $lessonOne = Lesson::factory()->create([
+      'learning_module_id' => $module->id,
+      'position' => 1,
+      'is_published' => true,
+    ]);
+
+    $lessonTwo = Lesson::factory()->create([
+      'learning_module_id' => $module->id,
+      'position' => 2,
+      'is_published' => true,
+    ]);
+
+    $activityOne = LessonActivity::factory()->create([
+      'lesson_id' => $lessonOne->id,
+      'position' => 1,
+      'is_published' => true,
+      'xp_reward' => 5,
+    ]);
+
+    LessonActivity::factory()->create([
+      'lesson_id' => $lessonTwo->id,
+      'position' => 1,
+      'is_published' => true,
+      'xp_reward' => 5,
+    ]);
+
+    app(LearningEngineService::class)->completeActivity(
+      $child,
+      $activityOne,
+      100
+    );
+
+    $currentLesson = app(LearningJourneyService::class)
+      ->getCurrentLesson($child);
+
+    $this->assertNotNull($currentLesson);
+    $this->assertSame($lessonTwo->id, $currentLesson->id);
+  }
+  
 }

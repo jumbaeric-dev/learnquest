@@ -295,4 +295,5 @@ class SkillProgressServiceTest extends TestCase
 
     $this->assertSame(0, $child->fresh()->xp);
   }
+  
 }
