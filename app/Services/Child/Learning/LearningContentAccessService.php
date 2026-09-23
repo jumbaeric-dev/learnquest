@@ -17,19 +17,25 @@ class LearningContentAccessService
    */
   public function course(Course $course): Course
   {
-    abort_unless($course->is_published, Response::HTTP_NOT_FOUND);
+    $course->loadMissing('subject');
+
+    abort_unless(
+      $course->is_published &&
+        $course->subject?->is_active,
+      Response::HTTP_NOT_FOUND
+    );
 
     return $course->load([
-      "subject",
-      "modules" => fn($query) => $query->orderBy("position"),
+      'subject',
+      'modules' => fn($query) => $query->orderBy('position'),
 
-      "modules.lessons" => fn($query) => $query
-        ->where("is_published", true)
-        ->orderBy("position"),
+      'modules.lessons' => fn($query) => $query
+        ->where('is_published', true)
+        ->orderBy('position'),
 
-      "modules.lessons.activities" => fn($query) => $query
-        ->where("is_published", true)
-        ->orderBy("position"),
+      'modules.lessons.activities' => fn($query) => $query
+        ->where('is_published', true)
+        ->orderBy('position'),
     ]);
   }
   /**
@@ -39,18 +45,20 @@ class LearningContentAccessService
    */
   public function lesson(Lesson $lesson): Lesson
   {
-    $lesson->loadMissing("module.course");
+    $lesson->loadMissing('module.course.subject');
 
     abort_unless(
-      $lesson->is_published && $lesson->module?->course?->is_published,
+      $lesson->is_published &&
+        $lesson->module?->course?->is_published &&
+        $lesson->module?->course?->subject?->is_active,
       Response::HTTP_NOT_FOUND
     );
 
     return $lesson->load([
-      "module.course",
-      "activities" => fn($query) => $query
-        ->where("is_published", true)
-        ->orderBy("position"),
+      'module.course',
+      'activities' => fn($query) => $query
+        ->where('is_published', true)
+        ->orderBy('position'),
     ]);
   }
 
@@ -61,15 +69,19 @@ class LearningContentAccessService
    */
   public function activity(LessonActivity $activity): LessonActivity
   {
-    $activity->loadMissing("lesson.module.course");
+    $activity->loadMissing('lesson.module.course.subject');
 
     abort_unless(
       $activity->is_published &&
         $activity->lesson?->is_published &&
-        $activity->lesson?->module?->course?->is_published,
+        $activity->lesson?->module?->course?->is_published &&
+        $activity->lesson?->module?->course?->subject?->is_active,
       Response::HTTP_NOT_FOUND
     );
 
-    return $activity->load(["lesson.module.course", "skills"]);
+    return $activity->load([
+      'lesson.module.course',
+      'skills',
+    ]);
   }
 }

@@ -123,7 +123,8 @@ class UniverseDashboardServiceTest extends TestCase
     $child = Child::factory()->create();
 
     $course = Course::factory()->create([
-      "is_published" => true,
+      // 'subject_id' => $subject->id,
+      'is_published' => true,
     ]);
 
     $module = $course->modules()->create([
@@ -135,6 +136,7 @@ class UniverseDashboardServiceTest extends TestCase
       "title" => "First Lesson",
       "position" => 1,
       "estimated_minutes" => 10,
+      'is_published' => true,
     ]);
 
     $activity = $lesson->activities()->create([

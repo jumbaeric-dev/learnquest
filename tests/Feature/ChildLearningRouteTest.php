@@ -281,4 +281,45 @@ class ChildLearningRouteTest extends TestCase
       ->get(route("learn.course", $course))
       ->assertForbidden();
   }
+
+  public function test_authenticated_child_cannot_access_course_from_inactive_world(): void
+  {
+    $user = User::factory()->create();
+
+    Child::factory()->create([
+      'user_id' => $user->id,
+      'is_active' => true,
+    ]);
+
+    $subject = \App\Models\Subject::factory()->create([
+      'is_active' => false,
+    ]);
+
+    $course = Course::factory()->create([
+      'subject_id' => $subject->id,
+      'is_published' => true,
+    ]);
+
+    $this->actingAs($user)
+      ->get(route('learn.course', $course))
+      ->assertNotFound();
+  }
+
+  public function test_authenticated_child_cannot_access_inactive_world(): void
+  {
+    $user = User::factory()->create();
+
+    Child::factory()->create([
+      'user_id' => $user->id,
+      'is_active' => true,
+    ]);
+
+    $subject = \App\Models\Subject::factory()->create([
+      'is_active' => false,
+    ]);
+
+    $this->actingAs($user)
+      ->get(route('child.world', $subject))
+      ->assertNotFound();
+  }
 }

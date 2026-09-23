@@ -8,6 +8,7 @@ use App\Models\Lesson;
 use App\Services\Progress\LessonProgressService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Models\LessonActivity;
 
 class LessonProgressServiceTest extends TestCase
 {
