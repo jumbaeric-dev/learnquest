@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Child\Missions\Components;
 
+use App\Services\Child\Learning\MissionDiscoveryService;
 use Livewire\Component;
 
 class MissionCategories extends Component
@@ -9,7 +10,7 @@ class MissionCategories extends Component
     public array $categories = [];
     public string $selectedCategory = 'all';
 
-    public function mount()
+    public function mount(MissionDiscoveryService $missions)
     {
         $this->categories = [
             [
@@ -17,53 +18,26 @@ class MissionCategories extends Component
                 'label' => 'All',
                 'icon' => '🌎',
             ],
-            [
-                'name' => 'Science',
-                'label' => 'Science',
-                'icon' => '🔬',
-            ],
 
-            [
-                'name' => 'Technology',
-                'label' => 'Technology',
-                'icon' => '💻',
-            ],
-
-            [
-                'name' => 'Creativity',
-                'label' => 'Creativity',
-                'icon' => '🎨',
-            ],
-
-            [
-                'name' => 'AI',
-                'label' => 'AI',
-                'icon' => '🤖',
-            ],
-
-            [
-                'name' => 'Life Skills',
-                'label' => 'Life Skills',
-                'icon' => '🌱',
-            ],
-
+            ...collect($missions->getCategories())
+                ->map(fn($category) => [
+                    'name' => $category['name'],
+                    'label' => $category['name'],
+                    'icon' => $category['icon'],
+                ])
+                ->all(),
         ];
     }
-
-
 
     public function selectCategory(string $category)
     {
         $this->selectedCategory = $category;
-
 
         $this->dispatch(
             'mission-category-selected',
             category: $category
         );
     }
-
-
 
     public function render()
     {

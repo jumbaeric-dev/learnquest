@@ -137,11 +137,10 @@
                 {{-- Profile menu items --}}
                 <div class="lq-profile-menu__items">
 
-                    <a
-                        href="#"
+                    <span
                         role="menuitem"
-                        class="lq-profile-menu__item"
-                        @click="closeProfile()"
+                        aria-disabled="true"
+                        class="lq-profile-menu__item lq-profile-menu__item--disabled"
                     >
                         <span class="lq-profile-menu__item-icon">
                             👤
@@ -150,11 +149,15 @@
                         <span>
                             My Profile
                         </span>
-                    </a>
+
+                        <span class="lq-profile-menu__item-badge">
+                            Soon
+                        </span>
+                    </span>
 
 
                     <a
-                        href="#"
+                        href="{{ route('child.dashboard') }}#recent-achievements"
                         role="menuitem"
                         class="lq-profile-menu__item"
                         @click="closeProfile()"
@@ -169,11 +172,10 @@
                     </a>
 
 
-                    <a
-                        href="#"
+                    <span
                         role="menuitem"
-                        class="lq-profile-menu__item"
-                        @click="closeProfile()"
+                        aria-disabled="true"
+                        class="lq-profile-menu__item lq-profile-menu__item--disabled"
                     >
                         <span class="lq-profile-menu__item-icon">
                             ⚙️
@@ -182,7 +184,11 @@
                         <span>
                             Settings
                         </span>
-                    </a>
+
+                        <span class="lq-profile-menu__item-badge">
+                            Soon
+                        </span>
+                    </span>
 
                 </div>
 

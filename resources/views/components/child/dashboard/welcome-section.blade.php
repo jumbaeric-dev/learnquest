@@ -23,6 +23,7 @@
     </p>
 
     <x-lq.button
+        wire:click="welcomeAction"
         variant="primary"
         size="lg"
     >

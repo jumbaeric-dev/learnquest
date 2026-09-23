@@ -12,7 +12,12 @@ class WorldRepository
     public function all()
     {
         return Subject::query()
-            ->withCount('courses')
+            ->where('is_active', true)
+            ->withCount([
+                'courses' => function ($query) {
+                    $query->where('is_published', true);
+                },
+            ])
             ->orderBy('position')
             ->orderBy('name')
             ->get();
@@ -27,7 +32,9 @@ class WorldRepository
         return Subject::query()
             ->with([
                 'courses' => function ($query) {
-                    $query->orderBy('title');
+                    $query
+                        ->where('is_published', true)
+                        ->orderBy('title');
                 },
 
                 'courses.modules' => function ($query) {
@@ -38,7 +45,11 @@ class WorldRepository
                     $query->orderBy('position');
                 },
             ])
-            ->withCount('courses')
+            ->withCount([
+                'courses' => function ($query) {
+                    $query->where('is_published', true);
+                },
+            ])
             ->find($id);
     }
 }

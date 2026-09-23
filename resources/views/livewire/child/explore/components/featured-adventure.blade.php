@@ -1,5 +1,6 @@
 <div class="px-4">
 
+    @if($adventure)
     <x-lq.glass-card>
 
         <div class="relative overflow-hidden">
@@ -52,6 +53,7 @@
 
 
     </x-lq.glass-card>
+    @endif
 
 
 </div>

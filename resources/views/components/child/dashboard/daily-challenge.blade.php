@@ -79,7 +79,13 @@
 
 
 
-                <x-lq.button>
+                <x-lq.button
+
+                    wire:click="startMission"
+
+                    :disabled="$challenge['current'] >= $challenge['target']"
+
+                >
 
                     {{ $challenge['buttonText'] }}
 

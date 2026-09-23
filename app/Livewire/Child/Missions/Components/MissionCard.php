@@ -2,28 +2,27 @@
 
 namespace App\Livewire\Child\Missions\Components;
 
+use App\Models\Course;
+use App\Services\Child\Context\CurrentChildService;
+use App\Services\Progress\CourseProgressService;
 use Livewire\Component;
 
 class MissionCard extends Component
 {
-
     public array $mission;
 
+    public function startMission(
+        CurrentChildService $currentChild,
+        CourseProgressService $courseProgress,
+    ) {
+        $child = $currentChild->current();
 
-    public function startMission()
-    {
-        return $this->redirect(
-            route(
-                'child.mission.show',
-                'math-galaxy'
-            )
-        );
+        $course = Course::findOrFail($this->mission['id']);
 
-        // Future:
-        // redirect to mission journey
+        $courseProgress->update($child, $course);
+
+        return $this->redirectRoute('learn.course', $course);
     }
-
-
 
     public function render()
     {

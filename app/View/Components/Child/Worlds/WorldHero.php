@@ -10,6 +10,7 @@ class WorldHero extends Component
 {
     public function __construct(
         public array $hero,
+        public ?array $journey = null,
     ) {}
 
     public function render(): View|Closure|string

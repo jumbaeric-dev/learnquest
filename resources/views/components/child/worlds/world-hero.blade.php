@@ -63,9 +63,11 @@
 
             </div>
 
+            @if($journey)
             <div class="mt-8">
 
                 <x-lq.button
+                    wire:click="continueJourney"
                     size="lg"
                     color="white"
                     icon="heroicon-o-play">
@@ -73,6 +75,7 @@
                 </x-lq.button>
 
             </div>
+            @endif
 
         </div>
 

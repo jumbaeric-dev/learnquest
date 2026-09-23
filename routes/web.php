@@ -101,7 +101,7 @@ Route::middleware(["child"])->group(function () {
 
 Route::middleware(["auth"])->group(function () {
   Route::get("/nova", function () {
-    return "Nova Coming Soon";
+    return redirect()->route("child.dashboard");
   })->name("nova");
 });
 

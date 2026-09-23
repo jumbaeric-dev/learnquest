@@ -10,8 +10,10 @@ md:grid-cols-3
 xl:grid-cols-4
 gap-4">
         @foreach($worlds as $world)
-        <div
+        <a
+            href="{{ route('child.world', $world['slug']) }}"
             class="
+                    block
                     rounded-2xl
                     border
                     border-slate-200
@@ -34,7 +36,7 @@ gap-4">
                 Courses
             </p>
 
-        </div>
+        </a>
         @endforeach
     </div>
 

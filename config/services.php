@@ -35,4 +35,25 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Nova AI Providers
+    |--------------------------------------------------------------------------
+    |
+    | Nova's default engine is Claude (Anthropic). config('learnquest.nova.provider')
+    | picks which of these is active; both are configured here so switching
+    | providers only ever means changing NOVA_AI_PROVIDER in .env.
+    |
+    */
+
+    'anthropic' => [
+        'api_key' => env('ANTHROPIC_API_KEY'),
+        'model' => env('ANTHROPIC_MODEL', 'claude-sonnet-5'),
+    ],
+
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+    ],
+
 ];

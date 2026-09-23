@@ -75,7 +75,7 @@
 
         <div class="mt-5">
 
-            <x-lq.button>
+            <x-lq.button disabled>
 
                 {{ $community['buttonText'] }}
 

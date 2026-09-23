@@ -1,3 +1,4 @@
+<div id="recent-achievements">
 <x-lq.glass-card animate>
 
     <x-lq.section-title>
@@ -94,3 +95,4 @@
     </div>
 
 </x-lq.glass-card>
+</div>

@@ -2,70 +2,88 @@
 
 namespace App\Livewire\Child\Worlds\Components;
 
+use App\Models\Course;
+use App\Services\Child\Context\CurrentChildService;
+use App\Services\Child\Learning\LearningJourneyService;
+use App\Services\Progress\CourseProgressService;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class AdventurePath extends Component
 {
-    public array $nodes = [
-        [
-            'id' => 1,
-            'title' => 'Counting Stars',
-            'description' => 'Practice counting numbers in the galaxy.',
-            'icon' => '⭐',
-            'status' => 'completed',
-            'xp' => 50,
-        ],
+    /**
+     * Course cards for this world, as built by WorldService
+     * (WorldCourseDTO[]: id, title, description, icon, ageGroup,
+     * locked, progress).
+     */
+    #[Locked]
+    public array $courses = [];
 
-        [
-            'id' => 2,
-            'title' => 'Rocket Maths',
-            'description' => 'Solve quick maths challenges to fuel your rocket.',
-            'icon' => '🚀',
-            'status' => 'completed',
-            'xp' => 75,
-        ],
+    public array $nodes = [];
 
-        [
-            'id' => 3,
-            'title' => 'Planet Puzzle',
-            'description' => 'Use your maths skills to solve the planetary puzzle.',
-            'icon' => '🪐',
-            'status' => 'current',
-            'xp' => 100,
-        ],
+    public function mount(
+        array $courses,
+        CurrentChildService $currentChild,
+        LearningJourneyService $journey,
+    ): void {
+        $this->courses = $courses;
 
-        [
-            'id' => 4,
-            'title' => 'Galaxy Quiz',
-            'description' => 'Test what you have learned so far.',
-            'icon' => '🌌',
-            'status' => 'locked',
-            'xp' => 100,
-        ],
+        $child = $currentChild->current();
 
-        [
-            'id' => 5,
-            'title' => 'Galaxy Master',
-            'description' => 'Complete the galaxy adventure.',
-            'icon' => '🏆',
-            'status' => 'reward',
-            'xp' => 250,
-        ],
-    ];
+        $currentCourseId = $journey->getCurrentCourse($child)?->id;
 
-    public function startNode(int $id): void
+        $this->nodes = collect($courses)
+            ->map(function (array $course) use ($currentCourseId) {
+                $status = match (true) {
+                    $course['progress'] >= 100 => 'completed',
+                    $course['id'] === $currentCourseId => 'current',
+                    default => 'available',
+                };
+
+                return [
+                    'id' => $course['id'],
+                    'title' => $course['title'],
+                    'description' => $course['description'],
+                    'icon' => $course['icon'] ?? '📘',
+                    'status' => $status,
+                    'xp' => $this->totalXp($course['id']),
+                ];
+            })
+            ->all();
+    }
+
+    /**
+     * A child taps any unlocked node to jump straight into that
+     * course. Starting a course they haven't touched before
+     * creates the initial CourseProgress row LearningContentAccessService
+     * requires before it will let them view it.
+     */
+    public function startCourse(
+        int $courseId,
+        CurrentChildService $currentChild,
+        CourseProgressService $courseProgress,
+    ) {
+        $child = $currentChild->current();
+
+        $course = Course::findOrFail($courseId);
+
+        $courseProgress->update($child, $course);
+
+        return $this->redirectRoute('learn.course', $course);
+    }
+
+    protected function totalXp(int $courseId): int
     {
-        $node = collect($this->nodes)
-            ->firstWhere('id', $id);
+        $course = Course::with('modules.lessons.activities')->find($courseId);
 
-        if (!$node || $node['status'] === 'locked') {
-            return;
+        if (! $course) {
+            return 0;
         }
 
-        $this->dispatch(
-            'adventure-node-selected',
-            nodeId: $id
-        );
+        return (int) $course->modules
+            ->flatMap(fn($module) => $module->lessons)
+            ->flatMap(fn($lesson) => $lesson->activities)
+            ->sum('xp_reward');
     }
 
     public function render()

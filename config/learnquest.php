@@ -103,6 +103,26 @@ return [
 
     'adaptive_learning' => true,
 
+    'nova' => [
+
+        /*
+         * Which provider powers Nova. See App\Services\Nova\NovaProviderFactory
+         * for the available keys ("anthropic" / "openai"). Swapping providers
+         * is a single env change — no other code needs to change.
+         */
+        'provider' => env('NOVA_AI_PROVIDER', 'anthropic'),
+
+        // How many prior turns are sent back to the AI provider as context.
+        'history_limit' => 20,
+
+        // Per-child, per-day cap on messages sent to Nova.
+        'daily_message_limit' => 60,
+
+        // Max tokens requested per Nova reply.
+        'max_tokens' => 300,
+
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Parent Dashboard

@@ -194,7 +194,9 @@ class UniverseDashboardService
 
           icon: $subject->icon,
 
-          courses: $subject->courses_count
+          courses: $subject->courses_count,
+
+          slug: $subject->slug
         )
       )
 

@@ -141,6 +141,11 @@ class Child extends Model
     return $this->hasMany(ChildSkillProgress::class);
   }
 
+  public function novaMessages()
+  {
+    return $this->hasMany(NovaMessage::class);
+  }
+
   public function getFutureReadinessScoreAttribute(): float
   {
     if (!$this->relationLoaded("skillProgress")) {

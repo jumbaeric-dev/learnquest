@@ -7,23 +7,6 @@
         pb-32
         space-y-8
     ">
-        @if(session()->has('message'))
-
-        <div
-            class="
-fixed
-top-5
-right-5
-z-50
-">
-            <x-lq.badge>
-                {{ session('message') }}
-            </x-lq.badge>
-
-        </div>
-
-        @endif
-
         {{-- Header --}}
         <livewire:child.missions.components.mission-header />
 

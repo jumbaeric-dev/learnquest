@@ -3,11 +3,10 @@
     <x-child.layout.section-stack>
 
         <x-child.worlds.world-hero
-            :hero="$world['hero']" />
+            :hero="$world['hero']"
+            :journey="$world['journey']" />
 
-        <livewire:child.worlds.components.adventure-path />
-
-        <!-- @if($world['journey'])
+        @if($world['journey'])
         <x-child.worlds.continue-journey
             :journey="$world['journey']" />
         @endif
@@ -15,8 +14,7 @@
         <x-child.worlds.world-progress
             :progress="$world['progress']" />
 
-        <x-child.worlds.course-grid
-            :courses="$world['courses']" /> -->
+        <livewire:child.worlds.components.adventure-path :courses="$world['courses']" />
 
     </x-child.layout.section-stack>
 

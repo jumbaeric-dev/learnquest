@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Child\Missions\Components;
 
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 
@@ -47,6 +48,12 @@ class DailyChallenges extends Component
     }
 
 
+
+    #[On('nova-message-sent')]
+    public function completeAskNovaChallenge(): void
+    {
+        $this->completeChallenge(3);
+    }
 
     public function completeChallenge($id)
     {

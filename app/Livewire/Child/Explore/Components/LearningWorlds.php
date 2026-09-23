@@ -2,99 +2,80 @@
 
 namespace App\Livewire\Child\Explore\Components;
 
+use App\Models\ActivityProgress;
+use App\Models\Subject;
+use App\Services\Child\Context\CurrentChildService;
 use Livewire\Component;
 
 class LearningWorlds extends Component
 {
     public array $worlds = [];
 
-
-    public function mount(): void
+    public function mount(CurrentChildService $currentChild): void
     {
-        $this->worlds = [
+        $child = $currentChild->current();
 
-            [
-                'title' => 'Reading Kingdom',
-                'description' => 'Discover stories and unlock new words.',
-                'icon' => '📚',
-                'progress' => 45,
-                'xp' => 120,
-                'theme' => 'blue',
+        if (! $child) {
+            return;
+        }
+
+        $this->worlds = Subject::query()
+            ->where('is_active', true)
+            ->withCount('courses')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn(Subject $subject) => [
+                'title' => $subject->name,
+                'description' => $subject->tagline ?? $subject->description,
+                'icon' => $subject->icon ?? '🌎',
+                'theme' => $subject->theme_color,
+                'progress' => $this->progressFor($child, $subject),
+                'xp' => $this->xpEarnedIn($child, $subject),
                 'locked' => false,
-                'badge' => 'Adventure',
-                'slug' => 'reading-kingdom',
-            ],
-
-
-            [
-                'title' => 'Math Galaxy',
-                'description' => 'Explore numbers, puzzles and challenges.',
-                'icon' => '🌌',
-                'progress' => 68,
-                'xp' => 150,
-                'theme' => 'purple',
-                'locked' => false,
-                'badge' => 'Popular',
-                'slug' => 'math-galaxy',
-            ],
-
-
-            [
-                'title' => 'Science Lab',
-                'description' => 'Experiment and discover amazing things.',
-                'icon' => '🔬',
-                'progress' => 20,
-                'xp' => 200,
-                'theme' => 'green',
-                'locked' => false,
-                'badge' => 'New',
-                'slug' => 'science-lab',
-            ],
-
-
-            [
-                'title' => 'Coding Planet',
-                'description' => 'Create games and build technology.',
-                'icon' => '💻',
-                'progress' => 0,
-                'xp' => 250,
-                'theme' => 'orange',
-                'locked' => false,
-                'badge' => 'Future',
-                'slug' => 'coding-planet',
-            ],
-
-
-            [
-                'title' => 'AI Universe',
-                'description' => 'Discover artificial intelligence.',
-                'icon' => '🤖',
-                'progress' => 0,
-                'xp' => 300,
-                'theme' => 'pink',
-                'locked' => true,
-                'badge' => 'Coming Soon',
-                'slug' => 'ai-universe',
-            ],
-
-        ];
+                'badge' => null,
+                'slug' => $subject->slug,
+            ])
+            ->all();
     }
 
-
-    public function openWorld(string $title): void
+    /**
+     * Average course-completion percentage for this child across
+     * every course in this world/subject.
+     */
+    protected function progressFor($child, Subject $subject): float
     {
-        // Future:
-        // Navigate to world
-        // Load courses
-        // Start journey
+        $progresses = $child->courseProgress()
+            ->whereHas(
+                'course',
+                fn($query) => $query->where('subject_id', $subject->id)
+            )
+            ->pluck('progress_percentage');
 
+        if ($progresses->isEmpty()) {
+            return 0;
+        }
+
+        return round($progresses->avg(), 1);
     }
 
+    /**
+     * Total XP this child has earned from activities anywhere
+     * within this world/subject.
+     */
+    protected function xpEarnedIn($child, Subject $subject): int
+    {
+        return (int) ActivityProgress::query()
+            ->where('child_id', $child->id)
+            ->where('completed', true)
+            ->whereHas(
+                'activity.lesson.module.course',
+                fn($query) => $query->where('subject_id', $subject->id)
+            )
+            ->sum('xp_earned');
+    }
 
     public function render()
     {
-        return view(
-            'livewire.child.explore.components.learning-worlds'
-        );
+        return view('livewire.child.explore.components.learning-worlds');
     }
 }

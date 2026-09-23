@@ -11,6 +11,7 @@ final readonly class LearningWorldDTO extends DTO
         public string $name,
         public ?string $icon,
         public int $courses,
+        public string $slug,
     ) {
     }
 

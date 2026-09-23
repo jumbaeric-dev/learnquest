@@ -2,103 +2,74 @@
 
 namespace App\Services\Child\Learning;
 
+use App\Models\Course;
+use App\Models\Subject;
 
+/**
+ * "Missions" are LearnQuest's playful framing of the real course
+ * catalog — a mission card always corresponds to a real, published
+ * Course, so starting one takes the child into real content.
+ */
 class MissionDiscoveryService
 {
     public function getCategories(): array
     {
+        return Subject::query()
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn(Subject $subject) => [
+                'name' => $subject->name,
+                'icon' => $subject->icon ?? '📘',
+            ])
+            ->all();
+    }
+
+    public function getMissions(string $category = 'all'): array
+    {
+        $courses = Course::query()
+            ->where('is_published', true)
+            ->with(['subject', 'modules.lessons.activities'])
+            ->when(
+                $category !== 'all',
+                fn($query) => $query->whereHas(
+                    'subject',
+                    fn($sub) => $sub->where('name', $category)
+                )
+            )
+            ->get();
+
+        return $courses
+            ->map(fn(Course $course) => $this->toMission($course))
+            ->all();
+    }
+
+    protected function toMission(Course $course): array
+    {
         return [
-            [
-                'name' => 'Science',
-                'icon' => '🔬'
-            ],
-
-            [
-                'name' => 'Technology',
-                'icon' => '💻'
-            ],
-
-            [
-                'name' => 'Creativity',
-                'icon' => '🎨'
-            ],
-
-            [
-                'name' => 'AI',
-                'icon' => '🤖'
-            ],
-
-            [
-                'name' => 'Life Skills',
-                'icon' => '🌱'
-            ],
+            'id' => $course->id,
+            'title' => $course->title,
+            'category' => $course->subject?->name ?? 'Learning',
+            'icon' => $course->subject?->icon ?? '📘',
+            'description' => $course->description,
+            'xp' => $this->totalXp($course),
+            'time' => $this->totalMinutes($course).' mins',
+            'difficulty' => $course->age_group,
         ];
     }
 
+    protected function totalXp(Course $course): int
+    {
+        return (int) $course->modules
+            ->flatMap(fn($module) => $module->lessons)
+            ->flatMap(fn($lesson) => $lesson->activities)
+            ->sum('xp_reward');
+    }
 
-
-    public function getMissions(
-        string $category = 'all'
-    ): array {
-        $missions = [
-
-            [
-
-                'title' => 'Build A Space Robot',
-                'category' => 'Technology',
-                'icon' => '🤖',
-                'description' => 'Create your first robot design.',
-                'xp' => 100,
-                'time' => '20 mins',
-                'difficulty' => 'Explorer',
-            ],
-
-
-            [
-
-                'title' => 'Solar System Explorer',
-                'category' => 'Science',
-                'icon' => '🪐',
-                'description' => 'Discover planets and galaxies.',
-                'xp' => 80,
-                'time' => '15 mins',
-                'difficulty' => 'Beginner',
-            ],
-
-
-            [
-
-                'title' => 'AI Art Studio',
-                'category' => 'AI',
-                'icon' => '🎨',
-                'description' => 'Create amazing artwork with AI.',
-                'xp' => 120,
-                'time' => '25 mins',
-                'difficulty' => 'Explorer',
-            ],
-
-
-            [
-
-                'title' => 'Story Creator',
-                'category' => 'Creativity',
-                'icon' => '📖',
-                'description' => 'Create your own adventure story.',
-                'xp' => 60,
-                'time' => '10 mins',
-                'difficulty' => 'Beginner',
-            ],
-
-
-        ];
-
-        if ($category === 'all') {
-            return $missions;
-        }
-
-        return collect($missions)
-            ->where('category', $category)
-            ->values()
-            ->toArray();
+    protected function totalMinutes(Course $course): int
+    {
+        return (int) $course->modules
+            ->flatMap(fn($module) => $module->lessons)
+            ->sum('estimated_minutes');
     }
 }

@@ -71,7 +71,7 @@
 
 
         <a
-            href="{{ route('child.missions') }}"
+            href="{{ route('child.explore') }}"
             class="lq-nav-link {{ $active === 'worlds' ? 'is-active' : '' }}"
             @if($active === 'worlds')
                 aria-current="page"

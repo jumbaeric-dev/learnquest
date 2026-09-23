@@ -28,24 +28,39 @@ class FloatingActions extends Component
                 'icon' => '🎨',
                 'action' => 'create',
             ],
-
         ];
     }
 
     public function execute(string $action)
     {
-        match ($action) {
-            'nova'
-            => redirect()
-                ->route('nova'),
-            'mission'
-            => $this->dispatch(
-                'scroll-to-mission'
+        return match ($action) {
+
+            // Opens the always-available chat widget in place,
+            // rather than navigating away to a separate page.
+            'nova' => $this->dispatch('open-nova-chat'),
+
+            // The dashboard is the one place a "current mission"
+            // section reliably exists, so route there and land on
+            // it directly rather than assuming the current page
+            // has a matching element to scroll to.
+            'mission' => $this->redirect(
+                route('child.dashboard').'#current-mission'
             ),
-            'create'
-            => redirect('/creator'),
+
+            // The Creator tool doesn't exist yet in V1 — flash a
+            // friendly notice instead of hitting a dead route.
+            'create' => $this->createComingSoon(),
+
             default => null,
         };
+    }
+
+    protected function createComingSoon()
+    {
+        session()->flash(
+            'message',
+            '🎨 The Creator tool is coming soon!'
+        );
     }
 
     public function render()

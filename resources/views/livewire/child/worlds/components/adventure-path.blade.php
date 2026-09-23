@@ -32,7 +32,7 @@
                 {{-- Node --}}
                 <button
                     type="button"
-                    wire:click="startNode({{ $node['id'] }})"
+                    wire:click="startCourse({{ $node['id'] }})"
                     @disabled($node['status']==='locked' )
                     class="relative z-10
        flex h-14 w-14 shrink-0
@@ -102,7 +102,7 @@
 
                             <x-lq.button
                                 type="button"
-                                wire:click="startNode({{ $node['id'] }})">
+                                wire:click="startCourse({{ $node['id'] }})">
                                 🚀 Start Adventure
                             </x-lq.button>
 

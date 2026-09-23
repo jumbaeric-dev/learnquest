@@ -39,6 +39,14 @@
 
     <x-child.layout.background :theme="$theme" />
 
+    @if(session()->has('message'))
+    <div class="fixed top-5 right-5 z-[120]">
+        <x-lq.badge>
+            {{ session('message') }}
+        </x-lq.badge>
+    </div>
+    @endif
+
     <x-child.layout.sidebar
         :active="$active" />
 
@@ -56,5 +64,7 @@
     </main>
 
     <livewire:child.layouts.components.floating-actions />
+
+    <livewire:child.nova.chat-widget />
 
 </div>
