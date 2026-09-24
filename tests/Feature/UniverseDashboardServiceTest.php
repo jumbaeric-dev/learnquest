@@ -274,25 +274,44 @@ class UniverseDashboardServiceTest extends TestCase
   {
     $child = Child::factory()->create();
 
+    $activeWorld = Subject::factory()->create([
+      'name' => 'Active World',
+      'is_active' => true,
+    ]);
+
+    $inactiveWorld = Subject::factory()->create([
+      'name' => 'Inactive World',
+      'is_active' => false,
+    ]);
+
     $currentCourse = Course::factory()->create([
-      "title" => "Current Course",
-      "is_published" => true,
+      'subject_id' => $activeWorld->id,
+      'title' => 'Current Course',
+      'is_published' => true,
     ]);
 
     $child->courseProgress()->create([
-      "course_id" => $currentCourse->id,
-      "progress_percentage" => 25,
-      "completed" => false,
+      'course_id' => $currentCourse->id,
+      'progress_percentage' => 25,
+      'completed' => false,
     ]);
 
     Course::factory()->create([
-      "title" => "Recommended Course",
-      "is_published" => true,
+      'subject_id' => $activeWorld->id,
+      'title' => 'Recommended Course',
+      'is_published' => true,
     ]);
 
     Course::factory()->create([
-      "title" => "Unpublished Course",
-      "is_published" => false,
+      'subject_id' => $activeWorld->id,
+      'title' => 'Unpublished Course',
+      'is_published' => false,
+    ]);
+
+    Course::factory()->create([
+      'subject_id' => $inactiveWorld->id,
+      'title' => 'Inactive World Course',
+      'is_published' => true,
     ]);
 
     $recommendations = $this->service()->recommendedAdventures($child);
@@ -302,10 +321,12 @@ class UniverseDashboardServiceTest extends TestCase
       $recommendations
     );
 
-    $this->assertContains("Recommended Course", $titles);
+    $this->assertContains('Recommended Course', $titles);
 
-    $this->assertNotContains("Current Course", $titles);
+    $this->assertNotContains('Current Course', $titles);
 
-    $this->assertNotContains("Unpublished Course", $titles);
+    $this->assertNotContains('Unpublished Course', $titles);
+
+    $this->assertNotContains('Inactive World Course', $titles);
   }
 }

@@ -322,4 +322,74 @@ class ChildLearningRouteTest extends TestCase
       ->get(route('child.world', $subject))
       ->assertNotFound();
   }
+
+  public function test_authenticated_child_cannot_access_lesson_from_inactive_world(): void
+  {
+    $user = User::factory()->create();
+
+    Child::factory()->create([
+      'user_id' => $user->id,
+      'is_active' => true,
+    ]);
+
+    $subject = \App\Models\Subject::factory()->create([
+      'is_active' => false,
+    ]);
+
+    $course = Course::factory()->create([
+      'subject_id' => $subject->id,
+      'is_published' => true,
+    ]);
+
+    $module = CourseModule::factory()->create([
+      'course_id' => $course->id,
+    ]);
+
+    $lesson = Lesson::factory()->create([
+      'learning_module_id' => $module->id,
+      'is_published' => true,
+    ]);
+
+    $this->actingAs($user)
+      ->get(route('learn.lesson', $lesson))
+      ->assertNotFound();
+  }
+
+  public function test_authenticated_child_cannot_access_activity_from_inactive_world(): void
+  {
+    $user = User::factory()->create();
+
+    Child::factory()->create([
+      'user_id' => $user->id,
+      'is_active' => true,
+    ]);
+
+    $subject = \App\Models\Subject::factory()->create([
+      'is_active' => false,
+    ]);
+
+    $course = Course::factory()->create([
+      'subject_id' => $subject->id,
+      'is_published' => true,
+    ]);
+
+    $module = CourseModule::factory()->create([
+      'course_id' => $course->id,
+    ]);
+
+    $lesson = Lesson::factory()->create([
+      'learning_module_id' => $module->id,
+      'is_published' => true,
+    ]);
+
+    $activity = LessonActivity::factory()->create([
+      'lesson_id' => $lesson->id,
+      'is_published' => true,
+    ]);
+
+    $this->actingAs($user)
+      ->get(route('learn.activity', $activity))
+      ->assertNotFound();
+  }
+  
 }

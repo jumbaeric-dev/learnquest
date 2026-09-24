@@ -8,7 +8,7 @@ use App\Models\Subject;
 /**
  * "Missions" are LearnQuest's playful framing of the real course
  * catalog — a mission card always corresponds to a real, published
- * Course, so starting one takes the child into real content.
+ * Course in an active World.
  */
 class MissionDiscoveryService
 {
@@ -18,9 +18,9 @@ class MissionDiscoveryService
             ->where('is_active', true)
             ->orderBy('sort_order')
             ->get()
-            ->map(fn(Subject $subject) => [
+            ->map(fn (Subject $subject) => [
                 'name' => $subject->name,
-                'icon' => $subject->icon ?? '📘',
+                'icon' => $subject->icon ?? '�',
             ])
             ->all();
     }
@@ -29,18 +29,33 @@ class MissionDiscoveryService
     {
         $courses = Course::query()
             ->where('is_published', true)
-            ->with(['subject', 'modules.lessons.activities'])
+            ->whereHas('subject', function ($query) {
+                $query->where('is_active', true);
+            })
+            ->with([
+                'subject',
+                'modules.lessons' => function ($query) {
+                    $query
+                        ->where('is_published', true)
+                        ->orderBy('position');
+                },
+                'modules.lessons.activities' => function ($query) {
+                    $query
+                        ->where('is_published', true)
+                        ->orderBy('position');
+                },
+            ])
             ->when(
                 $category !== 'all',
-                fn($query) => $query->whereHas(
+                fn ($query) => $query->whereHas(
                     'subject',
-                    fn($sub) => $sub->where('name', $category)
+                    fn ($sub) => $sub->where('name', $category)
                 )
             )
             ->get();
 
         return $courses
-            ->map(fn(Course $course) => $this->toMission($course))
+            ->map(fn (Course $course) => $this->toMission($course))
             ->all();
     }
 
@@ -50,7 +65,7 @@ class MissionDiscoveryService
             'id' => $course->id,
             'title' => $course->title,
             'category' => $course->subject?->name ?? 'Learning',
-            'icon' => $course->subject?->icon ?? '📘',
+            'icon' => $course->subject?->icon ?? '�',
             'description' => $course->description,
             'xp' => $this->totalXp($course),
             'time' => $this->totalMinutes($course).' mins',
@@ -61,15 +76,15 @@ class MissionDiscoveryService
     protected function totalXp(Course $course): int
     {
         return (int) $course->modules
-            ->flatMap(fn($module) => $module->lessons)
-            ->flatMap(fn($lesson) => $lesson->activities)
+            ->flatMap(fn ($module) => $module->lessons)
+            ->flatMap(fn ($lesson) => $lesson->activities)
             ->sum('xp_reward');
     }
 
     protected function totalMinutes(Course $course): int
     {
         return (int) $course->modules
-            ->flatMap(fn($module) => $module->lessons)
+            ->flatMap(fn ($module) => $module->lessons)
             ->sum('estimated_minutes');
     }
 }

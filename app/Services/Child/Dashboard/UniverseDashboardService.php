@@ -30,8 +30,7 @@ class UniverseDashboardService
   public function __construct(
     protected LearningJourneyService $learningJourney,
     protected LevelService $levelService
-  ) {
-  }
+  ) {}
 
   public function welcome(Child $child): WelcomeDTO
   {
@@ -264,34 +263,26 @@ class UniverseDashboardService
     $currentCourse = $this->learningJourney->getCurrentCourse($child);
 
     return Course::query()
-
-      ->where("is_published", true)
-
+      ->where('is_published', true)
+      ->whereHas('subject', function ($query) {
+        $query->where('is_active', true);
+      })
       ->when(
         $currentCourse,
-        fn($query) => $query->where("id", "!=", $currentCourse->id)
+        fn($query) => $query->where('id', '!=', $currentCourse->id)
       )
-
-      ->with("subject")
-
+      ->with('subject')
       ->limit(5)
-
       ->get()
-
       ->map(function (Course $course) {
         return new RecommendedAdventureDTO(
           id: $course->id,
-
           title: $course->title,
-
           description: $course->description,
-
           icon: $course->subject?->icon,
-
           ageGroup: $course->age_group
         );
       })
-
       ->all();
   }
 
