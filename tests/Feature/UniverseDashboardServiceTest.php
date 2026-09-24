@@ -330,3 +330,4 @@ class UniverseDashboardServiceTest extends TestCase
     $this->assertNotContains('Inactive World Course', $titles);
   }
 }
+
