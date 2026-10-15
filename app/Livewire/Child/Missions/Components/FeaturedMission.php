@@ -5,6 +5,7 @@ namespace App\Livewire\Child\Missions\Components;
 use App\Models\Course;
 use App\Services\Child\Context\CurrentChildService;
 use App\Services\Child\Dashboard\UniverseDashboardService;
+use App\Services\Child\Learning\LearningContentAccessService;
 use App\Services\Child\Learning\MissionDiscoveryService;
 use App\Services\Progress\CourseProgressService;
 use Livewire\Component;
@@ -25,15 +26,16 @@ class FeaturedMission extends Component
         }
 
         $recommended = $dashboardService->recommendedAdventures($child);
-
         $courseId = $recommended[0]->id ?? null;
 
         if (! $courseId) {
             return;
         }
 
-        $course = Course::with(['subject', 'modules.lessons.activities'])
-            ->find($courseId);
+        $course = Course::with([
+            'subject',
+            'modules.lessons.activities',
+        ])->find($courseId);
 
         if (! $course) {
             return;
@@ -46,6 +48,7 @@ class FeaturedMission extends Component
     public function startMission(
         CurrentChildService $currentChild,
         CourseProgressService $courseProgress,
+        LearningContentAccessService $access,
     ) {
         if (! $this->mission) {
             return;
@@ -53,7 +56,13 @@ class FeaturedMission extends Component
 
         $child = $currentChild->current();
 
+        abort_unless($child, 403);
+
         $course = Course::findOrFail($this->mission['id']);
+
+        // Enforce the child-facing content access contract
+        // before creating or updating course progress.
+        $course = $access->course($course);
 
         $courseProgress->update($child, $course);
 

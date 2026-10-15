@@ -61,37 +61,37 @@ return [
 
     'future_readiness' => [
 
-    'levels' => [
-        [
-            'min_score' => 90,
-            'title' => 'Future Ready',
+        'levels' => [
+            [
+                'min_score' => 90,
+                'title' => 'Future Ready',
+            ],
+            [
+                'min_score' => 75,
+                'title' => 'Visionary',
+            ],
+            [
+                'min_score' => 60,
+                'title' => 'Creator',
+            ],
+            [
+                'min_score' => 45,
+                'title' => 'Builder',
+            ],
+            [
+                'min_score' => 25,
+                'title' => 'Innovator',
+            ],
+            [
+                'min_score' => 0,
+                'title' => 'Explorer',
+            ],
         ],
-        [
-            'min_score' => 75,
-            'title' => 'Visionary',
-        ],
-        [
-            'min_score' => 60,
-            'title' => 'Creator',
-        ],
-        [
-            'min_score' => 45,
-            'title' => 'Builder',
-        ],
-        [
-            'min_score' => 25,
-            'title' => 'Innovator',
-        ],
-        [
-            'min_score' => 0,
-            'title' => 'Explorer',
-        ],
+
+        'strongest_skills_limit' => 5,
+
+        'weakest_skills_limit' => 5,
     ],
-
-    'strongest_skills_limit' => 5,
-
-    'weakest_skills_limit' => 5,
-],
 
     /*
     |--------------------------------------------------------------------------
@@ -111,6 +111,16 @@ return [
          * is a single env change — no other code needs to change.
          */
         'provider' => env('NOVA_AI_PROVIDER', 'anthropic'),
+
+        'fallback_providers' => array_values(array_filter(
+            array_map(
+                'trim',
+                explode(',', env(
+                    'NOVA_AI_FALLBACK_PROVIDERS',
+                    'openai,gemini,deepseek,mistral,anthropic'
+                ))
+            )
+        )),
 
         // How many prior turns are sent back to the AI provider as context.
         'history_limit' => 20,

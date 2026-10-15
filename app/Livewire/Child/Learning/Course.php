@@ -22,6 +22,18 @@ class Course extends Component
    */
   public Collection $completedLessonIds;
 
+  /**
+   * Topbar/profile summary for the app shell.
+   *
+   * @var array{name: string, level: int, xp: int, streak: int}
+   */
+  public array $explorer = [];
+
+  /**
+   * Visual theme applied to the app shell for this course.
+   */
+  public string $theme = "sky";
+
   public function mount(
     CourseModel $course,
     LearningContentAccessService $access,
@@ -47,6 +59,29 @@ class Course extends Component
       ->whereIn("lesson_id", $lessonIds)
       ->where("completed", true)
       ->pluck("lesson_id");
+
+    $this->explorer = [
+      "name" => $child->first_name,
+      "level" => $child->level,
+      "xp" => $child->xp,
+      "streak" => $child->streak?->current_streak ?? 0,
+    ];
+
+    $this->theme = $this->themeForSubject($this->course->subject?->slug);
+  }
+
+  /**
+   * Map a subject to one of the LQDS app-shell themes.
+   */
+  protected function themeForSubject(?string $slug): string
+  {
+    return match ($slug) {
+      "science-lab" => "science",
+      "code-city", "ai-academy" => "coding",
+      "life-skills-village" => "finance",
+      "reading-kingdom", "creative-studio" => "explorer",
+      default => "sky",
+    };
   }
 
   public function getProgressPercentageProperty(): int
@@ -64,6 +99,13 @@ class Course extends Component
     return $this->course->modules
       ->flatMap(fn($module) => $module->lessons)
       ->count();
+  }
+
+  public function getTotalXpProperty(): int
+  {
+    return (int) $this->course->modules
+      ->flatMap(fn($module) => $module->lessons)
+      ->sum("xp_reward");
   }
 
   public function isLessonCompleted(int $lessonId): bool

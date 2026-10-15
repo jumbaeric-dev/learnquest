@@ -1,13 +1,13 @@
 @props([
-    'explorer' => [],
+'explorer' => [],
 ])
 
 @php
-    $name = $explorer['name'] ?? 'Explorer';
+$name = $explorer['name'] ?? 'Explorer';
 
-    $initials = strtoupper(
-        substr($name, 0, 1)
-    );
+$initials = strtoupper(
+substr($name, 0, 1)
+);
 @endphp
 
 <header class="lq-topbar">
@@ -17,8 +17,7 @@
 
         <div
             class="lq-brand-mark"
-            aria-hidden="true"
-        >
+            aria-hidden="true">
             🚀
         </div>
 
@@ -35,8 +34,7 @@
         {{-- Notifications --}}
         <x-lq.icon-button
             size="md"
-            aria-label="Notifications"
-        >
+            aria-label="Notifications">
             🔔
         </x-lq.icon-button>
 
@@ -44,8 +42,7 @@
         {{-- Profile --}}
         <div
             class="lq-profile-anchor"
-            @click.outside="closeProfile()"
-        >
+            @click.outside="closeProfile()">
 
             <button
                 type="button"
@@ -57,8 +54,7 @@
                     profileOpen
                         ? closeProfile()
                         : openProfile()
-                "
-            >
+                ">
                 {{ $initials }}
             </button>
 
@@ -75,8 +71,7 @@
                 x-transition:leave-end="opacity-0 scale-95"
                 class="lq-profile-menu"
                 role="menu"
-                aria-label="Profile menu"
-            >
+                aria-label="Profile menu">
 
                 {{-- Profile summary --}}
                 <div class="lq-profile-summary">
@@ -140,8 +135,7 @@
                     <span
                         role="menuitem"
                         aria-disabled="true"
-                        class="lq-profile-menu__item lq-profile-menu__item--disabled"
-                    >
+                        class="lq-profile-menu__item lq-profile-menu__item--disabled">
                         <span class="lq-profile-menu__item-icon">
                             👤
                         </span>
@@ -160,8 +154,7 @@
                         href="{{ route('child.dashboard') }}#recent-achievements"
                         role="menuitem"
                         class="lq-profile-menu__item"
-                        @click="closeProfile()"
-                    >
+                        @click="closeProfile()">
                         <span class="lq-profile-menu__item-icon">
                             🏆
                         </span>
@@ -175,8 +168,7 @@
                     <span
                         role="menuitem"
                         aria-disabled="true"
-                        class="lq-profile-menu__item lq-profile-menu__item--disabled"
-                    >
+                        class="lq-profile-menu__item lq-profile-menu__item--disabled">
                         <span class="lq-profile-menu__item-icon">
                             ⚙️
                         </span>
@@ -192,25 +184,24 @@
 
                 </div>
 
-
                 {{-- Logout --}}
                 <div class="lq-profile-menu__logout">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
 
-                    <button
-                        type="button"
-                        class="lq-profile-menu__logout-button"
-                        role="menuitem"
-                        @click="openLogout()"
-                    >
-                        <span class="lq-profile-menu__item-icon">
-                            🚪
-                        </span>
+                        <button
+                            type="submit"
+                            class="lq-profile-menu__logout-button"
+                            role="menuitem">
+                            <span class="lq-profile-menu__item-icon">
+                                🚪
+                            </span>
 
-                        <span>
-                            Log out
-                        </span>
-                    </button>
-
+                            <span>
+                                Log out
+                            </span>
+                        </button>
+                    </form>
                 </div>
 
             </div>

@@ -31,14 +31,10 @@ class AnthropicNovaProvider extends AbstractNovaProvider
         $messages = $this->toAnthropicMessages($history, $message);
 
         try {
-            $response = Http::withHeaders([
-                'x-api-key' => $apiKey,
-                'anthropic-version' => '2023-06-01',
-                'content-type' => 'application/json',
-            ])
+            $response = Http::withHeaders($this->headers($apiKey))
                 ->timeout(20)
                 ->post('https://api.anthropic.com/v1/messages', [
-                    'model' => config('services.anthropic.model', 'claude-sonnet-5'),
+                    'model' => config('services.anthropic.model', 'claude-sonnet-5-5'),
                     'max_tokens' => config('learnquest.nova.max_tokens', 300),
                     'system' => $this->buildSystemPrompt($child),
                     'messages' => $messages,
@@ -68,6 +64,27 @@ class AnthropicNovaProvider extends AbstractNovaProvider
         }
 
         return trim($text);
+    }
+
+    /**
+     * Request headers. The workspace header is only needed for API keys
+     * that are not scoped to a single workspace.
+     *
+     * @return array<string, string>
+     */
+    protected function headers(string $apiKey): array
+    {
+        $headers = [
+            'x-api-key' => $apiKey,
+            'anthropic-version' => '2023-06-01',
+            'content-type' => 'application/json',
+        ];
+
+        if ($workspaceId = config('services.anthropic.workspace_id')) {
+            $headers['anthropic-workspace-id'] = $workspaceId;
+        }
+
+        return $headers;
     }
 
     /**

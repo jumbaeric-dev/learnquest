@@ -5,6 +5,9 @@ namespace App\Services\Nova;
 use App\Contracts\Ai\NovaAiProviderContract;
 use App\Services\Nova\Providers\AnthropicNovaProvider;
 use App\Services\Nova\Providers\OpenAiNovaProvider;
+use App\Services\Nova\Providers\DeepSeekNovaProvider;
+use App\Services\Nova\Providers\GeminiNovaProvider;
+use App\Services\Nova\Providers\MistralNovaProvider;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
@@ -22,12 +25,14 @@ class NovaProviderFactory
         'claude' => AnthropicNovaProvider::class,
         'openai' => OpenAiNovaProvider::class,
         'chatgpt' => OpenAiNovaProvider::class,
+        'gemini' => GeminiNovaProvider::class,
+        'deepseek' => DeepSeekNovaProvider::class,
+        'mistral' => MistralNovaProvider::class,
     ];
 
     public function __construct(
         protected Container $container,
-    ) {
-    }
+    ) {}
 
     public function make(?string $provider = null): NovaAiProviderContract
     {
@@ -40,7 +45,7 @@ class NovaProviderFactory
         if (! $class) {
             throw new InvalidArgumentException(
                 "Unknown Nova AI provider [{$key}]. Available: "
-                    .implode(', ', array_keys(static::$providers))
+                    . implode(', ', array_keys(static::$providers))
             );
         }
 

@@ -1,0 +1,246 @@
+/*
+|--------------------------------------------------------------------------
+| LearnQuest Course Screen
+|--------------------------------------------------------------------------
+|
+| Composition for /learn/course/{course}.
+|
+| NOTE: dashboard.css redefines `.lq-card` after card.css, which overrides
+| the `.lq-card--hero` background. The hero selector below is therefore
+| more specific (.lq-card.lq-card--hero.lq-course-hero) so it always wins.
+|--------------------------------------------------------------------------
+*/
+
+.lq-card.lq-card--hero.lq-course-hero {
+    position: relative;
+    overflow: hidden;
+
+    border: 0;
+
+    color: var(--lq-on-primary, #ffffff);
+
+    background:
+        radial-gradient(circle at 86% 20%,
+            rgba(255, 255, 255, 0.22),
+            transparent 9rem),
+        var(--lq-theme-gradient,
+            linear-gradient(135deg,
+                var(--lq-theme-primary, #2563eb),
+                var(--lq-theme-secondary, #06b6d4)));
+
+    box-shadow: var(--lq-theme-shadow, 0 18px 42px rgba(37, 99, 235, 0.18));
+}
+
+/* Decorative glows */
+.lq-course-hero::before,
+.lq-course-hero::after {
+    content: "";
+
+    position: absolute;
+
+    width: 14rem;
+    height: 14rem;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.1);
+
+    filter: blur(48px);
+
+    pointer-events: none;
+}
+
+.lq-course-hero::before {
+    top: -4rem;
+    right: -3rem;
+}
+
+.lq-course-hero::after {
+    bottom: -5rem;
+    left: -3rem;
+}
+
+.lq-course-hero__inner {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+    .lq-course-hero__inner {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        gap: 2rem;
+    }
+}
+
+.lq-course-hero__main {
+    display: flex;
+    align-items: flex-start;
+
+    flex: 1;
+    min-width: 0;
+
+    gap: 1.25rem;
+}
+
+.lq-course-hero__icon {
+    display: grid;
+    place-items: center;
+
+    flex-shrink: 0;
+
+    width: 4.5rem;
+    height: 4.5rem;
+
+    border-radius: 1.25rem;
+
+    font-size: 2.5rem;
+
+    background: rgba(255, 255, 255, 0.18);
+
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+@media (min-width: 640px) {
+    .lq-course-hero__icon {
+        width: 5.5rem;
+        height: 5.5rem;
+
+        font-size: 3rem;
+    }
+}
+
+.lq-course-hero__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.lq-course-hero__tags {
+    display: flex;
+    flex-wrap: wrap;
+
+    gap: 0.5rem;
+}
+
+.lq-course-hero__tag {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 0.35rem;
+
+    padding: 0.3rem 0.75rem;
+
+    border-radius: 999px;
+
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+
+    color: #ffffff;
+
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.lq-course-hero__title {
+    margin: 0.75rem 0 0;
+
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 800;
+    line-height: 1.15;
+
+    color: #ffffff;
+
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.lq-course-hero__description {
+    max-width: 36rem;
+
+    margin: 0.6rem 0 0;
+
+    line-height: 1.55;
+
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Progress panel */
+.lq-course-hero__progress {
+    flex-shrink: 0;
+
+    width: 100%;
+
+    padding: 1.25rem;
+
+    border-radius: 1.25rem;
+
+    color: #ffffff;
+
+    background: rgba(255, 255, 255, 0.16);
+
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.26);
+
+    backdrop-filter: blur(6px);
+}
+
+@media (min-width: 1024px) {
+    .lq-course-hero__progress {
+        width: 18rem;
+    }
+}
+
+.lq-course-hero__progress-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+}
+
+.lq-course-hero__progress-label {
+    font-size: 0.875rem;
+    font-weight: 700;
+
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.lq-course-hero__progress-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+}
+
+.lq-course-hero__track {
+    height: 0.75rem;
+
+    margin-top: 0.75rem;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.lq-course-hero__fill {
+    height: 100%;
+
+    border-radius: inherit;
+
+    background: #ffffff;
+
+    transition: width 0.5s ease;
+}
+
+.lq-course-hero__meta {
+    margin: 0.75rem 0 0;
+
+    font-size: 0.875rem;
+
+    color: rgba(255, 255, 255, 0.88);
+}
