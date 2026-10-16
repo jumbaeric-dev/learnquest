@@ -59,7 +59,14 @@ return [
 
     'gemini' => [
         'api_key' => env('GEMINI_API_KEY'),
-        'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+        'model' => env(
+            'GEMINI_MODEL',
+            'gemini-3.5-flash-lite'
+        ),
+        'fallback_model' => env(
+            'GEMINI_FALLBACK_MODEL',
+            'gemini-3.6-flash'
+        ),
     ],
 
     'deepseek' => [
@@ -70,6 +77,14 @@ return [
     'mistral' => [
         'api_key' => env('MISTRAL_API_KEY'),
         'model' => env('MISTRAL_MODEL', 'mistral-small-latest'),
+    ],
+
+    'openrouter' => [
+        'api_key' => env('OPENROUTER_API_KEY'),
+        'model' => env(
+            'OPENROUTER_MODEL',
+            'thinkingmachines/inkling-small'
+        ),
     ],
 
 ];

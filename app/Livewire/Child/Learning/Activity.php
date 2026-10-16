@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Child\Learning;
 
+use App\Livewire\Child\Learning\Concerns\InteractsWithLearningShell;
 use App\Models\ActivityProgress;
 use App\Models\LessonActivity as LessonActivityModel;
 use App\Services\Child\Context\CurrentChildService;
@@ -11,6 +12,8 @@ use Livewire\Component;
 
 class Activity extends Component
 {
+  use InteractsWithLearningShell;
+
   public LessonActivityModel $activity;
 
   public ?ActivityProgress $progress = null;
@@ -30,9 +33,16 @@ class Activity extends Component
   ): void {
     $this->activity = $access->activity($activity);
 
+    $this->activity->loadMissing("lesson.module.course.subject");
+
     $child = $currentChildService->current();
 
     abort_unless($child, 403);
+
+    $this->prepareShell(
+      $child,
+      $this->activity->lesson->module->course->subject?->slug
+    );
 
     $this->progress = $child
       ->activityProgress()
@@ -123,6 +133,21 @@ class Activity extends Component
     $this->progress = $this->result["activity_progress"];
 
     $this->submitted = true;
+  }
+
+  /**
+   * Let the child try again after a failed attempt.
+   */
+  public function retry(): void
+  {
+    if ($this->progress?->completed) {
+      return;
+    }
+
+    $this->submitted = false;
+    $this->selectedOption = null;
+    $this->score = null;
+    $this->result = null;
   }
 
   public function render()

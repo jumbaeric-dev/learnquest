@@ -101,7 +101,7 @@ class NovaConversationService
         $child->novaMessages()->create([
             'role' => 'assistant',
             'content' => $reply,
-            'provider' => $successfulProvider ?? $this->provider->name(),
+            'provider' => $successfulProvider,
         ]);
 
         return $reply;

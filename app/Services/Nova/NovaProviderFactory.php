@@ -4,19 +4,18 @@ namespace App\Services\Nova;
 
 use App\Contracts\Ai\NovaAiProviderContract;
 use App\Services\Nova\Providers\AnthropicNovaProvider;
-use App\Services\Nova\Providers\OpenAiNovaProvider;
 use App\Services\Nova\Providers\DeepSeekNovaProvider;
 use App\Services\Nova\Providers\GeminiNovaProvider;
 use App\Services\Nova\Providers\MistralNovaProvider;
+use App\Services\Nova\Providers\OpenAiNovaProvider;
+use App\Services\Nova\Providers\OpenRouterNovaProvider;
 use Illuminate\Contracts\Container\Container;
 use InvalidArgumentException;
 
 class NovaProviderFactory
 {
     /**
-     * Map of config('learnquest.nova.provider') values to their
-     * provider class. Add a new AI vendor by implementing
-     * NovaAiProviderContract and adding one line here.
+     * Map configured provider names to their implementations.
      *
      * @var array<string, class-string<NovaAiProviderContract>>
      */
@@ -26,6 +25,7 @@ class NovaProviderFactory
         'openai' => OpenAiNovaProvider::class,
         'chatgpt' => OpenAiNovaProvider::class,
         'gemini' => GeminiNovaProvider::class,
+        'openrouter' => OpenRouterNovaProvider::class,
         'deepseek' => DeepSeekNovaProvider::class,
         'mistral' => MistralNovaProvider::class,
     ];
@@ -34,10 +34,14 @@ class NovaProviderFactory
         protected Container $container,
     ) {}
 
-    public function make(?string $provider = null): NovaAiProviderContract
-    {
+    public function make(
+        ?string $provider = null
+    ): NovaAiProviderContract {
         $key = strtolower(
-            $provider ?? config('learnquest.nova.provider', 'anthropic')
+            trim(
+                $provider
+                    ?? config('learnquest.nova.provider', 'gemini')
+            )
         );
 
         $class = static::$providers[$key] ?? null;
@@ -45,7 +49,7 @@ class NovaProviderFactory
         if (! $class) {
             throw new InvalidArgumentException(
                 "Unknown Nova AI provider [{$key}]. Available: "
-                    . implode(', ', array_keys(static::$providers))
+                .implode(', ', array_keys(static::$providers))
             );
         }
 

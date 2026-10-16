@@ -151,7 +151,7 @@ class NovaConversationServiceTest extends TestCase
             'child_id' => $child->id,
             'role' => 'assistant',
             'content' => $reply,
-            'provider' => 'anthropic',
+            'provider' => null,
         ]);
 
         $this->assertSame(2, $child->novaMessages()->count());
@@ -211,5 +211,69 @@ class NovaConversationServiceTest extends TestCase
                 . 'Can you try asking me again in a moment?',
             $reply
         );
+    }
+
+
+    public function test_openrouter_is_used_when_gemini_provider_fails(): void
+    {
+        $child = Child::factory()->create();
+
+        $gemini = Mockery::mock(NovaAiProviderContract::class);
+
+        $gemini->shouldReceive('name')
+            ->andReturn('gemini');
+
+        $gemini->shouldReceive('reply')
+            ->once()
+            ->with($child, 'Tell me a space fact.', [])
+            ->andThrow(
+                new NovaAiException(
+                    'All configured Gemini models failed.'
+                )
+            );
+
+        $openRouter = Mockery::mock(NovaAiProviderContract::class);
+
+        $openRouter->shouldReceive('name')
+            ->andReturn('openrouter');
+
+        $openRouter->shouldReceive('reply')
+            ->once()
+            ->with($child, 'Tell me a space fact.', [])
+            ->andReturn(
+                'Mars has two tiny moons named Phobos and Deimos.'
+            );
+
+        $factory = Mockery::mock(NovaProviderFactory::class);
+
+        $factory->shouldReceive('make')
+            ->once()
+            ->with('openrouter')
+            ->andReturn($openRouter);
+
+        config([
+            'learnquest.nova.fallback_providers' => ['openrouter'],
+        ]);
+
+        $service = new NovaConversationService($gemini, $factory);
+
+        $reply = $service->respond(
+            $child,
+            'Tell me a space fact.'
+        );
+
+        $this->assertSame(
+            'Mars has two tiny moons named Phobos and Deimos.',
+            $reply
+        );
+
+        $this->assertDatabaseHas('nova_messages', [
+            'child_id' => $child->id,
+            'role' => 'assistant',
+            'content' => $reply,
+            'provider' => 'openrouter',
+        ]);
+
+        $this->assertSame(2, $child->novaMessages()->count());
     }
 }

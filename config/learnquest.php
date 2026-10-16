@@ -110,14 +110,14 @@ return [
          * for the available keys ("anthropic" / "openai"). Swapping providers
          * is a single env change — no other code needs to change.
          */
-        'provider' => env('NOVA_AI_PROVIDER', 'anthropic'),
+        'provider' => env('NOVA_AI_PROVIDER', 'gemini'),
 
         'fallback_providers' => array_values(array_filter(
             array_map(
                 'trim',
                 explode(',', env(
                     'NOVA_AI_FALLBACK_PROVIDERS',
-                    'openai,gemini,deepseek,mistral,anthropic'
+                    'openrouter'
                 ))
             )
         )),
@@ -129,7 +129,7 @@ return [
         'daily_message_limit' => 60,
 
         // Max tokens requested per Nova reply.
-        'max_tokens' => 300,
+        'max_tokens' => 1024,
 
     ],
 
