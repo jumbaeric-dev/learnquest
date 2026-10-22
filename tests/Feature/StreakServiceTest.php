@@ -4,7 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Child;
 use App\Models\ChildStreak;
-use App\Services\StreakService;
+use App\Services\Progress\StreakService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

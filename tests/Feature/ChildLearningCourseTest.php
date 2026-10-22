@@ -58,6 +58,102 @@ class ChildLearningCourseTest extends TestCase
       ->assertSee($lesson->title);
   }
 
+  public function test_course_page_does_not_link_to_future_unfinished_lessons(): void
+  {
+    $user = User::factory()->create();
+
+    $child = Child::factory()->create([
+      'user_id' => $user->id,
+      'is_active' => true,
+    ]);
+
+    $course = Course::factory()->create([
+      'is_published' => true,
+    ]);
+
+    $module = CourseModule::factory()->create([
+      'course_id' => $course->id,
+      'position' => 1,
+    ]);
+
+    $firstLesson = Lesson::factory()->create([
+      'learning_module_id' => $module->id,
+      'position' => 1,
+      'is_published' => true,
+    ]);
+
+    $futureLesson = Lesson::factory()->create([
+      'learning_module_id' => $module->id,
+      'position' => 2,
+      'is_published' => true,
+    ]);
+
+    CourseProgress::create([
+      'child_id' => $child->id,
+      'course_id' => $course->id,
+      'completed_lessons' => 0,
+      'total_lessons' => 2,
+      'progress_percentage' => 0,
+      'completed' => false,
+      'completed_at' => null,
+    ]);
+
+    $response = $this->actingAs($user)
+      ->get(route('learn.course', $course))
+      ->assertOk()
+      ->assertSee($firstLesson->title)
+      ->assertSee($futureLesson->title)
+      ->assertSee('Complete the previous lesson first');
+
+    $response->assertSee(route('learn.lesson', $firstLesson), false);
+    $response->assertDontSee(route('learn.lesson', $futureLesson), false);
+  }
+
+  public function test_non_current_course_shows_lessons_as_locked_until_started(): void
+  {
+    $user = User::factory()->create();
+
+    $child = Child::factory()->create([
+      'user_id' => $user->id,
+      'is_active' => true,
+    ]);
+
+    $currentCourse = Course::factory()->create([
+      'is_published' => true,
+    ]);
+
+    CourseProgress::create([
+      'child_id' => $child->id,
+      'course_id' => $currentCourse->id,
+      'completed_lessons' => 0,
+      'total_lessons' => 1,
+      'progress_percentage' => 0,
+      'completed' => false,
+      'completed_at' => null,
+    ]);
+
+    $otherCourse = Course::factory()->create([
+      'is_published' => true,
+    ]);
+
+    $module = CourseModule::factory()->create([
+      'course_id' => $otherCourse->id,
+    ]);
+
+    $lesson = Lesson::factory()->create([
+      'learning_module_id' => $module->id,
+      'is_published' => true,
+    ]);
+
+    $response = $this->actingAs($user)
+      ->get(route('learn.course', $otherCourse))
+      ->assertOk()
+      ->assertSee($lesson->title)
+      ->assertSee('Start this course from the Adventure Path first');
+
+    $response->assertDontSee(route('learn.lesson', $lesson), false);
+  }
+
   public function test_course_progress_is_shown_for_current_child(): void
   {
     $user = User::factory()->create();

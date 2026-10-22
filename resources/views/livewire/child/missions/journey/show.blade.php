@@ -19,7 +19,7 @@ space-y-8
 
             <div class="text-6xl">
 
-                {{ $mission['icon'] }}
+                <x-lq.world-icon :name="$mission['icon'] ?? null" class="h-16 w-16" fallback="🚀" />
 
             </div>
 
@@ -69,7 +69,7 @@ space-y-8
 
                     <div class="text-4xl">
 
-                        {{ $step['icon'] }}
+                        <x-lq.world-icon :name="$step['icon'] ?? null" class="h-10 w-10" fallback="✨" />
 
                     </div>
 

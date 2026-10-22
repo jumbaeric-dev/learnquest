@@ -13,7 +13,7 @@
         {{-- Icon --}}
         <div class="text-4xl">
 
-            {{ $mission['icon'] }}
+            <x-lq.world-icon :name="$mission['icon'] ?? null" class="h-10 w-10" fallback="🚀" />
 
         </div>
 

@@ -24,7 +24,10 @@
     <div class="lq-world-tile__hero">
 
         <div class="lq-world-tile__icon">
-            {{ $icon }}
+            <x-lq.world-icon
+                :name="$icon"
+                class="h-16 w-16"
+            />
         </div>
 
         @if($badge)

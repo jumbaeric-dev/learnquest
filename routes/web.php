@@ -9,7 +9,10 @@ use App\Livewire\Child\Learning\Lesson as LearningLesson;
 use App\Livewire\Child\Missions\Index as Missions;
 use App\Livewire\Child\Missions\Journey\Show as MissionJourneyShow;
 use App\Livewire\Child\Worlds\Show as SubjectsWorld;
+use App\Livewire\Child\Profile\Show as ChildProfile;
+use App\Livewire\Child\Profile\Edit as ChildProfileEdit;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Child\Settings\Index as ChildSettings;
 
 Route::get("/", function () {
   return view("welcome");
@@ -33,12 +36,17 @@ Route::post("/logout", [ChildLoginController::class, "logout"])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(["child"])->group(function () {
+Route::middleware(["auth", "child"])->group(function () {
   /*
     |--------------------------------------------------------------------------
     | Child Universe
     |--------------------------------------------------------------------------
     */
+  Route::get("/child/profile", ChildProfile::class)
+    ->name("child.profile");
+
+  Route::get("/child/profile/edit", ChildProfileEdit::class)
+    ->name("child.profile.edit");
 
   Route::get("/child", Dashboard::class)->name("child");
 
@@ -91,6 +99,10 @@ Route::middleware(["child"])->group(function () {
   Route::get("/learn/activity/{activity}", LearningActivity::class)->name(
     "learn.activity"
   );
+
+  // child settings
+  Route::get('/child/settings', ChildSettings::class)
+    ->name('child.settings');
 });
 
 /*

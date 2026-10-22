@@ -17,6 +17,7 @@ class SubjectSeeder extends Seeder
 
             [
                 'name' => 'Math Galaxy',
+                'icon' => 'heroicon-o-calculator',
                 'tagline' => 'Every number unlocks a new star.',
                 'description' => 'Master mathematics through exciting space adventures.',
                 'story_intro' => 'The stars across Math Galaxy are fading. Solve puzzles and complete missions to restore their light.',
@@ -32,6 +33,7 @@ class SubjectSeeder extends Seeder
 
             [
                 'name' => 'Reading Kingdom',
+                'icon' => 'heroicon-o-book-open',
                 'tagline' => 'Every page opens a new adventure.',
                 'description' => 'Discover magical stories while building reading skills.',
                 'story_intro' => 'Story Owl needs your help restoring enchanted books scattered throughout the kingdom.',
@@ -47,6 +49,7 @@ class SubjectSeeder extends Seeder
 
             [
                 'name' => 'Science Lab',
+                'icon' => 'heroicon-o-beaker',
                 'tagline' => 'Experiment. Discover. Explore.',
                 'description' => 'Investigate the amazing world of science.',
                 'story_intro' => 'Dr. Spark has exciting experiments waiting for curious explorers.',
@@ -62,6 +65,7 @@ class SubjectSeeder extends Seeder
 
             [
                 'name' => 'Code City',
+                'icon' => 'heroicon-o-code-bracket',
                 'tagline' => 'Build the future one line at a time.',
                 'description' => 'Learn programming through games and interactive challenges.',
                 'story_intro' => 'The robots of Code City need your help fixing their programs.',
@@ -76,6 +80,7 @@ class SubjectSeeder extends Seeder
 
             [
                 'name' => 'Creative Studio',
+                'icon' => 'heroicon-o-paint-brush',
                 'tagline' => 'Imagine. Create. Inspire.',
                 'description' => 'Express yourself through art, music and creativity.',
                 'story_intro' => 'Pixel Panda is collecting masterpieces from young artists around the world.',
@@ -90,6 +95,7 @@ class SubjectSeeder extends Seeder
 
             [
                 'name' => 'Bible Adventures',
+                'icon' => 'heroicon-o-book-open',
                 'tagline' => 'Journey through timeless stories.',
                 'description' => 'Explore inspiring Bible stories and values.',
                 'story_intro' => 'Travel with Shepherd Eli and meet heroes of faith through exciting adventures.',
@@ -104,6 +110,7 @@ class SubjectSeeder extends Seeder
 
             [
                 'name' => 'Life Skills Village',
+                'icon' => 'heroicon-o-heart',
                 'tagline' => 'Skills for everyday heroes.',
                 'description' => 'Learn confidence, kindness, leadership and responsibility.',
                 'story_intro' => 'Captain Kind is helping every explorer become a hero in everyday life.',
@@ -118,6 +125,7 @@ class SubjectSeeder extends Seeder
 
             [
                 'name' => 'AI Academy',
+                'icon' => 'heroicon-o-sparkles',
                 'tagline' => 'Build the future with Artificial Intelligence.',
                 'description' => 'Discover AI through fun projects and interactive learning.',
                 'story_intro' => 'Nova has discovered friendly robots that have forgotten how to learn. Help repair them by mastering Artificial Intelligence.',
@@ -135,37 +143,33 @@ class SubjectSeeder extends Seeder
 
         foreach ($worlds as $world) {
 
-            Subject::updateOrCreate(
-
+            $subject = Subject::updateOrCreate(
                 [
                     'slug' => Str::slug($world['name']),
                 ],
-
                 [
                     'name' => $world['name'],
                     'description' => $world['description'],
                     'tagline' => $world['tagline'],
                     'story_intro' => $world['story_intro'],
                     'hero_character' => $world['hero_character'],
-
-                    'icon' => null,
-                    'cover_image' => null,
-                    'banner_animation' => null,
-                    'background_music' => null,
-
                     'theme_color' => $world['theme_color'],
                     'difficulty' => $world['difficulty'],
                     'unlock_level' => $world['unlock_level'],
                     'estimated_hours' => $world['estimated_hours'],
                     'sort_order' => $world['sort_order'],
-
                     'badge_icon' => $world['badge_icon'],
-
                     'is_featured' => $world['is_featured'] ?? false,
                     'is_seasonal' => false,
                     'is_active' => true,
                 ]
             );
+
+            // Fill missing defaults without overwriting an icon selected
+            // by an admin in the Subject editor.
+            if (blank($subject->icon) && filled($world['icon'] ?? null)) {
+                $subject->forceFill(['icon' => $world['icon']])->save();
+            }
         }
     }
 }

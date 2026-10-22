@@ -12,146 +12,215 @@ use Livewire\Component;
 
 class Activity extends Component
 {
-  use InteractsWithLearningShell;
+    use InteractsWithLearningShell;
 
-  public LessonActivityModel $activity;
+    public LessonActivityModel $activity;
 
-  public ?ActivityProgress $progress = null;
+    public ?ActivityProgress $progress = null;
 
-  public bool $submitted = false;
+    public bool $submitted = false;
 
-  public ?int $selectedOption = null;
+    public ?int $selectedOption = null;
 
-  public ?int $score = null;
+    public ?int $score = null;
 
-  public ?array $result = null;
+    public ?array $result = null;
 
-  public function mount(
-    LessonActivityModel $activity,
-    LearningContentAccessService $access,
-    CurrentChildService $currentChildService
-  ): void {
-    $this->activity = $access->activity($activity);
+    public function mount(
+        LessonActivityModel $activity,
+        LearningContentAccessService $access,
+        CurrentChildService $currentChildService,
+    ): void {
+        $child = $currentChildService->current();
 
-    $this->activity->loadMissing("lesson.module.course.subject");
+        abort_unless($child, 403);
 
-    $child = $currentChildService->current();
+        $this->activity = $access->activity($activity, $child);
 
-    abort_unless($child, 403);
+        $this->activity->loadMissing('lesson.module.course.subject');
 
-    $this->prepareShell(
-      $child,
-      $this->activity->lesson->module->course->subject?->slug
-    );
+        $this->prepareShell(
+            $child,
+            $this->activity->lesson->module->course->subject?->slug
+        );
 
-    $this->progress = $child
-      ->activityProgress()
-      ->where("activity_id", $this->activity->id)
-      ->first();
+        $this->progress = $child
+            ->activityProgress()
+            ->where('activity_id', $this->activity->id)
+            ->first();
 
-    if ($this->progress?->completed) {
-      $this->submitted = true;
-      $this->score = $this->progress->score;
-    }
-  }
-
-  /**
-   * Submit a quiz option.
-   *
-   * The correct answer is evaluated server-side.
-   * The browser only sends the selected option index.
-   */
-  public function submitOption(
-    int $option,
-    CurrentChildService $currentChildService,
-    LearningEngineService $learningEngine
-  ): void {
-    $child = $currentChildService->current();
-
-    abort_unless($child, 403);
-
-    if ($this->progress?->completed) {
-      $this->submitted = true;
-      $this->score = $this->progress->score;
-
-      return;
+        if ($this->progress?->completed) {
+            $this->submitted = true;
+            $this->score = $this->progress->score;
+        }
     }
 
-    $content = $this->activity->content ?? [];
+    /**
+     * Submit a quiz option.
+     *
+     * The correct answer is evaluated server-side. Access is rechecked
+     * on each action because Livewire actions are client-triggered.
+     */
+    public function submitOption(
+        int $option,
+        CurrentChildService $currentChildService,
+        LearningEngineService $learningEngine,
+        LearningContentAccessService $access,
+    ): void {
+        $child = $currentChildService->current();
 
-    $options = $content["options"] ?? [];
+        abort_unless($child, 403);
 
-    abort_unless(
-      is_array($options) && array_key_exists($option, $options),
-      422
-    );
+        $this->activity = $access->activity($this->activity, $child);
+        $this->progress = $child
+            ->activityProgress()
+            ->where('activity_id', $this->activity->id)
+            ->first();
 
-    $correctAnswer = $content["answer"] ?? null;
+        if ($this->progress?->completed) {
+            $this->submitted = true;
+            $this->score = $this->progress->score;
 
-    $score = (int) $option === (int) $correctAnswer ? 100 : 0;
+            return;
+        }
 
-    $this->selectedOption = $option;
-    $this->score = $score;
+        $content = $this->activity->content;
 
-    $this->result = $learningEngine->completeActivity(
-      $child,
-      $this->activity,
-      $score
-    );
+        abort_unless(
+            is_array($content) && ! empty($content['question']),
+            422,
+            'This activity does not contain a valid quiz question.'
+        );
 
-    $this->progress = $this->result["activity_progress"];
+        $options = $content['options'] ?? null;
 
-    $this->submitted = true;
-  }
+        abort_unless(
+            is_array($options)
+                && array_is_list($options)
+                && $options !== []
+                && array_key_exists($option, $options),
+            422,
+            'This quiz does not contain valid answer options.'
+        );
 
-  /**
-   * Complete a non-quiz activity.
-   */
-  public function complete(
-    CurrentChildService $currentChildService,
-    LearningEngineService $learningEngine
-  ): void {
-    $child = $currentChildService->current();
+        // Never coerce a missing or malformed answer to index 0.
+        // Without this validation, (int) null would make the first
+        // option look correct for a malformed quiz.
+        $rawCorrectAnswer = $content['answer'] ?? null;
 
-    abort_unless($child, 403);
+        if (is_int($rawCorrectAnswer)) {
+            $correctAnswer = $rawCorrectAnswer;
+        } elseif (
+            is_string($rawCorrectAnswer)
+            && preg_match('/^(0|[1-9][0-9]*)$/D', $rawCorrectAnswer) === 1
+        ) {
+            $correctAnswer = (int) $rawCorrectAnswer;
+        } else {
+            abort(
+                422,
+                'This quiz has an invalid answer configuration.'
+            );
+        }
 
-    if ($this->progress?->completed) {
-      $this->submitted = true;
-      $this->score = $this->progress->score;
+        abort_unless(
+            array_key_exists($correctAnswer, $options),
+            422,
+            'This quiz answer does not match an available option.'
+        );
 
-      return;
+        $score = $option === $correctAnswer ? 100 : 0;
+
+        $this->selectedOption = $option;
+        $this->score = $score;
+
+        $this->result = $learningEngine->completeActivity(
+            $child,
+            $this->activity,
+            $score
+        );
+
+        $this->progress = $this->result['activity_progress'];
+        $this->submitted = true;
     }
 
-    $this->score = 100;
+    /**
+     * Complete a non-quiz activity.
+     *
+     * Access is rechecked here too so direct Livewire calls cannot
+     * bypass the lesson/activity progression boundary.
+     */
+    public function complete(
+        CurrentChildService $currentChildService,
+        LearningEngineService $learningEngine,
+        LearningContentAccessService $access,
+    ): void {
+        $child = $currentChildService->current();
 
-    $this->result = $learningEngine->completeActivity(
-      $child,
-      $this->activity,
-      100
-    );
+        abort_unless($child, 403);
 
-    $this->progress = $this->result["activity_progress"];
+        $this->activity = $access->activity($this->activity, $child);
+        $this->progress = $child
+            ->activityProgress()
+            ->where('activity_id', $this->activity->id)
+            ->first();
 
-    $this->submitted = true;
-  }
+        if ($this->progress?->completed) {
+            $this->submitted = true;
+            $this->score = $this->progress->score;
 
-  /**
-   * Let the child try again after a failed attempt.
-   */
-  public function retry(): void
-  {
-    if ($this->progress?->completed) {
-      return;
+            return;
+        }
+
+        // Quiz completion must go through submitOption(), which
+        // evaluates the selected answer on the server. Never allow
+        // a direct Livewire call to complete a quiz for 100 points.
+        abort_unless(
+            ! $this->isQuizActivity(),
+            403,
+            'Quiz activities must be completed by submitting an answer.'
+        );
+
+        $this->score = 100;
+
+        $this->result = $learningEngine->completeActivity(
+            $child,
+            $this->activity,
+            100
+        );
+
+        $this->progress = $this->result['activity_progress'];
+        $this->submitted = true;
     }
 
-    $this->submitted = false;
-    $this->selectedOption = null;
-    $this->score = null;
-    $this->result = null;
-  }
+    /**
+     * Let the child try again after a failed attempt.
+     */
+    public function retry(): void
+    {
+        if ($this->progress?->completed) {
+            return;
+        }
 
-  public function render()
-  {
-    return view("livewire.child.learning.activity");
-  }
+        $this->submitted = false;
+        $this->selectedOption = null;
+        $this->score = null;
+        $this->result = null;
+    }
+
+    /**
+     * Keep this aligned with the view, which renders quiz UI when
+     * question content is present even if the activity type is wrong.
+     */
+    private function isQuizActivity(): bool
+    {
+        $content = $this->activity->content;
+
+        return strtolower((string) $this->activity->activity_type) === 'quiz'
+            || (is_array($content) && ! empty($content['question']));
+    }
+
+    public function render()
+    {
+        return view('livewire.child.learning.activity');
+    }
 }

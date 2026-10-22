@@ -4,6 +4,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Child Authentication
+    |--------------------------------------------------------------------------
+    */
+
+    'auth' => [
+        'child_login' => [
+            'max_attempts' => (int) env('LEARNQUEST_CHILD_LOGIN_MAX_ATTEMPTS', 5),
+            'decay_seconds' => (int) env('LEARNQUEST_CHILD_LOGIN_DECAY_SECONDS', 60),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Learning
     |--------------------------------------------------------------------------
     */
@@ -107,8 +120,9 @@ return [
 
         /*
          * Which provider powers Nova. See App\Services\Nova\NovaProviderFactory
-         * for the available keys ("anthropic" / "openai"). Swapping providers
-         * is a single env change — no other code needs to change.
+         * for the available keys: anthropic (claude), openai (chatgpt), gemini,
+         * openrouter, deepseek, mistral. Swapping providers is a single env
+         * change — no other code needs to change.
          */
         'provider' => env('NOVA_AI_PROVIDER', 'gemini'),
 
@@ -131,6 +145,46 @@ return [
         // Max tokens requested per Nova reply.
         'max_tokens' => 1024,
 
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Daily Challenges
+    |--------------------------------------------------------------------------
+    |
+    | Completion is derived from real activity (see DailyChallengeService);
+    | only the display text and XP reward are configured here.
+    |
+    | "timezone" decides when a child's day starts and ends.
+    */
+    'daily_challenges' => [
+
+        'timezone' => env('LEARNQUEST_TIMEZONE', 'UTC'),
+
+        'challenges' => [
+
+            'complete_lesson' => [
+                'icon' => '🔥',
+                'title' => 'Complete one lesson',
+                'description' => 'Finish every activity in a lesson.',
+                'xp' => 20,
+            ],
+
+            'create_something' => [
+                'icon' => '🎨',
+                'title' => 'Create something',
+                'description' => 'Finish a project activity.',
+                'xp' => 30,
+            ],
+
+            'ask_nova' => [
+                'icon' => '🤖',
+                'title' => 'Ask Nova AI',
+                'description' => 'Send Nova a message.',
+                'xp' => 10,
+            ],
+
+        ],
     ],
 
     /*

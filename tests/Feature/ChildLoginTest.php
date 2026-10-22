@@ -109,6 +109,51 @@ class ChildLoginTest extends TestCase
     $this->assertNull(session("active_child_id"));
   }
 
+  public function test_child_login_is_rate_limited_after_configured_failed_attempts(): void
+  {
+    config([
+      'learnquest.auth.child_login.max_attempts' => 2,
+      'learnquest.auth.child_login.decay_seconds' => 60,
+    ]);
+
+    $user = User::factory()->create();
+
+    $user->assignRole('child');
+
+    Child::factory()->create([
+      'user_id' => $user->id,
+      'parent_id' => $user->id,
+      'username' => 'RateLimitedExplorer',
+      'pin' => Hash::make('1234'),
+      'is_active' => true,
+    ]);
+
+    foreach (['9999', '8888'] as $wrongPin) {
+      $this->from(route('login'))
+        ->post(route('child.login'), [
+          'username' => 'RateLimitedExplorer',
+          'pin' => $wrongPin,
+        ])
+        ->assertRedirect(route('login'))
+        ->assertSessionHasErrors('username');
+    }
+
+    // Even a correct PIN is temporarily blocked after repeated failures.
+    $response = $this->from(route('login'))
+      ->post(route('child.login'), [
+        'username' => 'RateLimitedExplorer',
+        'pin' => '1234',
+      ]);
+
+    $response->assertRedirect(route('login'));
+    $response->assertSessionHasErrors('username');
+    $this->assertStringContainsString(
+      'Too many login attempts',
+      session('errors')->first('username')
+    );
+    $this->assertGuest();
+  }
+
   /*
     |--------------------------------------------------------------------------
     | Inactive Child

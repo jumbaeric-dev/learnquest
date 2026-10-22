@@ -132,10 +132,11 @@ substr($name, 0, 1)
                 {{-- Profile menu items --}}
                 <div class="lq-profile-menu__items">
 
-                    <span
+                    <a
+                        href="{{ route('child.profile') }}"
                         role="menuitem"
-                        aria-disabled="true"
-                        class="lq-profile-menu__item lq-profile-menu__item--disabled">
+                        class="lq-profile-menu__item"
+                        @click="closeProfile()">
                         <span class="lq-profile-menu__item-icon">
                             👤
                         </span>
@@ -143,12 +144,7 @@ substr($name, 0, 1)
                         <span>
                             My Profile
                         </span>
-
-                        <span class="lq-profile-menu__item-badge">
-                            Soon
-                        </span>
-                    </span>
-
+                    </a>
 
                     <a
                         href="{{ route('child.dashboard') }}#recent-achievements"
@@ -165,10 +161,12 @@ substr($name, 0, 1)
                     </a>
 
 
-                    <span
+
+                    <a
+                        href="{{ route('child.settings') }}"
                         role="menuitem"
-                        aria-disabled="true"
-                        class="lq-profile-menu__item lq-profile-menu__item--disabled">
+                        class="lq-profile-menu__item"
+                        @click="closeProfile()">
                         <span class="lq-profile-menu__item-icon">
                             ⚙️
                         </span>
@@ -176,11 +174,8 @@ substr($name, 0, 1)
                         <span>
                             Settings
                         </span>
+                    </a>
 
-                        <span class="lq-profile-menu__item-badge">
-                            Soon
-                        </span>
-                    </span>
 
                 </div>
 

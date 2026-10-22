@@ -14,7 +14,11 @@
                 <div class="lq-course-hero__main">
 
                     <div class="lq-course-hero__icon" aria-hidden="true">
-                        {{ $course->subject->icon ?? '📘' }}
+                        <x-lq.world-icon
+                            :name="$course->subject?->icon"
+                            fallback="📘"
+                            class="h-10 w-10"
+                        />
                     </div>
 
                     <div class="lq-course-hero__body">
@@ -151,7 +155,7 @@
                 @php
                 $completed = $this->isLessonCompleted($lesson->id);
 
-                $isNext = ! $completed && ! $nextLessonFound;
+                $isNext = $this->isCurrentCourse && ! $completed && ! $nextLessonFound;
 
                 if ($isNext) {
                 $nextLessonFound = true;
@@ -217,23 +221,37 @@
                     </div>
 
 
-                    <div class="shrink-0">
+                    <div class="flex shrink-0 flex-col items-start gap-2 sm:items-end">
 
                         @if ($completed)
 
-                        <x-lq.badge variant="success">
-                            ✓ Completed
-                        </x-lq.badge>
+                            <x-lq.badge variant="success">
+                                ✓ Completed
+                            </x-lq.badge>
+
+                            <x-lq.button
+                                tag="a"
+                                href="{{ route('learn.lesson', $lesson) }}"
+                                variant="secondary"
+                                size="sm">
+                                Review Lesson
+                            </x-lq.button>
+
+                        @elseif ($isNext)
+
+                            <x-lq.button
+                                tag="a"
+                                href="{{ route('learn.lesson', $lesson) }}"
+                                variant="primary"
+                                size="sm">
+                                ▶ Continue
+                            </x-lq.button>
 
                         @else
 
-                        <x-lq.button
-                            tag="a"
-                            href="{{ route('learn.lesson', $lesson) }}"
-                            variant="{{ $isNext ? 'primary' : 'secondary' }}"
-                            size="sm">
-                            {{ $isNext ? '▶ Continue' : 'Start Lesson' }}
-                        </x-lq.button>
+                            <span class="inline-flex items-center rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-500">
+                                🔒 {{ $this->isCurrentCourse ? 'Complete the previous lesson first' : 'Start this course from the Adventure Path first' }}
+                            </span>
 
                         @endif
 

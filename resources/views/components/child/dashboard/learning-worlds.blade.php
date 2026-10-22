@@ -23,8 +23,12 @@ gap-4">
                     hover:scale-105
                 ">
 
-            <div class="text-4xl">
-                {{ $world['icon'] ?? '🌎' }}
+            <div class="flex h-12 w-12 items-center justify-center text-4xl text-indigo-600">
+                <x-lq.world-icon
+                    :name="$world['icon'] ?? null"
+                    fallback="🌎"
+                    class="h-10 w-10"
+                />
             </div>
 
             <h3 class="mt-3 font-bold text-lg">

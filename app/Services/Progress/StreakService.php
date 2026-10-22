@@ -41,6 +41,16 @@ class StreakService
         return $this->resetStreak($streak, $today);
     }
 
+    /**
+     * The child's current streak in days (0 if they have none yet).
+     * Used by BadgeService and the Missions header.
+     */
+    public function current(Child $child): int
+    {
+        return ChildStreak::where('child_id', $child->id)
+            ->value('current_streak') ?? 0;
+    }
+
     protected function setInitialStreak(ChildStreak $streak, Carbon $today): ChildStreak
     {
         $streak->update([
@@ -73,14 +83,5 @@ class StreakService
         ]);
 
         return $streak->fresh();
-    }
-
-    /**
-     * 🔥 ADD THIS (needed for BadgeService)
-     */
-    public function current(Child $child): int
-    {
-        return ChildStreak::where('child_id', $child->id)
-            ->value('current_streak') ?? 0;
     }
 }

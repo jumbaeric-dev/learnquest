@@ -50,8 +50,29 @@ class SubjectForm
                 Section::make('Visual Identity')
                     ->schema([
 
-                        TextInput::make('icon')
-                            ->helperText('Heroicon, Lucide or Emoji'),
+                        Select::make('icon')
+                            ->options([
+                                'heroicon-o-globe-alt' => 'Globe',
+                                'heroicon-o-calculator' => 'Math — Calculator',
+                                'heroicon-o-book-open' => 'Reading — Open book',
+                                'heroicon-o-beaker' => 'Science — Beaker',
+                                'heroicon-o-code-bracket' => 'Coding — Code',
+                                'heroicon-o-paint-brush' => 'Creative — Paint brush',
+                                'heroicon-o-heart' => 'Life skills — Heart',
+                                'heroicon-o-sparkles' => 'AI — Sparkles',
+                                'heroicon-o-cpu-chip' => 'AI — CPU chip',
+                                'heroicon-o-star' => 'Star',
+                                '🌎' => 'Globe emoji',
+                                '🚀' => 'Rocket emoji',
+                                '📚' => 'Books emoji',
+                                '🎨' => 'Art emoji',
+                                '🧠' => 'Brain emoji',
+                                '🌱' => 'Growth emoji',
+                            ])
+                            ->searchable()
+                            ->native(false)
+                            ->placeholder('Choose a world icon')
+                            ->helperText('Choose a supported Heroicon or emoji. Heroicons render as SVG; emojis display as text.'),
 
                         FileUpload::make('cover_image')
                             ->directory('worlds')
@@ -105,7 +126,7 @@ class SubjectForm
                             ->numeric(),
 
                         TextInput::make('badge_icon')
-                            ->helperText('Heroicon, Lucide or Emoji'),
+                            ->helperText('Use a registered Heroicon component name, or an emoji.'),
 
                     ])
                     ->columns(3),

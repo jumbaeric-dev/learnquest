@@ -2,87 +2,69 @@
 
 namespace App\Livewire\Child\Missions\Components;
 
+use App\Services\Child\Context\CurrentChildService;
+use App\Services\Child\Learning\DailyChallengeService;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-
 class DailyChallenges extends Component
 {
-
+    /**
+     * @var array<int, array<string, mixed>>
+     */
     public array $challenges = [];
 
-
-    public function mount()
+    public function mount(): void
     {
-
-        $this->challenges = [
-
-            [
-                'id'=>1,
-                'icon'=>'🔥',
-                'title'=>'Complete one lesson',
-                'xp'=>20,
-                'completed'=>false,
-            ],
-
-
-            [
-                'id'=>2,
-                'icon'=>'🎨',
-                'title'=>'Create something',
-                'xp'=>30,
-                'completed'=>false,
-            ],
-
-
-            [
-                'id'=>3,
-                'icon'=>'🤖',
-                'title'=>'Ask Nova AI',
-                'xp'=>10,
-                'completed'=>false,
-            ],
-
-        ];
-
+        $this->refreshChallenges();
     }
 
-
-
+    /**
+     * Re-read today's state. Also runs when the child sends Nova a
+     * message, so "Ask Nova AI" flips to claimable immediately.
+     */
     #[On('nova-message-sent')]
-    public function completeAskNovaChallenge(): void
+    public function refreshChallenges(): void
     {
-        $this->completeChallenge(3);
+        $child = app(CurrentChildService::class)->current();
+
+        $this->challenges = $child
+            ? app(DailyChallengeService::class)->forChild($child)
+            : [];
     }
 
-    public function completeChallenge($id)
-    {
+    public function claim(
+        string $key,
+        CurrentChildService $currentChild,
+        DailyChallengeService $service
+    ) {
+        $child = $currentChild->current();
 
-        foreach($this->challenges as &$challenge){
+        abort_unless($child, 403);
 
-            if($challenge['id'] === $id){
+        $result = $service->claim($child, $key);
 
-                $challenge['completed'] = true;
+        if (! $result) {
+            // Not completed, unknown, or already claimed — just resync.
+            $this->refreshChallenges();
 
-
-                session()->flash(
-                    'message',
-                    "+{$challenge['xp']} XP earned 🎉"
-                );
-
-            }
-
+            return;
         }
 
+        $message = "+{$result['awarded']} XP earned 🎉";
+
+        if ($result['leveled_up']) {
+            $message .= ' Level up!';
+        }
+
+        session()->flash('message', $message);
+
+        // Reload so the topbar and header XP/level update too.
+        return $this->redirectRoute('child.missions');
     }
-
-
 
     public function render()
     {
-        return view(
-            'livewire.child.missions.components.daily-challenges'
-        );
+        return view('livewire.child.missions.components.daily-challenges');
     }
-
 }

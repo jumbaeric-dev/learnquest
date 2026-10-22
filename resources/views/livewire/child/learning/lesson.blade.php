@@ -34,7 +34,11 @@
                 <div class="lq-course-hero__main">
 
                     <div class="lq-course-hero__icon" aria-hidden="true">
-                        {{ $course->subject->icon ?? '📘' }}
+                        <x-lq.world-icon
+                            :name="$course->subject?->icon"
+                            fallback="📘"
+                            class="h-10 w-10"
+                        />
                     </div>
 
                     <div class="lq-course-hero__body">
@@ -150,7 +154,7 @@
                         @php
                             $completed = $this->isActivityCompleted($activity->id);
 
-                            $isNext = ! $completed && ! $nextActivityFound;
+                            $isNext = ! $this->isCompleted && ! $completed && ! $nextActivityFound;
 
                             if ($isNext) {
                                 $nextActivityFound = true;
@@ -220,28 +224,37 @@
                             </div>
 
 
-                            <div class="flex shrink-0 items-center gap-3">
+                            <div class="flex shrink-0 flex-col items-start gap-2 sm:items-end">
 
                                 @if ($completed)
                                     <x-lq.badge variant="success">
                                         ✓ Completed
                                     </x-lq.badge>
-                                @endif
 
-                                <x-lq.button
-                                    tag="a"
-                                    href="{{ route('learn.activity', $activity) }}"
-                                    variant="{{ $isNext ? 'primary' : 'secondary' }}"
-                                    size="sm"
-                                >
-                                    @if ($completed)
+                                    <x-lq.button
+                                        tag="a"
+                                        href="{{ route('learn.activity', $activity) }}"
+                                        variant="secondary"
+                                        size="sm"
+                                    >
                                         Review
-                                    @elseif ($isNext)
+                                    </x-lq.button>
+
+                                @elseif ($isNext)
+                                    <x-lq.button
+                                        tag="a"
+                                        href="{{ route('learn.activity', $activity) }}"
+                                        variant="primary"
+                                        size="sm"
+                                    >
                                         ▶ Start
-                                    @else
-                                        Start
-                                    @endif
-                                </x-lq.button>
+                                    </x-lq.button>
+
+                                @else
+                                    <span class="inline-flex items-center rounded-xl bg-slate-100 px-3 py-2 text-xs font-semibold text-slate-500">
+                                        🔒 Complete the previous activity first
+                                    </span>
+                                @endif
 
                             </div>
 

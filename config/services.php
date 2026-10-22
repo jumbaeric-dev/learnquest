@@ -83,7 +83,7 @@ return [
         'api_key' => env('OPENROUTER_API_KEY'),
         'model' => env(
             'OPENROUTER_MODEL',
-            'thinkingmachines/inkling-small'
+            'thinkingmachines/inkling-small:free'
         ),
     ],
 

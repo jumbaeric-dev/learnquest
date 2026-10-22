@@ -50,7 +50,7 @@
        {{ $node['status'] === 'locked'
             ? 'cursor-not-allowed opacity-50 grayscale'
             : 'hover:scale-110 active:scale-95' }}">
-                    {{ $node['icon'] }}
+                    <x-lq.world-icon :name="$node['icon'] ?? null" class="h-8 w-8" fallback="📘" />
                 </button>
 
                 {{-- Content --}}

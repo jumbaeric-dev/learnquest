@@ -8,7 +8,6 @@ use App\Services\AchievementService;
 use App\Services\BadgeService;
 use App\Services\FutureReadinessService;
 use App\Services\LevelService;
-use App\Services\StreakService;
 use App\Services\XPService;
 use Illuminate\Support\Facades\DB;
 

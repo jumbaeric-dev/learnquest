@@ -41,7 +41,7 @@
 
                 <span class="text-xl">
 
-                    {{ $category['icon'] }}
+                    <x-lq.world-icon :name="$category['icon'] ?? null" class="h-5 w-5" fallback="🌍" />
 
                 </span>
 

@@ -59,7 +59,11 @@
                        shadow-xl
                        ring-8 ring-indigo-100"
             >
-                {{ $world['icon'] ?? '🌍' }}
+                <x-lq.world-icon
+                    :name="$world['icon'] ?? null"
+                    fallback="🌍"
+                    class="h-12 w-12"
+                />
             </div>
 
 

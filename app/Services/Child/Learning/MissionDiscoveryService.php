@@ -20,7 +20,7 @@ class MissionDiscoveryService
             ->get()
             ->map(fn (Subject $subject) => [
                 'name' => $subject->name,
-                'icon' => $subject->icon ?? '�',
+                'icon' => $subject->icon ?: '🌍',
             ])
             ->all();
     }
@@ -65,7 +65,7 @@ class MissionDiscoveryService
             'id' => $course->id,
             'title' => $course->title,
             'category' => $course->subject?->name ?? 'Learning',
-            'icon' => $course->subject?->icon ?? '�',
+            'icon' => $course->subject?->icon ?: '🌍',
             'description' => $course->description,
             'xp' => $this->totalXp($course),
             'time' => $this->totalMinutes($course).' mins',

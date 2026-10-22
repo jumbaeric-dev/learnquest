@@ -10,7 +10,7 @@
 
 
                 <div class="text-6xl">
-                    {{ $adventure['icon'] }}
+                    <x-lq.world-icon :name="$adventure['icon'] ?? null" class="h-14 w-14" fallback="🚀" />
                 </div>
 
 

@@ -21,6 +21,15 @@
 
         <div class="relative z-10">
 
+            {{-- World icon --}}
+            <div class="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15 text-4xl ring-1 ring-white/20">
+                <x-lq.world-icon
+                    :name="$hero['icon'] ?? null"
+                    fallback="🌍"
+                    class="h-10 w-10 text-white"
+                />
+            </div>
+
             {{-- Title --}}
             <h1 class="text-4xl font-black">
                 {{ $hero['name'] }}

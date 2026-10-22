@@ -6,7 +6,9 @@ use App\Models\Course as CourseModel;
 use App\Models\CourseProgress;
 use App\Services\Child\Context\CurrentChildService;
 use App\Services\Child\Learning\LearningContentAccessService;
+use App\Services\Child\Learning\LearningJourneyService;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class Course extends Component
@@ -14,6 +16,10 @@ class Course extends Component
   public CourseModel $course;
 
   public ?CourseProgress $progress = null;
+
+  /** Whether this is the child's current unfinished course journey. */
+  #[Locked]
+  public bool $isCurrentCourse = false;
 
   /**
    * IDs of lessons completed by the current child.
@@ -37,7 +43,8 @@ class Course extends Component
   public function mount(
     CourseModel $course,
     LearningContentAccessService $access,
-    CurrentChildService $currentChildService
+    CurrentChildService $currentChildService,
+    LearningJourneyService $journey
   ): void {
     $this->course = $access->course($course);
 
@@ -49,6 +56,10 @@ class Course extends Component
       ->courseProgress()
       ->where("course_id", $this->course->id)
       ->first();
+
+    $currentCourse = $journey->getCurrentCourse($child);
+    $this->isCurrentCourse = $currentCourse !== null
+      && (int) $currentCourse->id === (int) $this->course->id;
 
     $lessonIds = $this->course->modules
       ->flatMap(fn($module) => $module->lessons)

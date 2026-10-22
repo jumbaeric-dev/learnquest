@@ -5,7 +5,7 @@
             {{-- Header --}}
             <div class="flex items-start gap-4">
                 <div class="text-5xl">
-                    {{ $mission['icon'] }}
+                    <x-lq.world-icon :name="$mission['icon'] ?? null" class="h-14 w-14" fallback="🚀" />
                 </div>
 
                 <div>

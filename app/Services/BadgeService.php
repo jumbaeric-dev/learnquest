@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Badge;
 use App\Models\Child;
+use App\Services\Progress\StreakService;
 
 class BadgeService
 {

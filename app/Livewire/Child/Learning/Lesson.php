@@ -12,77 +12,79 @@ use Livewire\Component;
 
 class Lesson extends Component
 {
-  use InteractsWithLearningShell;
+    use InteractsWithLearningShell;
 
-  public LessonModel $lesson;
+    public LessonModel $lesson;
 
-  public ?LessonProgress $progress = null;
+    public ?LessonProgress $progress = null;
 
-  /**
-   * IDs of activities completed by the current child.
-   *
-   * @var Collection<int, int>
-   */
-  public Collection $completedActivityIds;
+    /**
+     * IDs of activities completed by the current child.
+     *
+     * @var Collection<int, int>
+     */
+    public Collection $completedActivityIds;
 
-  public function mount(
-    LessonModel $lesson,
-    LearningContentAccessService $access,
-    CurrentChildService $currentChildService
-  ): void {
-    $this->lesson = $access->lesson($lesson);
+    public function mount(
+        LessonModel $lesson,
+        LearningContentAccessService $access,
+        CurrentChildService $currentChildService,
+    ): void {
+        $child = $currentChildService->current();
 
-    $this->lesson->loadMissing("module.course.subject");
+        abort_unless($child, 403);
 
-    $child = $currentChildService->current();
+        // Access checks are child-specific and must happen only after
+        // resolving the authenticated child's own progress context.
+        $this->lesson = $access->lesson($lesson, $child);
 
-    abort_unless($child, 403);
+        $this->lesson->loadMissing('module.course.subject');
 
-    $this->prepareShell(
-      $child,
-      $this->lesson->module->course->subject?->slug
-    );
+        $this->prepareShell(
+            $child,
+            $this->lesson->module->course->subject?->slug
+        );
 
-    $this->progress = $child
-      ->lessonProgress()
-      ->where("lesson_id", $this->lesson->id)
-      ->first();
+        $this->progress = $child
+            ->lessonProgress()
+            ->where('lesson_id', $this->lesson->id)
+            ->first();
 
-    $this->completedActivityIds = $child
-      ->activityProgress()
-      ->whereIn("activity_id", $this->lesson->activities->pluck("id"))
-      ->where("completed", true)
-      ->pluck("activity_id");
-  }
+        $this->completedActivityIds = $child
+            ->activityProgress()
+            ->whereIn('activity_id', $this->lesson->activities->pluck('id'))
+            ->where('completed', true)
+            ->pluck('activity_id');
+    }
 
-  public function getProgressPercentageProperty(): int
-  {
-    return (int) round($this->progress?->progress_percentage ?? 0);
-  }
+    public function getProgressPercentageProperty(): int
+    {
+        return (int) round($this->progress?->progress_percentage ?? 0);
+    }
 
-  public function getCompletedActivitiesProperty(): int
-  {
-    return (int) ($this->progress?->completed_activities ?? 0);
-  }
+    public function getCompletedActivitiesProperty(): int
+    {
+        return (int) ($this->progress?->completed_activities ?? 0);
+    }
 
-  public function getTotalActivitiesProperty(): int
-  {
-    return (int) ($this->progress?->total_activities ??
-      $this->lesson->activities->count());
-  }
+    public function getTotalActivitiesProperty(): int
+    {
+        return (int) ($this->progress?->total_activities
+            ?? $this->lesson->activities->count());
+    }
 
-  public function getIsCompletedProperty(): bool
-  {
-    return (bool) ($this->progress?->completed ?? false);
-  }
+    public function getIsCompletedProperty(): bool
+    {
+        return (bool) ($this->progress?->completed ?? false);
+    }
 
-  public function isActivityCompleted(int $activityId): bool
-  {
-    return $this->completedActivityIds->contains($activityId);
-  }
+    public function isActivityCompleted(int $activityId): bool
+    {
+        return $this->completedActivityIds->contains($activityId);
+    }
 
-  public function render()
-  {
-    return view("livewire.child.learning.lesson");
-  }
+    public function render()
+    {
+        return view('livewire.child.learning.lesson');
+    }
 }

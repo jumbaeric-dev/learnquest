@@ -1,26 +1,13 @@
 <div
     x-data
-    class="fixed bottom-24 right-5 z-[110] sm:bottom-8"
+    class="fixed right-5 z-[110]"
+    style="bottom: 8rem;"
 >
 
-    {{-- Floating launcher bubble --}}
-    @unless($open)
-    <button
-        type="button"
-        wire:click="open"
-        class="
-            flex h-16 w-16 items-center justify-center
-            rounded-full
-            bg-gradient-to-br from-indigo-500 to-purple-600
-            text-3xl text-white shadow-2xl
-            transition duration-300
-            hover:scale-110
-        "
-        aria-label="Chat with Nova"
-    >
-        🤖
-    </button>
-    @endunless
+    {{--
+        No launcher bubble here on purpose: the chat is opened from the
+        floating ✨ menu ("Ask Nova"), which dispatches `open-nova-chat`.
+    --}}
 
     {{-- Chat panel --}}
     @if($open)
