@@ -1407,3 +1407,117 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+
+
+/*
+|--------------------------------------------------------------------------
+| Mobile Navigation Drawer
+|--------------------------------------------------------------------------
+|
+| The desktop sidebar is hidden on narrow screens. The shared top bar
+| exposes it as an off-canvas drawer, with a backdrop and touch-friendly
+| controls. Desktop navigation remains unchanged.
+|--------------------------------------------------------------------------
+*/
+
+.lq-mobile-menu-trigger {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+
+  width: 2.625rem;
+  height: 2.625rem;
+
+  border: 1px solid var(--lq-border);
+  border-radius: 0.75rem;
+
+  color: var(--lq-text-primary);
+  background: color-mix(in srgb, var(--lq-theme-surface) 92%, transparent);
+  box-shadow: var(--lq-shadow-sm);
+
+  cursor: pointer;
+}
+
+.lq-mobile-menu-trigger svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.lq-mobile-menu-trigger:focus-visible {
+  outline: 2px solid var(--lq-theme-primary);
+  outline-offset: 2px;
+}
+
+.lq-mobile-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(2px);
+
+  cursor: pointer;
+}
+
+.lq-sidebar.is-mobile-open {
+  display: flex;
+  z-index: 80;
+
+  width: min(18rem, calc(100vw - 2rem));
+  max-height: 100vh;
+  max-height: 100dvh;
+  overflow-y: auto;
+
+  box-shadow: var(--lq-shadow-lg);
+  animation: lq-mobile-menu-enter 180ms ease-out both;
+}
+
+@keyframes lq-mobile-menu-enter {
+  from {
+    transform: translateX(-0.5rem);
+    opacity: 0.88;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 1023.98px) {
+  .lq-mobile-brand {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .lq-topbar {
+    gap: 0.5rem;
+  }
+
+  .lq-top-actions {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .lq-mobile-menu-trigger,
+  .lq-mobile-menu-overlay {
+    display: none !important;
+  }
+
+  .lq-sidebar.is-mobile-open {
+    z-index: 40;
+    width: 248px;
+    max-height: none;
+    overflow: visible;
+    box-shadow: none;
+    animation: none;
+  }
+}

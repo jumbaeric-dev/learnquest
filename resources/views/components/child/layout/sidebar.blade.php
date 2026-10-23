@@ -3,7 +3,9 @@
 ])
 
 <aside
+    id="child-navigation"
     class="lq-sidebar"
+    :class="{ 'is-mobile-open': mobileMenuOpen }"
     aria-label="LearnQuest navigation"
 >
 
@@ -28,6 +30,7 @@
     <nav
         class="lq-sidebar-nav"
         aria-label="Main navigation"
+        @click="closeMobileMenu()"
     >
 
         <a

@@ -12,6 +12,25 @@ substr($name, 0, 1)
 
 <header class="lq-topbar">
 
+    {{-- Mobile navigation toggle --}}
+    <button
+        type="button"
+        class="lq-mobile-menu-trigger"
+        aria-label="Toggle navigation menu"
+        aria-controls="child-navigation"
+        :aria-expanded="mobileMenuOpen.toString()"
+        @click="toggleMobileMenu()">
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+    </button>
+
     {{-- Mobile brand --}}
     <div class="lq-mobile-brand">
 

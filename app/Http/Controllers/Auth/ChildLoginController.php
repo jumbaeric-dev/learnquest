@@ -99,6 +99,9 @@ class ChildLoginController extends Controller
     {
         $normalizedUsername = Str::lower(trim($username));
 
-        return 'child-login:' . $normalizedUsername . '|' . $request->ip();
+        return 'child-login:' . hash(
+            'sha256',
+            $normalizedUsername . '|' . ($request->ip() ?? 'unknown')
+        );
     }
 }

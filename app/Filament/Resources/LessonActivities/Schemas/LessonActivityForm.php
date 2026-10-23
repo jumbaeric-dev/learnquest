@@ -15,6 +15,10 @@ class LessonActivityForm
 {
     public static function configure(Schema $schema): Schema
     {
+        $isPublishedQuiz = fn (Get $get): bool =>
+            $get('activity_type') === 'quiz'
+            && (bool) $get('is_published');
+
         return $schema
             ->components([
 
@@ -76,23 +80,55 @@ class LessonActivityForm
                             ->visible(fn(Get $get) => $get('activity_type') === 'story'),
 
                         // QUIZ
-                        TextInput::make('content.question')
+                        Textarea::make('content.question')
                             ->label('Question')
-                            ->visible(fn(Get $get) => $get('activity_type') === 'quiz'),
+                            ->rows(3)
+                            ->maxLength(1000)
+                            ->required($isPublishedQuiz)
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'quiz'),
 
                         Repeater::make('content.options')
+                            ->label('Answer Options')
                             ->schema([
                                 TextInput::make('option')
-                                    ->required(),
+                                    ->label('Option text')
+                                    ->required()
+                                    ->maxLength(255)
+                                    ->live(onBlur: true),
                             ])
-                            ->visible(fn(Get $get) => $get('activity_type') === 'quiz')
-                            ->minItems(2)
-                            ->maxItems(6),
+                            ->required($isPublishedQuiz)
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'quiz')
+                            ->minItems(fn (Get $get): int => $isPublishedQuiz($get) ? 2 : 0)
+                            ->maxItems(6)
+                            ->addActionLabel('Add answer option'),
 
-                        TextInput::make('content.answer')
-                            ->label('Correct Answer Index')
-                            ->numeric()
-                            ->visible(fn(Get $get) => $get('activity_type') === 'quiz'),
+                        Select::make('content.answer')
+                            ->label('Correct Answer')
+                            ->placeholder('Choose the correct answer')
+                            ->options(function (Get $get): array {
+                                $state = $get('content.options');
+                                $options = is_array($state) ? array_values($state) : [];
+                                $choices = [];
+
+                                foreach ($options as $index => $option) {
+                                    $label = is_array($option)
+                                        ? ($option['option'] ?? '')
+                                        : $option;
+                                    $label = is_string($label) ? trim($label) : '';
+
+                                    $choices[$index] = $label !== ''
+                                        ? $label
+                                        : 'Option '.($index + 1);
+                                }
+
+                                return $choices;
+                            })
+                            ->required($isPublishedQuiz)
+                            ->rules(fn (Get $get): array => $isPublishedQuiz($get)
+                                ? ['integer', 'min:0', 'max:'.max(0, count(is_array($get('content.options')) ? $get('content.options') : []) - 1)]
+                                : [])
+                            ->native(false)
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'quiz'),
 
                         // AI CHAT
                         Textarea::make('content.system_prompt')
@@ -141,6 +177,7 @@ class LessonActivityForm
                             ->required(),
 
                         Toggle::make('is_published')
+                            ->live()
                             ->default(false),
 
                     ])
