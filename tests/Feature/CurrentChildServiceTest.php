@@ -69,4 +69,35 @@ class CurrentChildServiceTest extends TestCase
     $this->assertNotNull($current);
     $this->assertSame($firstChild->id, $current->id);
   }
+  public function test_parent_resolves_only_the_child_selected_from_their_own_family(): void
+  {
+    \Spatie\Permission\Models\Role::findOrCreate("parent", "web");
+    $parent = User::factory()->create();
+    $parent->assignRole("parent");
+    $ownChild = Child::factory()->create(["parent_id" => $parent->id, "is_active" => true]);
+    $otherParent = User::factory()->create();
+    $otherChild = Child::factory()->create(["parent_id" => $otherParent->id, "is_active" => true]);
+
+    $this->actingAs($parent);
+    session(["active_child_id" => $ownChild->id]);
+
+    $this->assertSame($ownChild->id, app(CurrentChildService::class)->current()?->id);
+
+    session(["active_child_id" => $otherChild->id]);
+    $this->assertNull(app(CurrentChildService::class)->current());
+  }
+
+  public function test_parent_cannot_resolve_an_inactive_selected_child(): void
+  {
+    \Spatie\Permission\Models\Role::findOrCreate("parent", "web");
+    $parent = User::factory()->create();
+    $parent->assignRole("parent");
+    $child = Child::factory()->create(["parent_id" => $parent->id, "is_active" => false]);
+
+    $this->actingAs($parent);
+    session(["active_child_id" => $child->id]);
+
+    $this->assertNull(app(CurrentChildService::class)->current());
+  }
+
 }

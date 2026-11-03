@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'subject_id',
         'title',
@@ -16,7 +17,9 @@ class Course extends Model
         'age_group',
         'thumbnail',
         'is_published',
+        'position',
     ];
+
     public function subject()
     {
         return $this->belongsTo(Subject::class);
@@ -24,7 +27,10 @@ class Course extends Model
 
     public function modules()
     {
-        return $this->hasMany(CourseModule::class)->orderBy('position');
+        return $this->hasMany(
+            CourseModule::class,
+            CourseModule::FOREIGN_KEY
+        )->orderBy('position');
     }
 
     public function courseProgress()

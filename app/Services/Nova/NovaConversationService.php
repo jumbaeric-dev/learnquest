@@ -48,7 +48,14 @@ class NovaConversationService
      */
     public function hasReachedDailyLimit(Child $child): bool
     {
-        $limit = config('learnquest.nova.daily_message_limit', 60);
+        $limit = (int) config('learnquest.nova.daily_message_limit', 60);
+
+        $planLimit = app(\App\Services\Billing\EntitlementService::class)
+            ->limitForChild($child, 'nova_messages_per_day');
+
+        if ($planLimit !== null) {
+            $limit = min($limit, $planLimit);
+        }
 
         $sentToday = $child->novaMessages()
             ->where('role', 'user')

@@ -13,6 +13,13 @@ use App\Livewire\Child\Profile\Show as ChildProfile;
 use App\Livewire\Child\Profile\Edit as ChildProfileEdit;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Child\Settings\Index as ChildSettings;
+use App\Http\Controllers\Auth\ParentAuthController;
+use App\Livewire\ParentPortal\Dashboard\Index as ParentDashboard;
+use App\Livewire\ParentPortal\Children\Show as ParentChildShow;
+use App\Livewire\ParentPortal\Children\Index as ParentChildren;
+use App\Services\Child\Context\CurrentChildService;
+use App\Livewire\ParentPortal\Account\Settings as ParentAccountSettings;
+use App\Livewire\ParentPortal\Billing\Index as ParentBilling;
 
 Route::get("/", function () {
   return view("welcome");
@@ -36,7 +43,7 @@ Route::post("/logout", [ChildLoginController::class, "logout"])
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(["auth", "child"])->group(function () {
+Route::middleware(["child"])->group(function () {
   /*
     |--------------------------------------------------------------------------
     | Child Universe
@@ -104,6 +111,42 @@ Route::middleware(["auth", "child"])->group(function () {
   Route::get('/child/settings', ChildSettings::class)
     ->name('child.settings');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Parent Portal
+|--------------------------------------------------------------------------
+*/
+
+Route::get("/parent/login", [ParentAuthController::class, "showLoginForm"])
+  ->name("parent.login");
+
+Route::post("/parent/login", [ParentAuthController::class, "login"])
+  ->name("parent.login.submit");
+
+Route::get("/parent/register", [ParentAuthController::class, "showRegisterForm"])
+  ->name("parent.register");
+
+Route::post("/parent/register", [ParentAuthController::class, "register"])
+  ->middleware("throttle:6,1")
+  ->name("parent.register.submit");
+
+Route::middleware(["parent", "auth.session"])
+  ->prefix("parent")
+  ->name("parent.")
+  ->group(function () {
+    Route::get("/", ParentDashboard::class)->name("dashboard");
+    Route::get("/children/{child}", ParentChildShow::class)->whereNumber("child")->name("children.show");
+    Route::get("/children", ParentChildren::class)->name("children.index");
+    Route::post("/return", function (CurrentChildService $currentChild) {
+      $currentChild->leaveParentPreview();
+
+      return redirect()->route("parent.dashboard");
+    })->name("return");
+    Route::get("/account", ParentAccountSettings::class)->name("account");
+    Route::get("/billing", ParentBilling::class)->name("billing");
+  });
+
 
 /*
 |--------------------------------------------------------------------------

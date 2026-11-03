@@ -52,7 +52,7 @@ class ChildLoginController extends Controller
         }
 
         $child = Child::query()
-            ->where('username', $credentials['username'])
+            ->whereRaw('LOWER(username) = ?', [Str::lower(trim($credentials['username']))])
             ->first();
 
         if (
@@ -83,12 +83,14 @@ class ChildLoginController extends Controller
 
     public function logout(Request $request)
     {
+        $wasParent = (bool) $request->user()?->isParent();
+
         Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('login');
+        return redirect()->route($wasParent ? 'parent.login' : 'login');
     }
 
     /**

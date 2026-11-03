@@ -11,12 +11,14 @@ use App\Models\Child;
 use App\Models\Subject;
 use App\Repositories\Child\WorldRepository;
 use App\Services\Child\Learning\LearningJourneyService;
+use App\Services\Child\Learning\ChildAgeBandService;
 
 class WorldService
 {
     public function __construct(
         protected WorldRepository $worlds,
         protected LearningJourneyService $journey,
+        protected ChildAgeBandService $ageBands,
     ) {}
 
     /**
@@ -29,6 +31,25 @@ class WorldService
         $subject = $this->worlds->find($subject->id);
 
         abort_if($subject === null, 404);
+
+        if ($this->ageBands->isCanonicalWorld($subject->slug)) {
+            $ageGroup = $this->ageBands->ageGroupFor($child);
+
+            $visibleCourses = $ageGroup === null
+                ? $subject->courses->take(0)
+                : $subject->courses
+                ->where('age_group', $ageGroup)
+                ->values();
+
+            $subject->setRelation('courses', $visibleCourses);
+
+            // These are the published courses applicable to this child,
+            // not the total number of age-band variants across the world.
+            $subject->setAttribute(
+                'courses_count',
+                $visibleCourses->count()
+            );
+        }
 
         return new WorldDTO(
             hero: $this->hero($subject),

@@ -105,4 +105,29 @@ class EnsureChildContextTest extends TestCase
       $response->headers->get("Location")
     );
   }
+  public function test_parent_with_an_owned_active_child_preview_can_pass_child_context(): void
+  {
+    \Spatie\Permission\Models\Role::findOrCreate("parent", "web");
+    $parent = User::factory()->create();
+    $parent->assignRole("parent");
+    $child = Child::factory()->create([
+      "parent_id" => $parent->id,
+      "is_active" => true,
+    ]);
+
+    $this->actingAs($parent);
+    session(["active_child_id" => $child->id]);
+
+    $request = Request::create("/child/my-universe", "GET");
+    $request->setUserResolver(fn() => $parent);
+
+    $response = app(EnsureChildContext::class)->handle(
+      $request,
+      fn(Request $request) => response("parent preview allowed", Response::HTTP_OK),
+    );
+
+    $this->assertSame(Response::HTTP_OK, $response->getStatusCode());
+    $this->assertSame("parent preview allowed", $response->getContent());
+  }
+
 }

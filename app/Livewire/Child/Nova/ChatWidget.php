@@ -30,6 +30,11 @@ class ChatWidget extends Component
             return;
         }
 
+        // A previewing parent must not be able to read the child's chats.
+        if ($currentChild->isParentPreview()) {
+            return;
+        }
+
         $this->messages = $nova->history($child);
 
         $this->limitReached = $nova->hasReachedDailyLimit($child);
@@ -59,6 +64,17 @@ class ChatWidget extends Component
         $child = $currentChild->current();
 
         if (! $child) {
+            return;
+        }
+
+                if ($currentChild->isParentPreview()) {
+            $this->draft = '';
+
+            $this->messages[] = [
+                'role' => 'assistant',
+                'content' => 'You’re previewing as a parent, so Nova stays quiet here and nothing is saved.',
+            ];
+
             return;
         }
 

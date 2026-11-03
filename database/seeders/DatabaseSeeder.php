@@ -11,21 +11,17 @@ class DatabaseSeeder extends Seeder
 {
     use WithoutModelEvents;
 
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-
+        // Roles and permissions must exist before assigning roles.
         $this->call([
             RolesSeeder::class,
             RolePermissionSeeder::class,
         ]);
 
+        // Development accounts.
         $admin = User::firstOrCreate(
-            [
-                'email' => 'gwandeprophet2@gmail.com',
-            ],
+            ['email' => 'gwandeprophet2@gmail.com'],
             [
                 'name' => 'Eric Jumba',
                 'password' => Hash::make('888888'),
@@ -57,20 +53,21 @@ class DatabaseSeeder extends Seeder
 
         $schoolAdmin->syncRoles(['school_admin', 'parent']);
 
+        // Canonical LearnQuest data. Dependencies matter:
+        // worlds, then skills, then the curriculum.
         $this->call([
             SubjectSeeder::class,
-            CourseSeeder::class,
-            CourseModuleSeeder::class,
-            LessonSeeder::class,
             SkillSeeder::class,
             BadgeSeeder::class,
-            AIForKidsCurriculumSeeder::class,
-            AIForKidsActivitiesSeeder::class,
+            LearnQuestCurriculumSeeder::class,
+
+            PlanSeeder::class,
+            // Preserve the old course without restoring legacy activity
+            // types, duplicated activities, or published unreviewed content.
+            LegacyAiCoursePreservationSeeder::class,
+
+            // Demo child accounts; learning progress starts empty.
             ChildrenSeeder::class,
-            ChildSkillProgressSeeder::class,
-            ActivityProgressSeeder::class,
-            LessonProgressSeeder::class,
-            CourseProgressSeeder::class,
         ]);
     }
 }

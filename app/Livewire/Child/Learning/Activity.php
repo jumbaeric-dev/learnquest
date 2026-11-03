@@ -71,6 +71,15 @@ class Activity extends Component
 
         abort_unless($child, 403);
 
+        if ($currentChildService->isParentPreview()) {
+            session()->now(
+                'message',
+                'Preview mode: answers are not saved to your child’s progress.'
+            );
+
+            return;
+        }
+
         $this->activity = $access->activity($this->activity, $child);
         $this->progress = $child
             ->activityProgress()
@@ -157,6 +166,15 @@ class Activity extends Component
         $child = $currentChildService->current();
 
         abort_unless($child, 403);
+
+        if ($currentChildService->isParentPreview()) {
+            session()->now(
+                'message',
+                'Preview mode: answers are not saved to your child’s progress.'
+            );
+
+            return;
+        }
 
         $this->activity = $access->activity($this->activity, $child);
         $this->progress = $child

@@ -46,12 +46,13 @@ class Course extends Component
     CurrentChildService $currentChildService,
     LearningJourneyService $journey
   ): void {
-    $this->course = $access->course($course);
 
     $child = $currentChildService->current();
 
     abort_unless($child, 403);
 
+    $this->course = $access->course($course, $child);
+    
     $this->progress = $child
       ->courseProgress()
       ->where("course_id", $this->course->id)

@@ -71,7 +71,7 @@ class AdventurePath extends Component
 
         $course = Course::findOrFail($courseId);
 
-        $course = $access->course($course);
+        $course = $access->course($course, $child);
 
         $courseProgress->update($child, $course);
 

@@ -24,12 +24,14 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use App\Services\FutureReadinessService;
 use App\Services\LevelService;
+use App\Services\Child\Learning\ChildAgeBandService;
 
 class UniverseDashboardService
 {
   public function __construct(
     protected LearningJourneyService $learningJourney,
-    protected LevelService $levelService
+    protected LevelService $levelService,
+    protected ChildAgeBandService $ageBands,
   ) {}
 
   public function welcome(Child $child): WelcomeDTO
@@ -198,6 +200,7 @@ class UniverseDashboardService
           slug: $subject->slug
         )
       )
+      ->map(fn(LearningWorldDTO $world) => $world->toArray())
 
       ->all();
   }
@@ -272,17 +275,21 @@ class UniverseDashboardService
         fn($query) => $query->where('id', '!=', $currentCourse->id)
       )
       ->with('subject')
-      ->limit(5)
       ->get()
+      ->filter(
+        fn(Course $course) => $this->ageBands->allowsCourse($course, $child)
+      )
+      ->take(5)
       ->map(function (Course $course) {
         return new RecommendedAdventureDTO(
           id: $course->id,
           title: $course->title,
           description: $course->description,
           icon: $course->subject?->icon,
-          ageGroup: $course->age_group
+          ageGroup: $course->age_group,
         );
       })
+      ->values()
       ->all();
   }
 

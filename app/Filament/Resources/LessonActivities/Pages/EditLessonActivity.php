@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\LessonActivities\Pages;
 
 use App\Filament\Resources\LessonActivities\LessonActivityResource;
+use App\Services\Learning\PublishedActivityContentValidator;
 use App\Services\Learning\PublishedQuizValidator;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -14,6 +15,12 @@ class EditLessonActivity extends EditRecord
     protected function beforeSave(): void
     {
         app(PublishedQuizValidator::class)->validateForPublication(
+            $this->data['activity_type'] ?? null,
+            $this->data['is_published'] ?? false,
+            $this->data['content'] ?? null,
+        );
+
+        app(PublishedActivityContentValidator::class)->validateForPublication(
             $this->data['activity_type'] ?? null,
             $this->data['is_published'] ?? false,
             $this->data['content'] ?? null,

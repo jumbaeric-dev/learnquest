@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Lesson extends Model
 {
     use HasFactory;
+
     public const FOREIGN_KEY = 'learning_module_id';
+
     protected $fillable = [
         'learning_module_id',
         'title',
@@ -21,12 +23,18 @@ class Lesson extends Model
 
     public function module()
     {
-        return $this->belongsTo(CourseModule::class, 'learning_module_id');
+        return $this->belongsTo(
+            CourseModule::class,
+            self::FOREIGN_KEY
+        );
     }
 
     public function activities()
     {
-        return $this->hasMany(LessonActivity::class)->orderBy('position');
+        return $this->hasMany(
+            LessonActivity::class,
+            'lesson_id'
+        )->orderBy('position');
     }
 
     public function progress()

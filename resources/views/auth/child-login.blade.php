@@ -5,14 +5,18 @@
         <div
             class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2
                    w-96 h-96 bg-purple-600/30 rounded-full blur-3xl
-                   pointer-events-none"
-        ></div>
+                   pointer-events-none"></div>
 
         <div
             class="absolute bottom-1/4 left-1/3
                    w-80 h-80 bg-cyan-600/20 rounded-full blur-3xl
-                   pointer-events-none"
-        ></div>
+                   pointer-events-none"></div>
+
+        <p class="mt-6 text-center text-sm text-slate-400">
+            <a href="{{ route('parent.login') }}" class="hover:text-slate-200">
+                Are you a parent? Sign in here →
+            </a>
+        </p>
 
         <x-lq.glass-card
             class="w-full max-w-md p-8 relative z-10
@@ -21,8 +25,7 @@
                    backdrop-blur-md
                    rounded-3xl
                    shadow-2xl
-                   text-center"
-        >
+                   text-center">
 
             {{-- Header --}}
             <div class="mb-6">
@@ -31,8 +34,7 @@
                 <h1
                     class="text-3xl font-extrabold
                            text-transparent bg-clip-text
-                           bg-gradient-to-r from-cyan-400 to-purple-400"
-                >
+                           bg-gradient-to-r from-cyan-400 to-purple-400">
                     Explorer Login
                 </h1>
 
@@ -45,8 +47,7 @@
             <form
                 method="POST"
                 action="{{ route('login') }}"
-                class="space-y-6"
-            >
+                class="space-y-6">
                 @csrf
 
                 {{-- Username --}}
@@ -55,8 +56,7 @@
                         for="username"
                         class="block text-xs font-semibold
                                uppercase tracking-wider
-                               text-slate-300 mb-2"
-                    >
+                               text-slate-300 mb-2">
                         Explorer Username
                     </label>
 
@@ -78,13 +78,12 @@
                                focus:ring-2 focus:ring-cyan-400
                                focus:border-transparent
                                transition"
-                        placeholder="e.g. StarCaptain99"
-                    >
+                        placeholder="e.g. StarCaptain99">
 
                     @error('username')
-                        <span class="text-xs text-rose-400 mt-1 block">
-                            {{ $message }}
-                        </span>
+                    <span class="text-xs text-rose-400 mt-1 block">
+                        {{ $message }}
+                    </span>
                     @enderror
                 </div>
 
@@ -94,8 +93,7 @@
                         for="pin"
                         class="block text-xs font-semibold
                                uppercase tracking-wider
-                               text-slate-300 mb-2"
-                    >
+                               text-slate-300 mb-2">
                         4-Digit Secret PIN
                     </label>
 
@@ -120,13 +118,12 @@
                                focus:ring-2 focus:ring-cyan-400
                                focus:border-transparent
                                transition"
-                        placeholder="••••"
-                    >
+                        placeholder="••••">
 
                     @error('pin')
-                        <span class="text-xs text-rose-400 mt-1 block">
-                            {{ $message }}
-                        </span>
+                    <span class="text-xs text-rose-400 mt-1 block">
+                        {{ $message }}
+                    </span>
                     @enderror
                 </div>
 
@@ -146,8 +143,7 @@
                            active:scale-[0.98]
                            transition duration-150
                            shadow-lg
-                           shadow-cyan-500/25"
-                >
+                           shadow-cyan-500/25">
                     Launch My Universe 🌌
                 </button>
             </form>

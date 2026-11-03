@@ -2,9 +2,9 @@
 
 namespace App\Livewire\Child\Missions;
 
-use Livewire\Component;
 use App\Services\Child\Context\CurrentChildService;
 use App\Services\Child\Learning\MissionDiscoveryService;
+use Livewire\Component;
 
 class Index extends Component
 {
@@ -21,24 +21,29 @@ class Index extends Component
         }
     }
 
-    public function render()
-    {
-        return view('livewire.child.missions.index', [
-            'missions' => app(MissionDiscoveryService::class)
-                ->getMissions($this->selectedCategory),
+    public function render(
+        CurrentChildService $currentChild,
+        MissionDiscoveryService $discovery,
+    ) {
+        $child = $currentChild->current();
 
-            'categories' => app(MissionDiscoveryService::class)
-                ->getCategories(),
+        abort_unless($child, 403);
+
+        return view('livewire.child.missions.index', [
+            'missions' => $discovery->getMissions(
+                $child,
+                $this->selectedCategory,
+            ),
+            'categories' => $discovery->getCategories(),
         ]);
     }
 
-
-    public function selectCategory(string $category)
+    public function selectCategory(string $category): void
     {
         $this->selectedCategory = $category;
     }
 
-    public function changeCategory($category)
+    public function changeCategory(string $category): void
     {
         $this->selectedCategory = $category;
     }

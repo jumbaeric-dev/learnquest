@@ -265,9 +265,9 @@ class UniverseDashboardServiceTest extends TestCase
 
     $this->assertCount(1, $worlds);
 
-    $this->assertSame("Active World", $worlds[0]->name);
+    $this->assertSame("Active World", $worlds[0]["name"]);
 
-    $this->assertSame(2, $worlds[0]->courses);
+    $this->assertSame(2, $worlds[0]["courses"]);
   }
 
   public function test_recommendations_include_published_courses_and_exclude_current_course(): void
@@ -329,5 +329,49 @@ class UniverseDashboardServiceTest extends TestCase
 
     $this->assertNotContains('Inactive World Course', $titles);
   }
-}
 
+  public function test_recommendations_only_include_courses_for_the_childs_age_band_in_canonical_worlds(): void
+  {
+    $child = Child::factory()->create([
+      'date_of_birth' => now()->subYears(4)->toDateString(),
+    ]);
+
+    $world = Subject::factory()->create([
+      'name' => 'Self Discovery',
+      'slug' => 'self-discovery',
+      'is_active' => true,
+    ]);
+
+    Course::factory()->create([
+      'subject_id' => $world->id,
+      'title' => 'Young Explorer Course',
+      'age_group' => '3-5',
+      'is_published' => true,
+    ]);
+
+    Course::factory()->create([
+      'subject_id' => $world->id,
+      'title' => 'Older Explorer Course',
+      'age_group' => '6-9',
+      'is_published' => true,
+    ]);
+
+    Course::factory()->create([
+      'subject_id' => $world->id,
+      'title' => 'Teen Explorer Course',
+      'age_group' => '10-14',
+      'is_published' => true,
+    ]);
+
+    $recommendations = $this->service()->recommendedAdventures($child);
+
+    $titles = array_map(
+      fn($recommendation) => $recommendation->title,
+      $recommendations,
+    );
+
+    $this->assertContains('Young Explorer Course', $titles);
+    $this->assertNotContains('Older Explorer Course', $titles);
+    $this->assertNotContains('Teen Explorer Course', $titles);
+  }
+}

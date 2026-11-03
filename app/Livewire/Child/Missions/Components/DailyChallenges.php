@@ -42,6 +42,15 @@ class DailyChallenges extends Component
 
         abort_unless($child, 403);
 
+        if ($currentChild->isParentPreview()) {
+            session()->flash(
+                'message',
+                'Preview mode: challenge rewards are only earned when your child plays.'
+            );
+
+            return $this->redirectRoute('child.missions');
+        }
+
         $result = $service->claim($child, $key);
 
         if (! $result) {

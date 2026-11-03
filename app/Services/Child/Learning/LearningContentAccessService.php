@@ -7,53 +7,57 @@ use App\Models\Course;
 use App\Models\Lesson;
 use App\Models\LessonActivity;
 use Symfony\Component\HttpFoundation\Response;
+use App\Services\Billing\EntitlementService;
 
 class LearningContentAccessService
 {
     public function __construct(
         protected LearningJourneyService $journey,
+        protected ChildAgeBandService $ageBands,
+        protected EntitlementService $plans,
     ) {}
 
     /**
-     * Ensure the child can browse a published course.
-     *
-     * Browsing a course is allowed even before the course is selected
-     * as the child's active journey. Opening unfinished lessons or
-     * activities is restricted by the methods below.
+     * A child may browse only a published course intended for their age band.
      */
-    public function course(Course $course): Course
+    public function course(Course $course, Child $child): Course
     {
         $course->loadMissing('subject');
 
         abort_unless(
-            $course->is_published && $course->subject?->is_active,
+            $course->is_published
+                && $course->subject?->is_active
+                && $this->ageBands->allowsCourse($course, $child),
             Response::HTTP_NOT_FOUND
         );
 
         return $course->load([
             'subject',
-            'modules' => fn ($query) => $query->orderBy('position'),
-            'modules.lessons' => fn ($query) => $query
+            'modules' => fn($query) => $query->orderBy('position'),
+            'modules.lessons' => fn($query) => $query
                 ->where('is_published', true)
                 ->orderBy('position'),
-            'modules.lessons.activities' => fn ($query) => $query
+            'modules.lessons.activities' => fn($query) => $query
                 ->where('is_published', true)
                 ->orderBy('position'),
         ]);
     }
 
     /**
-     * A child may review a completed lesson at any time. An unfinished
-     * lesson must be the next lesson in the child's active course.
+     * A child may review a completed lesson at any time.
+     * An unfinished lesson must be next in the child's active journey.
      */
     public function lesson(Lesson $lesson, Child $child): Lesson
     {
         $lesson->loadMissing('module.course.subject');
 
+        $course = $lesson->module?->course;
+
         abort_unless(
             $lesson->is_published
-                && $lesson->module?->course?->is_published
-                && $lesson->module?->course?->subject?->is_active,
+                && $course?->is_published
+                && $course->subject?->is_active
+                && $this->ageBands->allowsCourse($course, $child),
             Response::HTTP_NOT_FOUND
         );
 
@@ -63,6 +67,7 @@ class LearningContentAccessService
             ->exists();
 
         if (! $isCompleted) {
+            $this->plans->assertLessonIncluded($child, $lesson);
             $currentCourse = $this->journey->getCurrentCourse($child);
 
             abort_unless(
@@ -82,16 +87,15 @@ class LearningContentAccessService
 
         return $lesson->load([
             'module.course',
-            'activities' => fn ($query) => $query
+            'activities' => fn($query) => $query
                 ->where('is_published', true)
                 ->orderBy('position'),
         ]);
     }
 
     /**
-     * A child may review a completed activity at any time. An
-     * unfinished activity must be the next activity in the child's
-     * active lesson and active course.
+     * A child may review a completed activity at any time.
+     * An unfinished activity must be next in the active learning journey.
      */
     public function activity(
         LessonActivity $activity,
@@ -99,11 +103,14 @@ class LearningContentAccessService
     ): LessonActivity {
         $activity->loadMissing('lesson.module.course.subject');
 
+        $course = $activity->lesson?->module?->course;
+
         abort_unless(
             $activity->is_published
                 && $activity->lesson?->is_published
-                && $activity->lesson?->module?->course?->is_published
-                && $activity->lesson?->module?->course?->subject?->is_active,
+                && $course?->is_published
+                && $course->subject?->is_active
+                && $this->ageBands->allowsCourse($course, $child),
             Response::HTTP_NOT_FOUND
         );
 
@@ -113,6 +120,7 @@ class LearningContentAccessService
             ->exists();
 
         if (! $isCompleted) {
+            $this->plans->assertLessonIncluded($child, $activity->lesson);
             $currentCourse = $this->journey->getCurrentCourse($child);
 
             abort_unless(

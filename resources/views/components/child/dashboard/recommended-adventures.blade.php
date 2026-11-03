@@ -24,15 +24,15 @@
 
             <div class="flex items-center gap-3">
 
-                @if($adventure['icon'])
+                @if(! empty($adventure['icon']))
 
-                <x-dynamic-component
-                    :component="$adventure['icon']"
-                    class="h-8 w-8 text-indigo-500" />
+                <x-lq.world-icon
+                    :name="$adventure['icon']"
+                    class="h-8 w-8 shrink-0 text-indigo-500" />
 
                 @else
 
-                <span class="text-3xl">
+                <span class="text-3xl" aria-hidden="true">
                     🚀
                 </span>
 

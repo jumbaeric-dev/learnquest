@@ -158,4 +158,31 @@ class LearningWorldIconTest extends TestCase
         $this->assertStringNotContainsString('heroicon-o-cpu-chip', $html);
     }
 
+    public function test_recommended_adventures_renders_world_icon_names_safely(): void
+    {
+        $html = view(
+            'components.child.dashboard.recommended-adventures',
+            [
+                'adventures' => [
+                    [
+                        'id' => 1,
+                        'icon' => 'compass',
+                        'title' => 'Getting to Know Myself',
+                        'description' => 'Explore interests and strengths.',
+                        'ageGroup' => '3-5',
+                    ],
+                ],
+            ]
+        )->render();
+
+        $this->assertStringContainsString(
+            'Getting to Know Myself',
+            $html
+        );
+
+        $this->assertStringNotContainsString(
+            'x-dynamic-component',
+            $html
+        );
+    }
 }

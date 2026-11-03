@@ -1,19 +1,39 @@
+
 @props([
 'theme' => 'sky',
 'explorer' => [],
-'active' => 'dashboard',
+'active' => null,
 ])
+
+@php
+    // Resolve the active sidebar item from the route unless the page explicitly
+    // passes an active key. Desktop and mobile both use this shared sidebar.
+    $active = $active ?? match (true) {
+        request()->routeIs('child', 'child.dashboard') => 'dashboard',
+        request()->routeIs('child.explore')
+            && request()->query('section') === 'worlds' => 'worlds',
+        request()->routeIs('child.explore') => 'explore',
+        request()->routeIs('child.world') => 'worlds',
+        request()->routeIs(
+            'child.missions',
+            'child.mission',
+            'learn.course',
+            'learn.lesson',
+            'learn.activity'
+        ) => 'courses',
+        default => null,
+    };
+@endphp
 
 <div
     data-lq-theme="{{ $theme }}"
     class="lq-universe lq-universe-shell"
     x-data="{
+        mobileMenuOpen: false,
         profileOpen: false,
         logoutOpen: false,
-        mobileMenuOpen: false,
 
         toggleMobileMenu() {
-            this.profileOpen = false;
             this.mobileMenuOpen = !this.mobileMenuOpen;
         },
 
@@ -40,12 +60,12 @@
         }
     }"
     @keydown.escape.window="
-        if (logoutOpen) {
+        if (mobileMenuOpen) {
+            mobileMenuOpen = false;
+        } else if (logoutOpen) {
             closeLogout();
         } else if (profileOpen) {
             closeProfile();
-        } else if (mobileMenuOpen) {
-            closeMobileMenu();
         }
     ">
 
@@ -59,16 +79,29 @@
     </div>
     @endif
 
+    {{-- Mobile navigation backdrop. Kept before the sidebar so the drawer stays above it. --}}
     <button
+        type="button"
         x-cloak
         x-show="mobileMenuOpen"
-        type="button"
-        class="lq-mobile-menu-overlay"
+        x-transition.opacity.duration.150ms
+        class="lq-mobile-nav-backdrop"
         aria-label="Close navigation menu"
-        @click="closeMobileMenu()"></button>
+        @click="mobileMenuOpen = false">
+    </button>
 
     <x-child.layout.sidebar
         :active="$active" />
+
+    @if (auth()->check() && auth()->user()->isParent())
+        <div class="relative z-[110] flex items-center justify-between gap-3 bg-cyan-950 px-4 py-2 text-sm text-white">
+            <span>Parent preview: {{ app(\App\Services\Child\Context\CurrentChildService::class)->current()?->full_name }}</span>
+            <form method="POST" action="{{ route('parent.return') }}">
+                @csrf
+                <button type="submit" class="rounded-lg bg-white/10 px-3 py-1.5 font-semibold hover:bg-white/20">Return to parent dashboard</button>
+            </form>
+        </div>
+    @endif
 
     <main class="lq-main">
 

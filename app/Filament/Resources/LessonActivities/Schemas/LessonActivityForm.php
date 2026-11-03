@@ -15,16 +15,15 @@ class LessonActivityForm
 {
     public static function configure(Schema $schema): Schema
     {
-        $isPublishedQuiz = fn (Get $get): bool =>
-            $get('activity_type') === 'quiz'
-            && (bool) $get('is_published');
+        $isPublishedType = fn (Get $get, string $type): bool =>
+            $get('activity_type') === $type && (bool) $get('is_published');
+
+        $isPublishedQuiz = fn (Get $get): bool => $isPublishedType($get, 'quiz');
 
         return $schema
             ->components([
-
                 Section::make('Activity Information')
                     ->schema([
-
                         Select::make('lesson_id')
                             ->relationship('lesson', 'title')
                             ->searchable()
@@ -37,17 +36,18 @@ class LessonActivityForm
 
                         Select::make('activity_type')
                             ->options([
-                                'video' => 'Video',
+                                'video' => 'Video (draft only — player not implemented)',
                                 'story' => 'Story',
                                 'quiz' => 'Quiz',
-                                'audio' => 'Audio',
-                                'drag_drop' => 'Drag & Drop',
-                                'drawing' => 'Drawing',
-                                'flashcard' => 'Flashcards',
-                                'ai_chat' => 'AI Chat',
+                                'audio' => 'Audio (draft only — player not implemented)',
+                                'drag_drop' => 'Drag & Drop (draft only — interaction not implemented)',
+                                'drawing' => 'Drawing (draft only — canvas not implemented)',
+                                'flashcard' => 'Flashcards (draft only — player not implemented)',
+                                'ai_chat' => 'AI Guided Activity',
                                 'coding_challenge' => 'Coding Challenge',
                                 'project' => 'Project',
                             ])
+                            ->helperText('Video, audio, drag-and-drop, drawing, and flashcard activities can be saved as drafts, but cannot be published until their learner experiences are implemented.')
                             ->live()
                             ->required(),
 
@@ -56,28 +56,31 @@ class LessonActivityForm
                             ->multiple()
                             ->searchable()
                             ->preload(),
-
                     ])
                     ->columns(2),
 
                 Section::make('Activity Content')
                     ->schema([
-
-                        // VIDEO
+                        // VIDEO: draft-only until the learner screen supports a player.
                         TextInput::make('content.video_url')
                             ->label('Video URL')
-                            ->visible(fn(Get $get) => $get('activity_type') === 'video'),
+                            ->url()
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'video'),
 
                         TextInput::make('content.duration')
                             ->numeric()
+                            ->minValue(0)
                             ->label('Duration (seconds)')
-                            ->visible(fn(Get $get) => $get('activity_type') === 'video'),
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'video'),
 
                         // STORY
                         Textarea::make('content.story_text')
                             ->label('Story')
                             ->rows(8)
-                            ->visible(fn(Get $get) => $get('activity_type') === 'story'),
+                            ->required(fn (Get $get): bool => $isPublishedType($get, 'story'))
+                            ->minLength(fn (Get $get): ?int => $isPublishedType($get, 'story') ? 10 : null)
+                            ->maxLength(10000)
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'story'),
 
                         // QUIZ
                         Textarea::make('content.question')
@@ -115,10 +118,7 @@ class LessonActivityForm
                                         ? ($option['option'] ?? '')
                                         : $option;
                                     $label = is_string($label) ? trim($label) : '';
-
-                                    $choices[$index] = $label !== ''
-                                        ? $label
-                                        : 'Option '.($index + 1);
+                                    $choices[$index] = $label !== '' ? $label : 'Option '.($index + 1);
                                 }
 
                                 return $choices;
@@ -130,21 +130,30 @@ class LessonActivityForm
                             ->native(false)
                             ->visible(fn (Get $get): bool => $get('activity_type') === 'quiz'),
 
-                        // AI CHAT
+                        // AI GUIDED ACTIVITY
                         Textarea::make('content.system_prompt')
                             ->label('AI System Prompt')
                             ->rows(4)
-                            ->visible(fn(Get $get) => $get('activity_type') === 'ai_chat'),
+                            ->required(fn (Get $get): bool => $isPublishedType($get, 'ai_chat'))
+                            ->minLength(fn (Get $get): ?int => $isPublishedType($get, 'ai_chat') ? 10 : null)
+                            ->maxLength(3000)
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'ai_chat'),
 
                         TextInput::make('content.goal')
                             ->label('Learning Goal')
-                            ->visible(fn(Get $get) => $get('activity_type') === 'ai_chat'),
+                            ->required(fn (Get $get): bool => $isPublishedType($get, 'ai_chat'))
+                            ->minLength(fn (Get $get): ?int => $isPublishedType($get, 'ai_chat') ? 10 : null)
+                            ->maxLength(500)
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'ai_chat'),
 
                         // CODING CHALLENGE
                         Textarea::make('content.challenge')
                             ->label('Coding Challenge')
                             ->rows(5)
-                            ->visible(fn(Get $get) => $get('activity_type') === 'coding_challenge'),
+                            ->required(fn (Get $get): bool => $isPublishedType($get, 'coding_challenge'))
+                            ->minLength(fn (Get $get): ?int => $isPublishedType($get, 'coding_challenge') ? 10 : null)
+                            ->maxLength(10000)
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'coding_challenge'),
 
                         Select::make('content.difficulty')
                             ->options([
@@ -152,37 +161,40 @@ class LessonActivityForm
                                 'medium' => 'Medium',
                                 'hard' => 'Hard',
                             ])
-                            ->visible(fn(Get $get) => $get('activity_type') === 'coding_challenge'),
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'coding_challenge'),
 
                         // PROJECT
                         Textarea::make('content.project_description')
-                            ->label('Project Description')
+                            ->label('Project Instructions')
                             ->rows(6)
-                            ->visible(fn(Get $get) => $get('activity_type') === 'project'),
-
+                            ->required(fn (Get $get): bool => $isPublishedType($get, 'project'))
+                            ->minLength(fn (Get $get): ?int => $isPublishedType($get, 'project') ? 10 : null)
+                            ->maxLength(10000)
+                            ->visible(fn (Get $get): bool => $get('activity_type') === 'project'),
                     ])
                     ->columnSpanFull(),
 
                 Section::make('Rewards & Publishing')
                     ->schema([
-
                         TextInput::make('position')
                             ->numeric()
+                            ->integer()
+                            ->minValue(1)
                             ->default(1)
                             ->required(),
 
                         TextInput::make('xp_reward')
                             ->numeric()
+                            ->integer()
+                            ->minValue(0)
                             ->default(5)
                             ->required(),
 
                         Toggle::make('is_published')
                             ->live()
                             ->default(false),
-
                     ])
                     ->columns(3),
-
             ]);
     }
 }

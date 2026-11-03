@@ -13,6 +13,10 @@ return [
             'max_attempts' => (int) env('LEARNQUEST_CHILD_LOGIN_MAX_ATTEMPTS', 5),
             'decay_seconds' => (int) env('LEARNQUEST_CHILD_LOGIN_DECAY_SECONDS', 60),
         ],
+        'parent_login' => [
+            'max_attempts' => (int) env('LEARNQUEST_PARENT_LOGIN_MAX_ATTEMPTS', 5),
+            'decay_seconds' => (int) env('LEARNQUEST_PARENT_LOGIN_DECAY_SECONDS', 60),
+        ],
     ],
 
     /*
@@ -195,4 +199,70 @@ return [
 
     'weekly_report_day' => 'Sunday',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Billing
+    |--------------------------------------------------------------------------
+    |
+    | While "enforced" is false nobody is restricted and no trials start.
+    | Flip it on at launch, then run: php artisan learnquest:start-trials
+    |
+    | A null limit means unlimited. Plan names and prices live in the
+    | plans / plan_prices tables, not here.
+    */
+    'billing' => [
+        'enforced' => (bool) env('LEARNQUEST_BILLING_ENFORCED', false),
+
+        'default_plan' => 'free',
+
+        // Shown as the plan while billing is not enforced.
+        'top_plan' => 'premium',
+
+        'trial' => [
+            'plan' => 'premium',
+            'days' => (int) env('LEARNQUEST_TRIAL_DAYS', 14),
+        ],
+
+        'currencies' => ['KES', 'USD'],
+
+        'default_currency' => env('LEARNQUEST_DEFAULT_CURRENCY', 'KES'),
+
+        'plans' => [
+            'free' => [
+                'limits' => [
+                    'children' => 1,
+                    'modules_per_course' => 1,
+                    'nova_messages_per_day' => 5,
+                ],
+                'features' => [
+                    'skill_reports' => false,
+                ],
+                'highlights' => [
+                    '1 child profile',
+                    'The first module of every course',
+                    'XP, streaks and badges',
+                    '5 Nova messages a day',
+                    'Weekly activity and streak overview',
+                ],
+            ],
+
+            'premium' => [
+                'limits' => [
+                    'children' => 4,
+                    'modules_per_course' => null,
+                    'nova_messages_per_day' => null,
+                ],
+                'features' => [
+                    'skill_reports' => true,
+                ],
+                'highlights' => [
+                    'Up to 4 child profiles',
+                    'Every module of every course',
+                    'XP, streaks and badges',
+                    'Much more time with Nova',
+                    'Full skill reports: strengths and growth areas',
+                ],
+            ],
+        ],
+    ],
 ];

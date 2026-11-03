@@ -4,7 +4,6 @@ namespace App\Livewire\Child\Missions\Components;
 
 use App\Models\Course;
 use App\Services\Child\Context\CurrentChildService;
-use App\Services\Child\Dashboard\UniverseDashboardService;
 use App\Services\Child\Learning\LearningContentAccessService;
 use App\Services\Child\Learning\MissionDiscoveryService;
 use App\Services\Progress\CourseProgressService;
@@ -16,7 +15,6 @@ class FeaturedMission extends Component
 
     public function mount(
         CurrentChildService $currentChild,
-        UniverseDashboardService $dashboardService,
         MissionDiscoveryService $missions,
     ): void {
         $child = $currentChild->current();
@@ -25,24 +23,10 @@ class FeaturedMission extends Component
             return;
         }
 
-        $recommended = $dashboardService->recommendedAdventures($child);
-        $courseId = $recommended[0]->id ?? null;
-
-        if (! $courseId) {
-            return;
-        }
-
-        $course = Course::with([
-            'subject',
-            'modules.lessons.activities',
-        ])->find($courseId);
-
-        if (! $course) {
-            return;
-        }
-
-        $this->mission = collect($missions->getMissions('all'))
-            ->firstWhere('id', $course->id);
+        // MissionDiscoveryService already enforces publication,
+        // active-world, and child age-band requirements.
+        $this->mission = collect($missions->getMissions($child, 'all'))
+            ->first();
     }
 
     public function startMission(
@@ -60,9 +44,8 @@ class FeaturedMission extends Component
 
         $course = Course::findOrFail($this->mission['id']);
 
-        // Enforce the child-facing content access contract
-        // before creating or updating course progress.
-        $course = $access->course($course);
+        // Recheck authorization when the child starts the mission.
+        $course = $access->course($course, $child);
 
         $courseProgress->update($child, $course);
 

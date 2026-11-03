@@ -40,21 +40,28 @@ class MissionDiscoveryServiceTest extends TestCase
             'subject_id' => $activeWorld->id,
             'title' => 'Published Course',
             'is_published' => true,
+            'age_group' => '6-9',
         ]);
 
         $unpublishedCourse = Course::factory()->create([
             'subject_id' => $activeWorld->id,
             'title' => 'Unpublished Course',
             'is_published' => false,
+            'age_group' => '6-9',
         ]);
 
         $inactiveWorldCourse = Course::factory()->create([
             'subject_id' => $inactiveWorld->id,
             'title' => 'Inactive World Course',
             'is_published' => true,
+            'age_group' => '6-9',
         ]);
 
-        $missions = $this->service->getMissions();
+        $child = \App\Models\Child::factory()->create([
+            'date_of_birth' => now()->subYears(8)->toDateString(),
+        ]);
+
+        $missions = $this->service->getMissions($child);
 
         $missionIds = collect($missions)
             ->pluck('id')
@@ -65,6 +72,7 @@ class MissionDiscoveryServiceTest extends TestCase
         $this->assertNotContains($inactiveWorldCourse->id, $missionIds);
     }
 
+
     public function test_mission_xp_and_time_include_only_published_learning_content(): void
     {
         $world = Subject::factory()->create([
@@ -74,6 +82,7 @@ class MissionDiscoveryServiceTest extends TestCase
         $course = Course::factory()->create([
             'subject_id' => $world->id,
             'is_published' => true,
+            'age_group' => '6-9',
         ]);
 
         $module = CourseModule::factory()->create([
@@ -110,7 +119,11 @@ class MissionDiscoveryServiceTest extends TestCase
             'xp_reward' => 999,
         ]);
 
-        $mission = collect($this->service->getMissions())
+        $child = \App\Models\Child::factory()->create([
+            'date_of_birth' => now()->subYears(8)->toDateString(),
+        ]);
+
+        $mission = collect($this->service->getMissions($child))
             ->firstWhere('id', $course->id);
 
         $this->assertNotNull($mission);
@@ -156,14 +169,20 @@ class MissionDiscoveryServiceTest extends TestCase
         $targetCourse = Course::factory()->create([
             'subject_id' => $targetWorld->id,
             'is_published' => true,
+            'age_group' => '6-9',
         ]);
 
         $otherCourse = Course::factory()->create([
             'subject_id' => $otherWorld->id,
             'is_published' => true,
+            'age_group' => '6-9',
         ]);
 
-        $missions = $this->service->getMissions('Money Skills');
+        $child = \App\Models\Child::factory()->create([
+            'date_of_birth' => now()->subYears(8)->toDateString(),
+        ]);
+
+        $missions = $this->service->getMissions($child, 'Money Skills');
 
         $missionIds = collect($missions)
             ->pluck('id')
@@ -171,5 +190,45 @@ class MissionDiscoveryServiceTest extends TestCase
 
         $this->assertContains($targetCourse->id, $missionIds);
         $this->assertNotContains($otherCourse->id, $missionIds);
+    }
+
+
+    public function test_missions_are_filtered_to_the_childs_age_band(): void
+    {
+        $world = Subject::factory()->create([
+            'is_active' => true,
+        ]);
+
+        $youngCourse = Course::factory()->create([
+            'subject_id' => $world->id,
+            'title' => 'Self Discovery - Little Explorers',
+            'age_group' => '3-5',
+            'is_published' => true,
+        ]);
+
+        $middleCourse = Course::factory()->create([
+            'subject_id' => $world->id,
+            'title' => 'Self Discovery - Curious Explorers',
+            'age_group' => '6-9',
+            'is_published' => true,
+        ]);
+
+        $olderCourse = Course::factory()->create([
+            'subject_id' => $world->id,
+            'title' => 'Self Discovery - Independent Explorers',
+            'age_group' => '10-14',
+            'is_published' => true,
+        ]);
+
+        $child = \App\Models\Child::factory()->create([
+            'date_of_birth' => now()->subYears(8)->toDateString(),
+        ]);
+
+        $missions = collect($this->service->getMissions($child));
+        $missionIds = $missions->pluck('id')->all();
+
+        $this->assertContains($middleCourse->id, $missionIds);
+        $this->assertNotContains($youngCourse->id, $missionIds);
+        $this->assertNotContains($olderCourse->id, $missionIds);
     }
 }

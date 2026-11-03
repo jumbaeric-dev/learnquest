@@ -57,7 +57,7 @@ class FeaturedAdventure extends Component
 
         $course = Course::findOrFail($this->adventure['id']);
 
-        $course = $access->course($course);
+        $course = $access->course($course, $child);
 
         $courseProgress->update($child, $course);
 

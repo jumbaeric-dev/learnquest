@@ -30,11 +30,11 @@
     <nav
         class="lq-sidebar-nav"
         aria-label="Main navigation"
-        @click="closeMobileMenu()"
     >
 
         <a
             href="{{ route('child.dashboard') }}"
+            @click="mobileMenuOpen = false"
             class="lq-nav-link {{ $active === 'dashboard' ? 'is-active' : '' }}"
             @if($active === 'dashboard')
                 aria-current="page"
@@ -55,6 +55,7 @@
 
         <a
             href="{{ route('child.explore') }}"
+            @click="mobileMenuOpen = false"
             class="lq-nav-link {{ $active === 'explore' ? 'is-active' : '' }}"
             @if($active === 'explore')
                 aria-current="page"
@@ -74,7 +75,8 @@
 
 
         <a
-            href="{{ route('child.explore') }}"
+            href="{{ route('child.explore', ['section' => 'worlds']) }}#learning-worlds"
+            @click="mobileMenuOpen = false"
             class="lq-nav-link {{ $active === 'worlds' ? 'is-active' : '' }}"
             @if($active === 'worlds')
                 aria-current="page"
@@ -95,6 +97,7 @@
 
         <a
             href="{{ route('child.missions') }}"
+            @click="mobileMenuOpen = false"
             class="lq-nav-link {{ $active === 'courses' ? 'is-active' : '' }}"
             @if($active === 'courses')
                 aria-current="page"

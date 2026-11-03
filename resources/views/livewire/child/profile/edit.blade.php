@@ -2,19 +2,17 @@
     theme="sky"
     :explorer="[
         'name' => trim($first_name . ' ' . $last_name),
-        'level' => auth()->user()?->child?->level ?? 1,
-        'xp' => auth()->user()?->child?->xp ?? 0,
-        'streak' => auth()->user()?->child?->streak?->current_streak ?? 0,
-    ]"
->
+        'level' => app(\App\Services\Child\Context\CurrentChildService::class)->current()?->level ?? 1,
+        'xp' => app(\App\Services\Child\Context\CurrentChildService::class)->current()?->xp ?? 0,
+        'streak' => app(\App\Services\Child\Context\CurrentChildService::class)->current()?->streak?->current_streak ?? 0,
+    ]">
     <x-child.layout.section-stack spacing="relaxed">
 
         {{-- Heading --}}
         <section>
             <a
                 href="{{ route('child.profile') }}"
-                class="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:underline"
-            >
+                class="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:underline">
                 <span aria-hidden="true">←</span>
                 Back to My Profile
             </a>
@@ -47,21 +45,20 @@
 
                 <div class="mt-5 flex flex-wrap gap-3">
                     @foreach ($availableAvatars as $option)
-                        <button
-                            type="button"
-                            wire:key="avatar-{{ $loop->index }}"
-                            wire:click="$set('avatar', '{{ $option }}')"
-                            aria-label="Choose avatar {{ $option }}"
-                            aria-pressed="{{ $avatar === $option ? 'true' : 'false' }}"
-                            class="flex h-14 w-14 items-center justify-center rounded-2xl border-2 text-3xl transition hover:-translate-y-0.5 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 {{ $avatar === $option ? 'border-sky-500 bg-sky-100 shadow-sm' : 'border-slate-200 bg-white/70' }}"
-                        >
-                            {{ $option }}
-                        </button>
+                    <button
+                        type="button"
+                        wire:key="avatar-{{ $loop->index }}"
+                        wire:click="$set('avatar', '{{ $option }}')"
+                        aria-label="Choose avatar {{ $option }}"
+                        aria-pressed="{{ $avatar === $option ? 'true' : 'false' }}"
+                        class="flex h-14 w-14 items-center justify-center rounded-2xl border-2 text-3xl transition hover:-translate-y-0.5 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 {{ $avatar === $option ? 'border-sky-500 bg-sky-100 shadow-sm' : 'border-slate-200 bg-white/70' }}">
+                        {{ $option }}
+                    </button>
                     @endforeach
                 </div>
 
                 @error('avatar')
-                    <p class="mt-3 text-sm font-medium text-red-600">{{ $message }}</p>
+                <p class="mt-3 text-sm font-medium text-red-600">{{ $message }}</p>
                 @enderror
             </section>
 
@@ -85,11 +82,10 @@
                             maxlength="50"
                             autocomplete="given-name"
                             required
-                            class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
-                        >
+                            class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
 
                         @error('first_name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -104,11 +100,10 @@
                             wire:model="last_name"
                             maxlength="50"
                             autocomplete="family-name"
-                            class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
-                        >
+                            class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100">
 
                         @error('last_name')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -123,15 +118,14 @@
                             wire:model="date_of_birth"
                             max="{{ now()->subDay()->toDateString() }}"
                             autocomplete="bday"
-                            class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100 sm:max-w-md"
-                        >
+                            class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100 sm:max-w-md">
 
                         <p class="mt-2 text-xs opacity-65">
                             Your birthday helps us personalise your learning experience.
                         </p>
 
                         @error('date_of_birth')
-                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
@@ -143,8 +137,7 @@
 
                 <a
                     href="{{ route('child.profile') }}"
-                    class="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white/70 px-6 py-3 font-semibold transition hover:bg-white"
-                >
+                    class="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white/70 px-6 py-3 font-semibold transition hover:bg-white">
                     Cancel
                 </a>
 
@@ -152,8 +145,7 @@
                     type="submit"
                     wire:loading.attr="disabled"
                     wire:target="save"
-                    class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-sky-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
-                >
+                    class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-sky-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60">
                     <span wire:loading.remove wire:target="save">
                         Save Changes
                     </span>

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Contracts\Ai\NovaAiProviderContract;
 use App\Services\Nova\NovaProviderFactory;
 use Illuminate\Support\ServiceProvider;
+use App\Services\Billing\EntitlementService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,6 +18,8 @@ class AppServiceProvider extends ServiceProvider
             NovaAiProviderContract::class,
             fn($app) => $app->make(NovaProviderFactory::class)->make()
         );
+        
+        $this->app->singleton(EntitlementService::class);
     }
 
     /**

@@ -23,7 +23,7 @@ class MissionCard extends Component
 
         $course = Course::findOrFail($this->mission['id']);
 
-        $course = $access->course($course);
+        $course = $access->course($course, $child);
 
         $courseProgress->update($child, $course);
 

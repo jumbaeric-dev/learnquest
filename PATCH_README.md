@@ -1,29 +1,28 @@
-# LearnQuest Child Login Rate-Limit Patch
+# LearnQuest Active Navigation Patch
 
-This patch protects the existing username + four-digit PIN login flow.
+## Problem
+After mobile navigation was added, the shared app shell defaulted to `active="dashboard"`. Pages without an explicit active prop therefore highlighted My Universe instead of the current section. The issue affected desktop and mobile because both use the same sidebar component.
 
-## Included project-relative files
-- `app/Http/Controllers/Auth/ChildLoginController.php`
-- `config/learnquest.php`
-- `tests/Feature/ChildLoginTest.php`
-- `.env.example`
+## Files
+- `resources/views/components/child/layout/app-shell.blade.php`
+- `resources/views/components/child/layout/sidebar.blade.php`
+- `resources/views/livewire/child/explore/components/learning-worlds.blade.php`
+- `tests/Feature/ChildActiveNavigationTest.php`
 
 ## Behavior
-- Allows five failed attempts by default per normalized username/IP pair within 60 seconds.
-- The username/IP cache key is hashed so the cache key does not expose the entered username.
-- Unknown usernames, wrong PINs, and inactive-child attempts all use the same generic login error and count toward the limit.
-- Further attempts are temporarily blocked after the limit, including a correct PIN.
-- Successful authentication clears the failed-attempt counter and preserves session regeneration and active-child selection.
-- The defaults can be changed using `LEARNQUEST_CHILD_LOGIN_MAX_ATTEMPTS` and `LEARNQUEST_CHILD_LOGIN_DECAY_SECONDS`.
+- `child` / `child.dashboard`: highlights My Universe.
+- `child.explore`: highlights Explorer.
+- `child.explore?section=worlds` and `child.world`: highlights Worlds.
+- `child.missions`, `child.mission`, `learn.course`, `learn.lesson`, `learn.activity`: highlights Courses.
+- Profile and settings don't highlight an unrelated sidebar item.
+- Explicit `active="..."` props supplied by a page take precedence.
+- Worlds sidebar link scrolls to the Learning Worlds section and highlights Worlds; this works on desktop and mobile because they share the same sidebar.
 
 ## Apply
-Back up or commit current work first. Extract this ZIP directly into the project root; all code files are stored at their project-relative paths. Review the `config/learnquest.php` merge if you have changed that file locally after the source archive. The `.env.example` addition documents defaults only; add or change values in your actual `.env` only when you want to override them.
+Back up or commit current changes. Merge these files into the Laravel project, preserving any unrelated local edits. Then run:
 
-Then run:
 ```bash
-php artisan config:clear
-php artisan test --filter=ChildLoginTest
+php artisan view:clear
+php artisan test --filter=ChildActiveNavigationTest
 php artisan test
 ```
-
-PHP syntax checks are included as preparation checks; PHPUnit must be run against your local project because this ZIP does not include `vendor/`.
