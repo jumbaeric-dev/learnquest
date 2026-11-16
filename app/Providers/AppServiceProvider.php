@@ -6,6 +6,7 @@ use App\Contracts\Ai\NovaAiProviderContract;
 use App\Services\Nova\NovaProviderFactory;
 use Illuminate\Support\ServiceProvider;
 use App\Services\Billing\EntitlementService;
+use App\Services\Billing\PaymentGatewayRegistry;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,7 +20,8 @@ class AppServiceProvider extends ServiceProvider
             fn($app) => $app->make(NovaProviderFactory::class)->make()
         );
         
-        $this->app->singleton(EntitlementService::class);
+        $this->app->scoped(EntitlementService::class);
+        $this->app->singleton(PaymentGatewayRegistry::class);
     }
 
     /**

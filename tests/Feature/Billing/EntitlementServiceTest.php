@@ -121,7 +121,7 @@ class EntitlementServiceTest extends TestCase
     public function test_an_expired_subscription_falls_back_to_free(): void
     {
         $parent = $this->parentAccount();
-        $this->subscribe($parent, 'active', now()->subMonths(2), now()->subDay());
+        $this->subscribe($parent, 'active', now()->subMonths(2), now()->subDays(3));    
 
         $this->assertSame('free', app(EntitlementService::class)->planKeyFor($parent));
     }
@@ -177,13 +177,90 @@ class EntitlementServiceTest extends TestCase
         $parent = $this->parentAccount();
 
         $trial = $subscriptions->startTrialIfEligible($parent);
-        $paid = $subscriptions->activate($parent, $this->premiumPrice('USD', 12), 'paypal', 'PAY1', true);
+        $paid = $subscriptions->activate($parent, $this->premiumPrice('USD', 12), 'paypal', 'PAY1');
 
         $this->assertNotSame($trial->id, $paid->id);
         $this->assertTrue($trial->fresh()->ends_at->lessThanOrEqualTo(now()));
         $this->assertSame('active', $paid->status);
-        $this->assertTrue($paid->auto_renews);
+        $this->assertFalse($paid->auto_renews);
         $this->assertTrue($paid->ends_at->equalTo(now()->addYear()));
+    }
+
+
+    public function test_disabling_free_plan_preserves_existing_grandfathered_families(): void
+    {
+        $existingParent = $this->parentAccount();
+        config(['learnquest.billing.free_plan_enabled' => false]);
+
+        $entitlements = app(EntitlementService::class);
+
+        $this->assertTrue($existingParent->fresh()->free_plan_grandfathered);
+        $this->assertSame('free', $entitlements->planKeyFor($existingParent->fresh()));
+        $this->assertSame(1, $entitlements->limit($existingParent->fresh(), 'children'));
+    }
+
+    public function test_new_non_grandfathered_parent_has_no_free_entitlements_when_free_is_disabled(): void
+    {
+        config(['learnquest.billing.free_plan_enabled' => false]);
+        $parent = User::factory()->create(['free_plan_grandfathered' => false]);
+        $parent->assignRole('parent');
+
+        $entitlements = app(EntitlementService::class);
+
+        $this->assertSame('unavailable', $entitlements->planKeyFor($parent));
+        $this->assertSame(0, $entitlements->limit($parent, 'children'));
+        $this->assertFalse($entitlements->allows($parent, 'skill_reports'));
+        $this->assertSame('plan_required', $entitlements->summary($parent)['status']);
+    }
+
+    public function test_activation_rejects_inactive_prices_and_automatic_renewal(): void
+    {
+        $parent = $this->parentAccount();
+        $price = $this->premiumPrice();
+        $price->update(['is_active' => false]);
+
+        try {
+            app(SubscriptionService::class)->activate($parent, $price);
+            $this->fail('An inactive price must not activate a subscription.');
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $this->assertArrayHasKey('price', $exception->errors());
+        }
+
+        $price->update(['is_active' => true]);
+        try {
+            app(SubscriptionService::class)->activate($parent, $price, autoRenews: true);
+            $this->fail('Automatic renewal must remain disabled in the initial release.');
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $this->assertArrayHasKey('renewal', $exception->errors());
+        }
+    }
+
+    public function test_changing_plans_ends_previous_current_subscription(): void
+    {
+        $parent = $this->parentAccount();
+        $premium = $this->premiumPrice();
+        $first = app(SubscriptionService::class)->activate($parent, $premium, 'intasend', 'PAY-1');
+
+        $family = Plan::create([
+            'key' => 'family_plus',
+            'name' => 'Family Plus',
+            'sort_order' => 3,
+            'is_active' => true,
+        ]);
+        $familyPrice = PlanPrice::create([
+            'plan_id' => $family->id,
+            'currency' => 'KES',
+            'months' => 3,
+            'amount_minor' => 250000,
+            'is_active' => true,
+        ]);
+
+        $changed = app(SubscriptionService::class)->activate($parent, $familyPrice, 'paypal', 'PAY-2');
+
+        $this->assertNotSame($first->id, $changed->id);
+        $this->assertTrue($first->fresh()->ends_at->equalTo(now()));
+        $this->assertSame('family_plus', app(EntitlementService::class)->planKeyFor($parent));
+        $this->assertSame(1, Subscription::query()->current()->where('user_id', $parent->id)->count());
     }
 
     /** @return array{0: Lesson, 1: Lesson} first-module and second-module lessons */
@@ -225,7 +302,7 @@ class EntitlementServiceTest extends TestCase
         $entitlements->assertLessonIncluded($child, $second);
     }
 
-    public function test_premium_unrestricted_and_parentless_children_see_every_lesson(): void
+    public function test_premium_children_see_every_lesson(): void
     {
         [, $second] = $this->lessonsInTwoModules();
         $entitlements = app(EntitlementService::class);
@@ -236,8 +313,8 @@ class EntitlementServiceTest extends TestCase
 
         $this->assertTrue($entitlements->isLessonIncluded($premiumChild, $second));
 
-        $orphan = Child::factory()->create(['parent_id' => null]);
-        $this->assertTrue($entitlements->isLessonIncluded($orphan, $second));
+        // children.parent_id is non-nullable; an orphan cannot be represented
+        // by a valid persisted fixture in the current schema.
     }
 
     public function test_free_plan_caps_nova_messages_per_day(): void

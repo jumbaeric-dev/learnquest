@@ -92,6 +92,10 @@ class BillingGatingTest extends TestCase
             ->assertSee('Family Premium')
             ->assertSee('KSh 499');
 
+        // Authenticate the second actor in a fresh session so auth.session does not
+        // invalidate the previous parent's session hash and redirect before the role check.
+        $this->flushSession();
+
         $this->actingAs(User::factory()->create())
             ->get(route('parent.billing'))
             ->assertForbidden();
@@ -126,6 +130,22 @@ class BillingGatingTest extends TestCase
         $this->assertTrue(
             Subscription::where('user_id', $user->id)->where('status', 'trialing')->exists()
         );
+    }
+
+    public function test_registration_when_free_is_disabled_does_not_grant_grandfathered_free_access(): void
+    {
+        config(['learnquest.billing.free_plan_enabled' => false]);
+
+        $this->post(route('parent.register.submit'), [
+            'name' => 'New Parent',
+            'email' => 'new-parent@example.test',
+            'password' => 'secret-pass-123',
+            'password_confirmation' => 'secret-pass-123',
+        ])->assertRedirect(route('parent.dashboard'));
+
+        $user = User::where('email', 'new-parent@example.test')->firstOrFail();
+        $this->assertFalse($user->free_plan_grandfathered);
+        $this->assertTrue(Subscription::where('user_id', $user->id)->where('status', 'trialing')->exists());
     }
 
     public function test_registration_starts_no_trial_before_launch(): void

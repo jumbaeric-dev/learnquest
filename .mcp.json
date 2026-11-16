@@ -6,6 +6,13 @@
                 "artisan",
                 "boost:mcp"
             ]
+        },
+        "ngrok": {
+            "httpUrl": "https://mcp.ngrok.com/mcp",
+            "oauth": {
+                "enabled": true,
+                "clientId": "iamcli_3KeK8docLctYxdqmXkXUIBSFhMo"
+            }
         }
     }
 }

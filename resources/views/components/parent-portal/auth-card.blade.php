@@ -23,6 +23,12 @@
                 @endif
             </div>
 
+            @if (session('status'))
+                <p role="status" class="mb-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-100">
+                    {{ session('status') }}
+                </p>
+            @endif
+
             {{ $slot }}
         </x-lq.glass-card>
     </div>

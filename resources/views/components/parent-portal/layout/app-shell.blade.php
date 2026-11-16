@@ -64,7 +64,7 @@
             </div>
         </div>
     </header>
-
+    <x-parent-portal.subscription-banner :hide="$active === 'billing'" />
     <main class="mx-auto w-full max-w-6xl px-4 py-8">
         {{ $slot }}
     </main>

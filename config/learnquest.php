@@ -1,6 +1,8 @@
 <?php
 
 return [
+    // Where parents can reach you. Used as the Reply-To on parent emails.
+    'support_email' => env('LEARNQUEST_SUPPORT_EMAIL', env('MAIL_FROM_ADDRESS')),
 
     /*
     |--------------------------------------------------------------------------
@@ -210,8 +212,50 @@ return [
     | A null limit means unlimited. Plan names and prices live in the
     | plans / plan_prices tables, not here.
     */
+    'gateways' => [
+        // Paystack is the default checkout provider. It remains fail-closed until
+        // its sandbox credentials and webhook settings are configured.
+        'default_provider' => env('LEARNQUEST_DEFAULT_PAYMENT_PROVIDER', 'paystack'),
+        // Which provider handles each currency at checkout. Currencies not listed
+        // here use default_provider. USD goes to PayPal; KES stays on Paystack.
+        'currency_providers' => [
+            'USD' => env('LEARNQUEST_USD_PROVIDER', 'paypal'),
+        ],
+        'providers' => [
+            'intasend' => [
+                'enabled' => (bool) env('LEARNQUEST_INTASEND_ENABLED', false),
+                'driver' => \App\Services\Billing\Gateways\IntaSendGateway::class,
+                'currencies' => ['KES'],
+                'public_key' => env('INTASEND_PUBLIC_KEY'),
+                'secret_key' => env('INTASEND_SECRET_KEY'),
+                'webhook_secret' => env('INTASEND_WEBHOOK_CHALLENGE', env('INTASEND_WEBHOOK_SECRET')),
+                'base_url' => env('INTASEND_BASE_URL', 'https://api.intasend.com'),
+            ],
+            'paystack' => [
+                'enabled' => (bool) env('LEARNQUEST_PAYSTACK_ENABLED', false),
+                'driver' => \App\Services\Billing\Gateways\PaystackGateway::class,
+                'currencies' => ['KES'],
+                'secret_key' => env('PAYSTACK_SECRET_KEY'),
+                'webhook_secret' => env('PAYSTACK_WEBHOOK_SECRET'),
+            ],
+            'paypal' => [
+                'enabled' => (bool) env('LEARNQUEST_PAYPAL_ENABLED', false),
+                'driver' => \App\Services\Billing\Gateways\PayPalGateway::class,
+                'currencies' => ['USD'],
+                'client_id' => env('PAYPAL_CLIENT_ID'),
+                'client_secret' => env('PAYPAL_CLIENT_SECRET'),
+                'webhook_id' => env('PAYPAL_WEBHOOK_ID'),
+                'base_url' => env('PAYPAL_BASE_URL', 'https://api-m.sandbox.paypal.com'),
+            ],
+        ],
+    ],
+
     'billing' => [
         'enforced' => (bool) env('LEARNQUEST_BILLING_ENFORCED', false),
+
+        // Controls Free-plan availability for newly registered families.
+        // Existing families are grandfathered in the users table.
+        'free_plan_enabled' => (bool) env('LEARNQUEST_FREE_PLAN_ENABLED', true),
 
         'default_plan' => 'free',
 
@@ -222,6 +266,29 @@ return [
             'plan' => 'premium',
             'days' => (int) env('LEARNQUEST_TRIAL_DAYS', 14),
         ],
+
+        // Reminders before access ends. M-Pesa and card payments are prepaid
+        // terms with no automatic renewal, so parents need a nudge.
+        'reminders' => [
+            'trial_days_before' => [3, 1],
+            'paid_days_before' => [7, 3, 1],
+            'expired_window_days' => 3,
+
+            // In-app banner thresholds.
+            'banner' => [
+                'trial_days' => 5,
+                'paid_days' => 7,
+                'expired_days' => 14,
+            ],
+        ],
+        // Complimentary time an admin may grant in one go.
+        'grants' => [
+            'max_days' => 365,
+        ],
+
+        // Days a lapsed PAID plan keeps working while a late payment confirms.
+        // Trials and complimentary time never get grace. 0 disables it.
+        'grace_days' => (int) env('LEARNQUEST_GRACE_DAYS', 2),
 
         'currencies' => ['KES', 'USD'],
 

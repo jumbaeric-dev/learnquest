@@ -206,6 +206,8 @@ class ParentDashboardTest extends TestCase
 
     public function test_parent_can_view_detailed_report_for_their_child(): void
     {
+        // This test verifies report rendering, not the Premium feature gate.
+        config(['learnquest.billing.enforced' => false]);
         $parent = $this->makeParent();
         $child = $this->makeChild($parent, [
             "first_name" => "Amina",

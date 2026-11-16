@@ -24,6 +24,9 @@ class PermissionsSeeder extends Seeder
             'manage schools',
 
             'manage ai content',
+
+            'view payments',
+            'manage payments',
         ];
 
         foreach ($permissions as $permission) {

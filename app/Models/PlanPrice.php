@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Support\Money;
 
 class PlanPrice extends Model
 {
@@ -30,17 +31,10 @@ class PlanPrice extends Model
     }
 
     /** "KSh 499" or "$4.99". */
+    /** "KSh 499" or "$4.99". */
     public function formatted(): string
     {
-        $major = $this->amount_minor / 100;
-
-        $symbol = match ($this->currency) {
-            'KES' => 'KSh ',
-            'USD' => '$',
-            default => $this->currency . ' ',
-        };
-
-        return $symbol . number_format($major, fmod($major, 1.0) === 0.0 ? 0 : 2);
+        return Money::format($this->amount_minor, $this->currency);
     }
 
     public function label(): string

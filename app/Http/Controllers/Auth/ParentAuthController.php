@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
+use App\Notifications\WelcomeParentNotification;
 
 class ParentAuthController extends Controller
 {
@@ -112,6 +113,7 @@ class ParentAuthController extends Controller
         "name" => trim($data["name"]),
         "email" => Str::lower(trim($data["email"])),
         "password" => $data["password"], // hashed by the model cast
+        "free_plan_grandfathered" => (bool) config("learnquest.billing.free_plan_enabled", true),
       ]);
 
       $user->assignRole("parent");
@@ -120,7 +122,13 @@ class ParentAuthController extends Controller
     });
 
     Auth::login($user);
-    app(\App\Services\Billing\SubscriptionService::class)->startTrialIfEligible($user);
+    $trial = app(\App\Services\Billing\SubscriptionService::class)->startTrialIfEligible($user);
+
+    try {
+      $user->notify(new WelcomeParentNotification($trial?->ends_at));
+    } catch (\Throwable $exception) {
+      report($exception);
+    }
     $request->session()->regenerate();
     $request->session()->forget("active_child_id");
 

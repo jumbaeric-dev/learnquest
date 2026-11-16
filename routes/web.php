@@ -20,6 +20,7 @@ use App\Livewire\ParentPortal\Children\Index as ParentChildren;
 use App\Services\Child\Context\CurrentChildService;
 use App\Livewire\ParentPortal\Account\Settings as ParentAccountSettings;
 use App\Livewire\ParentPortal\Billing\Index as ParentBilling;
+use App\Http\Controllers\Auth\ParentPasswordResetController;
 
 Route::get("/", function () {
   return view("welcome");
@@ -130,6 +131,22 @@ Route::get("/parent/register", [ParentAuthController::class, "showRegisterForm"]
 Route::post("/parent/register", [ParentAuthController::class, "register"])
   ->middleware("throttle:6,1")
   ->name("parent.register.submit");
+
+Route::get("/parent/forgot-password", [ParentPasswordResetController::class, "showForgotForm"])
+  ->name("parent.password.request");
+
+Route::post("/parent/forgot-password", [ParentPasswordResetController::class, "sendLink"])
+  ->middleware("throttle:5,1")
+  ->name("parent.password.email");
+
+Route::get(
+  "/parent/reset-password/{token}",
+  [ParentPasswordResetController::class, "showResetForm"]
+)->name("parent.password.reset");
+
+Route::post("/parent/reset-password", [ParentPasswordResetController::class, "reset"])
+  ->middleware("throttle:10,1")
+  ->name("parent.password.update");
 
 Route::middleware(["parent", "auth.session"])
   ->prefix("parent")

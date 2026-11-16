@@ -19,6 +19,12 @@
             autocomplete="current-password"
             required />
 
+        <p class="-mt-2 text-right text-sm">
+            <a href="{{ route('parent.password.request') }}" class="font-semibold text-cyan-400 hover:text-cyan-300">
+                Forgot your password?
+            </a>
+        </p>
+
         <label class="flex items-center gap-2 text-sm text-slate-300">
             <input type="checkbox" name="remember" value="1" class="rounded border-slate-600 bg-slate-900">
             Keep me signed in

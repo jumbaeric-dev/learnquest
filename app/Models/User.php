@@ -14,7 +14,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 
-#[Fillable(["name", "email", "password"])]
+#[Fillable(["name", "email", "password", "free_plan_grandfathered"])]
 #[Hidden(["password", "remember_token"])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -31,6 +31,7 @@ class User extends Authenticatable implements FilamentUser
   {
     return [
       "email_verified_at" => "datetime",
+      "free_plan_grandfathered" => "boolean",
       "password" => "hashed",
     ];
   }
@@ -73,5 +74,21 @@ class User extends Authenticatable implements FilamentUser
   public function children()
   {
     return $this->hasMany(Child::class, "parent_id");
+  }
+
+  public function payments()
+  {
+    return $this->hasMany(Payment::class);
+  }
+
+  public function sendPasswordResetNotification($token): void
+  {
+    if ($this->isParent()) {
+      $this->notify(new \App\Notifications\ParentResetPasswordNotification($token));
+
+      return;
+    }
+
+    parent::sendPasswordResetNotification($token);
   }
 }
