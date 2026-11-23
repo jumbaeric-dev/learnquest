@@ -4,14 +4,14 @@
         $claimedCount = collect($challenges)->where('claimed', true)->count();
     @endphp
 
-    <x-lq.section-title subtitle="Finish them to earn bonus XP. Resets every day!">
-        🎯 Today's Challenges
+    <x-lq.section-title :subtitle="__('localization.daily_challenges_description')">
+        {{ __('localization.daily_challenges') }}
     </x-lq.section-title>
 
     @if (! empty($challenges))
 
         <p class="text-sm font-semibold text-slate-500">
-            {{ $claimedCount }} of {{ count($challenges) }} claimed today
+            {{ __('localization.claimed_today', ['claimed' => $claimedCount, 'total' => count($challenges)]) }}
         </p>
 
         <div class="space-y-3">
@@ -52,7 +52,7 @@
                             @if ($challenge['claimed'])
 
                                 <x-lq.badge variant="success">
-                                    ✓ Claimed
+                                    {{ __('localization.claimed') }}
                                 </x-lq.badge>
 
                             @elseif ($challenge['completed'])
@@ -65,7 +65,7 @@
                                     variant="primary"
                                     size="sm"
                                 >
-                                    🎁 Claim +{{ $challenge['xp'] }} XP
+                                    {{ __('localization.claim_xp', ['xp' => $challenge['xp']]) }}
                                 </x-lq.button>
 
                             @elseif ($challenge['key'] === 'ask_nova')
@@ -76,7 +76,7 @@
                                     variant="secondary"
                                     size="sm"
                                 >
-                                    🤖 Ask Nova
+                                    {{ __('localization.ask_nova') }}
                                 </x-lq.button>
 
                             @else
@@ -87,7 +87,7 @@
                                     variant="secondary"
                                     size="sm"
                                 >
-                                    🚀 Let's go
+                                    {{ __('localization.lets_go') }}
                                 </x-lq.button>
 
                             @endif

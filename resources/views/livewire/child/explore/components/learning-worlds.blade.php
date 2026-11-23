@@ -1,8 +1,8 @@
 <div id="learning-worlds" class="px-4">
 
     <x-lq.section-title
-        title="Learning Worlds"
-        subtitle="Choose your next adventure" />
+        :title="__('localization.learning_worlds_title')"
+        :subtitle="__('localization.choose_next_adventure')" />
 
 
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -31,7 +31,7 @@
             <a href="{{ route('child.world', $world['slug']) }}">
 
                 <x-lq.button>
-                    🚀 Enter World
+                    {{ __('localization.enter_world') }}
                 </x-lq.button>
 
             </a>

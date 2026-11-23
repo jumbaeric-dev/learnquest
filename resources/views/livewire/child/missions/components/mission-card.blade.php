@@ -56,13 +56,13 @@
 
             <x-lq.stat-chip
                 icon="⭐"
-                label="XP"
+                :label="__('localization.xp')"
                 :value="$mission['xp']" />
 
 
             <x-lq.stat-chip
                 icon="⏱"
-                label="Time"
+                :label="__('localization.time')"
                 :value="$mission['time']" />
 
 
@@ -75,7 +75,7 @@
         <x-lq.button
             wire:click="startMission">
 
-            🚀 Start
+            {{ __('localization.mission_start') }}
 
         </x-lq.button>
 

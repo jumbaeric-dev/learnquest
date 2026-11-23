@@ -93,7 +93,7 @@ class Activity extends Component
             return;
         }
 
-        $content = $this->activity->content;
+        $content = $this->activity->localizedContent();
 
         abort_unless(
             is_array($content) && ! empty($content['question']),
@@ -231,7 +231,7 @@ class Activity extends Component
      */
     private function isQuizActivity(): bool
     {
-        $content = $this->activity->content;
+        $content = $this->activity->localizedContent();
 
         return strtolower((string) $this->activity->activity_type) === 'quiz'
             || (is_array($content) && ! empty($content['question']));

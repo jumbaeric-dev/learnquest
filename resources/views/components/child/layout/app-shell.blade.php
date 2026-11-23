@@ -86,7 +86,7 @@
         x-show="mobileMenuOpen"
         x-transition.opacity.duration.150ms
         class="lq-mobile-nav-backdrop"
-        aria-label="Close navigation menu"
+        aria-label="{{ __('localization.close_navigation') }}"
         @click="mobileMenuOpen = false">
     </button>
 
@@ -95,10 +95,10 @@
 
     @if (auth()->check() && auth()->user()->isParent())
         <div class="relative z-[110] flex items-center justify-between gap-3 bg-cyan-950 px-4 py-2 text-sm text-white">
-            <span>Parent preview: {{ app(\App\Services\Child\Context\CurrentChildService::class)->current()?->full_name }}</span>
+            <span>{{ __('localization.parent_preview', ['name' => app(\App\Services\Child\Context\CurrentChildService::class)->current()?->full_name]) }}</span>
             <form method="POST" action="{{ route('parent.return') }}">
                 @csrf
-                <button type="submit" class="rounded-lg bg-white/10 px-3 py-1.5 font-semibold hover:bg-white/20">Return to parent dashboard</button>
+                <button type="submit" class="rounded-lg bg-white/10 px-3 py-1.5 font-semibold hover:bg-white/20">{{ __('localization.return_parent_dashboard') }}</button>
             </form>
         </div>
     @endif

@@ -27,25 +27,25 @@
 
                             @if ($course->subject)
                             <span class="lq-course-hero__tag">
-                                🌍 {{ $course->subject->name }}
+                                🌍 {{ $course->subject->localized('name') }}
                             </span>
                             @endif
 
                             @if ($course->age_group)
                             <span class="lq-course-hero__tag">
-                                🎯 Ages {{ $course->age_group }}
+                                {{ __('localization.course_age_group', ['ages' => $course->age_group]) }}
                             </span>
                             @endif
 
                         </div>
 
                         <h1 class="lq-course-hero__title">
-                            {{ $course->title }}
+                            {{ $course->localized('title') }}
                         </h1>
 
-                        @if ($course->description)
+                        @if ($course->localized('description'))
                         <p class="lq-course-hero__description">
-                            {{ $course->description }}
+                            {{ $course->localized('description') }}
                         </p>
                         @endif
 
@@ -59,7 +59,7 @@
 
                     <div class="lq-course-hero__progress-head">
                         <span class="lq-course-hero__progress-label">
-                            Your Progress
+                            {{ __('localization.your_progress') }}
                         </span>
 
                         <strong class="lq-course-hero__progress-value">
@@ -74,7 +74,7 @@
                     </div>
 
                     <p class="lq-course-hero__meta">
-                        {{ $this->completedLessons }} of {{ $this->totalLessons }} lessons completed
+                        {{ __('localization.lessons_completed_count', ['completed' => $this->completedLessons, 'total' => $this->totalLessons]) }}
                     </p>
 
                 </div>
@@ -90,33 +90,33 @@
             <x-lq.stat-chip
                 icon="📦"
                 :value="$course->modules->count()"
-                label="Modules"
+                label="{{ __('localization.modules') }}"
                 variant="primary" />
 
             <x-lq.stat-chip
                 icon="📖"
                 :value="$this->totalLessons"
-                label="Lessons"
+                label="{{ __('localization.lessons') }}"
                 variant="neutral" />
 
             <x-lq.stat-chip
                 icon="✅"
                 :value="$this->completedLessons"
-                label="Completed"
+                label="{{ __('localization.completed') }}"
                 variant="success" />
 
             <x-lq.stat-chip
                 icon="⭐"
                 :value="number_format($this->totalXp)"
-                label="Total XP"
+                label="{{ __('localization.total_xp') }}"
                 variant="reward" />
 
         </div>
 
 
         {{-- Adventure map --}}
-        <x-lq.section-title subtitle="Complete each lesson to continue your journey.">
-            🗺️ Adventure Map
+        <x-lq.section-title subtitle="{{ __('localization.complete_each_lesson') }}">
+            🗺️ {{ __('localization.adventure_map') }}
         </x-lq.section-title>
 
         @php
@@ -135,12 +135,12 @@
 
                 <div>
                     <h3 class="text-lg font-bold text-slate-800">
-                        {{ $module->title }}
+                        {{ $module->localized('title') }}
                     </h3>
 
-                    @if ($module->description)
+                    @if ($module->localized('description'))
                     <p class="text-sm text-slate-500">
-                        {{ $module->description }}
+                        {{ $module->localized('description') }}
                     </p>
                     @endif
                 </div>
@@ -195,20 +195,20 @@
                         <div class="flex flex-wrap items-center gap-2">
 
                             <h4 class="font-semibold text-slate-800">
-                                {{ $lesson->title }}
+                                {{ $lesson->localized('title') }}
                             </h4>
 
                             @if ($isNext)
                             <x-lq.badge variant="primary" size="sm">
-                                Up Next
+                                {{ __('localization.up_next') }}
                             </x-lq.badge>
                             @endif
 
                         </div>
 
-                        @if ($lesson->description)
+                        @if ($lesson->localized('description'))
                         <p class="text-sm text-slate-500">
-                            {{ $lesson->description }}
+                            {{ $lesson->localized('description') }}
                         </p>
                         @endif
 
@@ -226,7 +226,7 @@
                         @if ($completed)
 
                             <x-lq.badge variant="success">
-                                ✓ Completed
+                                ✓ {{ __('localization.completed') }}
                             </x-lq.badge>
 
                             <x-lq.button
@@ -234,7 +234,7 @@
                                 href="{{ route('learn.lesson', $lesson) }}"
                                 variant="secondary"
                                 size="sm">
-                                Review Lesson
+                                {{ __('localization.review') }}
                             </x-lq.button>
 
                         @elseif ($isNext)
@@ -263,8 +263,8 @@
 
                 <x-lq.empty-state
                     icon="📭"
-                    title="No lessons yet"
-                    message="This module does not have any lessons yet." />
+                    :title="__('localization.no_lessons_yet')"
+                    :message="__('localization.module_no_lessons')" />
 
                 @endforelse
 
@@ -276,9 +276,9 @@
 
         <x-lq.empty-state
             icon="🚀"
-            title="Your adventure is being prepared"
-            message="There are no lessons in this course yet — check back soon!"
-            action="Back to Explore"
+            :title="__('localization.adventure_preparing')"
+            :message="__('localization.course_no_lessons')"
+            :action="__('localization.back_to_explore')"
             href="{{ route('child.explore') }}" />
 
         @endforelse

@@ -14,19 +14,19 @@
                 href="{{ route('child.profile') }}"
                 class="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:underline">
                 <span aria-hidden="true">←</span>
-                Back to My Profile
+                {{ __('localization.back_to_my_profile') }}
             </a>
 
             <p class="mt-5 text-sm font-semibold uppercase tracking-widest text-sky-600">
-                Make it yours
+                {{ __('localization.make_it_yours') }}
             </p>
 
             <h1 class="mt-1 text-3xl font-extrabold tracking-tight">
-                Edit My Profile
+                {{ __('localization.edit_my_profile') }}
             </h1>
 
             <p class="mt-2 text-sm opacity-75">
-                Choose your explorer avatar and update your details.
+                {{ __('localization.edit_profile_description') }}
             </p>
         </section>
 
@@ -36,11 +36,11 @@
             {{-- Avatar selection --}}
             <section class="lq-glass-card rounded-3xl border border-sky-100 p-6 shadow-sm sm:p-8">
                 <h2 class="text-lg font-extrabold">
-                    Choose your explorer avatar
+                    {{ __('localization.choose_explorer_avatar') }}
                 </h2>
 
                 <p class="mt-1 text-sm opacity-70">
-                    Pick the character that represents you.
+                    {{ __('localization.pick_representative_character') }}
                 </p>
 
                 <div class="mt-5 flex flex-wrap gap-3">
@@ -49,7 +49,7 @@
                         type="button"
                         wire:key="avatar-{{ $loop->index }}"
                         wire:click="$set('avatar', '{{ $option }}')"
-                        aria-label="Choose avatar {{ $option }}"
+                        aria-label="{{ __('localization.choose_avatar', ['avatar' => $option]) }}"
                         aria-pressed="{{ $avatar === $option ? 'true' : 'false' }}"
                         class="flex h-14 w-14 items-center justify-center rounded-2xl border-2 text-3xl transition hover:-translate-y-0.5 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-500 {{ $avatar === $option ? 'border-sky-500 bg-sky-100 shadow-sm' : 'border-slate-200 bg-white/70' }}">
                         {{ $option }}
@@ -65,14 +65,14 @@
             {{-- Personal details --}}
             <section class="lq-glass-card rounded-3xl border border-sky-100 p-6 shadow-sm sm:p-8">
                 <h2 class="text-lg font-extrabold">
-                    My Details
+                    {{ __('localization.my_details') }}
                 </h2>
 
                 <div class="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
 
                     <div>
                         <label for="first_name" class="mb-2 block text-sm font-semibold">
-                            First name
+                            {{ __('localization.first_name') }}
                         </label>
 
                         <input
@@ -91,7 +91,7 @@
 
                     <div>
                         <label for="last_name" class="mb-2 block text-sm font-semibold">
-                            Last name
+                            {{ __('localization.last_name') }}
                         </label>
 
                         <input
@@ -109,7 +109,7 @@
 
                     <div class="sm:col-span-2">
                         <label for="date_of_birth" class="mb-2 block text-sm font-semibold">
-                            Birthday
+                            {{ __('localization.birthday') }}
                         </label>
 
                         <input
@@ -121,7 +121,7 @@
                             class="w-full rounded-xl border border-slate-200 bg-white/80 px-4 py-3 outline-none transition focus:border-sky-500 focus:ring-2 focus:ring-sky-100 sm:max-w-md">
 
                         <p class="mt-2 text-xs opacity-65">
-                            Your birthday helps us personalise your learning experience.
+                            {{ __('localization.birthday_personalise') }}
                         </p>
 
                         @error('date_of_birth')
@@ -138,7 +138,7 @@
                 <a
                     href="{{ route('child.profile') }}"
                     class="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white/70 px-6 py-3 font-semibold transition hover:bg-white">
-                    Cancel
+                    {{ __('localization.cancel') }}
                 </a>
 
                 <button
@@ -147,11 +147,11 @@
                     wire:target="save"
                     class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-sky-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60">
                     <span wire:loading.remove wire:target="save">
-                        Save Changes
+                        {{ __('localization.save_changes') }}
                     </span>
 
                     <span wire:loading wire:target="save">
-                        Saving...
+                        {{ __('localization.saving') }}
                     </span>
                 </button>
 

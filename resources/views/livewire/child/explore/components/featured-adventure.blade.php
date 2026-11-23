@@ -29,7 +29,7 @@
                     <div class="mt-3">
 
                         <x-lq.button wire:click="startAdventure">
-                            Start Adventure 🚀
+                            {{ __('localization.start_adventure') }}
                         </x-lq.button>
 
                     </div>

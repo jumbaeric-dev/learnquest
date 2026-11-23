@@ -15,14 +15,14 @@ class MissionCategories extends Component
         $this->categories = [
             [
                 'name' => 'all',
-                'label' => 'All',
+                'label' => __('localization.all'),
                 'icon' => '🌎',
             ],
 
             ...collect($missions->getCategories())
                 ->map(fn($category) => [
                     'name' => $category['name'],
-                    'label' => $category['name'],
+                    'label' => $category['label'] ?? $category['name'],
                     'icon' => $category['icon'],
                 ])
                 ->all(),

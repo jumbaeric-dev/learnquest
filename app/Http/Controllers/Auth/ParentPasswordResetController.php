@@ -30,11 +30,17 @@ class ParentPasswordResetController extends Controller
     // Only parent accounts can reset here. The reply is identical in every case,
     // so the form never reveals which emails have accounts.
     if ($user && $user->isParent()) {
-      try {
-        Password::sendResetLink(["email" => $user->email]);
-      } catch (\Throwable $exception) {
-        report($exception);
-      }
+      $email = $user->email;
+
+      // Send after the response, so the reply takes the same time whether or not
+      // the account exists.
+      dispatch(function () use ($email) {
+        try {
+          Password::sendResetLink(["email" => $email]);
+        } catch (\Throwable $exception) {
+          report($exception);
+        }
+      })->afterResponse();
     }
 
     return back()->with(

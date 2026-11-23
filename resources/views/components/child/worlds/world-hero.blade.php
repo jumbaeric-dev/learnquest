@@ -53,19 +53,19 @@
 
                 <x-lq.stat-chip
                     icon="📚"
-                    label="Courses"
+                    label="{{ __('localization.world_courses') }}"
                     :value="$hero['courses']" />
 
                 <x-lq.stat-chip
                     icon="⭐"
-                    label="Difficulty"
+                    label="{{ __('localization.world_difficulty') }}"
                     :value="$hero['difficulty']" />
 
                 @if($hero['heroCharacter'])
 
                 <x-lq.stat-chip
                     icon="🧙"
-                    label="Guide"
+                    label="{{ __('localization.world_guide') }}"
                     :value="$hero['heroCharacter']" />
 
                 @endif
@@ -80,7 +80,7 @@
                     size="lg"
                     color="white"
                     icon="heroicon-o-play">
-                    Continue Journey
+                    {{ __('localization.continue_journey') }}
                 </x-lq.button>
 
             </div>

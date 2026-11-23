@@ -39,8 +39,8 @@ class RecommendedLessons extends Component
 
                 return [
                     'courseId' => $course->id,
-                    'courseTitle' => $course->title,
-                    'lessonTitle' => $lesson->title,
+                    'courseTitle' => $course->localized('title'),
+                    'lessonTitle' => $lesson->localized('title'),
                     'minutes' => $lesson->estimated_minutes,
                     'icon' => $adventure->icon ?? '📘',
                 ];

@@ -3,7 +3,7 @@
 
     <h2 class="text-xl font-bold text-gray-800">
 
-        🧭 Explore Missions
+        🧭 {{ __('localization.explore_missions') }}
 
     </h2>
 

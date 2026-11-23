@@ -16,7 +16,7 @@ substr($name, 0, 1)
     <button
         type="button"
         class="lq-mobile-menu-trigger"
-        aria-label="Toggle navigation menu"
+        aria-label="{{ __('localization.toggle_navigation') }}"
         aria-controls="child-navigation"
         :aria-expanded="mobileMenuOpen.toString()"
         @click="toggleMobileMenu()">
@@ -50,10 +50,12 @@ substr($name, 0, 1)
     {{-- Top actions --}}
     <div class="lq-top-actions">
 
+        <x-localization.language-switcher />
+
         {{-- Notifications --}}
         <x-lq.icon-button
             size="md"
-            aria-label="Notifications">
+            aria-label="{{ __('localization.notifications') }}">
             🔔
         </x-lq.icon-button>
 
@@ -66,7 +68,7 @@ substr($name, 0, 1)
             <button
                 type="button"
                 class="lq-profile-trigger lq-avatar lq-avatar--md"
-                aria-label="Open profile menu"
+                aria-label="{{ __('localization.open_profile') }}"
                 aria-haspopup="menu"
                 :aria-expanded="profileOpen.toString()"
                 @click="
@@ -90,7 +92,7 @@ substr($name, 0, 1)
                 x-transition:leave-end="opacity-0 scale-95"
                 class="lq-profile-menu"
                 role="menu"
-                aria-label="Profile menu">
+                aria-label="{{ __('localization.profile_menu') }}">
 
                 {{-- Profile summary --}}
                 <div class="lq-profile-summary">
@@ -108,7 +110,7 @@ substr($name, 0, 1)
                             </div>
 
                             <div class="lq-profile-level">
-                                Level {{ $explorer['level'] ?? 1 }} Explorer
+                                {{ __('localization.level_explorer', ['level' => $explorer['level'] ?? 1]) }}
                             </div>
 
                         </div>
@@ -134,7 +136,7 @@ substr($name, 0, 1)
                         <div class="lq-profile-stat">
 
                             <div class="lq-profile-stat__label">
-                                Streak
+                                {{ __('localization.streak') }}
                             </div>
 
                             <div class="lq-profile-stat__value">
@@ -161,7 +163,7 @@ substr($name, 0, 1)
                         </span>
 
                         <span>
-                            My Profile
+                            {{ __('localization.my_profile') }}
                         </span>
                     </a>
 
@@ -175,7 +177,7 @@ substr($name, 0, 1)
                         </span>
 
                         <span>
-                            My Achievements
+                            {{ __('localization.my_achievements') }}
                         </span>
                     </a>
 
@@ -191,7 +193,7 @@ substr($name, 0, 1)
                         </span>
 
                         <span>
-                            Settings
+                            {{ __('localization.settings_menu') }}
                         </span>
                     </a>
 
@@ -212,7 +214,7 @@ substr($name, 0, 1)
                             </span>
 
                             <span>
-                                Log out
+                                {{ __('localization.log_out') }}
                             </span>
                         </button>
                     </form>

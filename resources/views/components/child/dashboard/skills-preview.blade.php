@@ -2,7 +2,7 @@
 
     <x-lq.section-title>
 
-        🧠 Your Super Skills
+        🧠 {{ __('localization.your_super_skills') }}
 
     </x-lq.section-title>
 
@@ -63,7 +63,7 @@
 
         <p class="text-slate-500">
 
-            Complete activities to build your first skills.
+            {{ __('localization.build_first_skills_prompt') }}
 
         </p>
 

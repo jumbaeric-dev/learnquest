@@ -3,13 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class Course extends Model
 {
     use HasFactory;
+    use HasTranslations;
+
+    protected $casts = ['translations' => 'array'];
 
     protected $fillable = [
+        'translations',
         'subject_id',
         'title',
         'slug',

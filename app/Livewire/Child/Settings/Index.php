@@ -43,7 +43,7 @@ class Index extends Component
         $child->settings = $settings;
         $child->save();
 
-        session()->flash('settings_saved', 'Your settings have been saved!');
+        session()->flash('settings_saved', __('localization.settings_saved'));
     }
 
     public function render(): View

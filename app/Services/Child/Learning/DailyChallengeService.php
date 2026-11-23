@@ -52,8 +52,8 @@ class DailyChallengeService
             $challenges[] = [
                 'key' => $key,
                 'icon' => $definition['icon'],
-                'title' => $definition['title'],
-                'description' => $definition['description'] ?? '',
+                'title' => __("localization.challenge_{$key}_title"),
+                'description' => __("localization.challenge_{$key}_description"),
                 'xp' => (int) $definition['xp'],
                 'completed' => $this->isCompleted($child, $key, $start, $end),
                 'claimed' => in_array($key, $claimed, true),

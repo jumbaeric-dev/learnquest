@@ -9,11 +9,15 @@ use App\Models\Payment;
 use App\Models\PlanPrice;
 use App\Models\User;
 use App\Models\WebhookEvent;
+use App\Services\Billing\DTO\VerifiedPaymentWebhook;
+use App\Services\Billing\PaymentWebhookProcessor;
 use Database\Seeders\PlanSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RolesSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\LateSettlementAdminNotification;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -233,6 +237,110 @@ class PaymentAdminTest extends TestCase
             ->assertOk()
             ->assertSee('LQ-VIEW-0001')
             ->assertSee('Paid after the checkout window closed');
+    }
+
+
+    public function test_late_settlement_notifies_every_payment_manager_but_not_view_only_users(): void
+    {
+        Notification::fake();
+
+        $adminOne = $this->userWithRole('admin');
+        $adminTwo = $this->userWithRole('admin');
+        $viewer = $this->userWithRole('school_admin');
+        $viewer->givePermissionTo('view payments');
+
+        $parent = $this->userWithRole('parent');
+        $payment = $this->payment('LQ-LATE-ALERT-0001', Payment::STATUS_PENDING, [
+            'parent' => $parent,
+            'expires_at' => now()->subMinutes(15),
+        ]);
+
+        $webhook = new VerifiedPaymentWebhook(
+            provider: $payment->provider,
+            eventId: 'evt-late-admin-alert-1',
+            eventType: 'charge.success',
+            paymentReference: $payment->reference,
+            providerTransactionId: 'txn-late-admin-alert-1',
+            amountMinor: $payment->amount_minor,
+            currency: $payment->currency,
+            outcome: 'succeeded',
+            signatureVerifiedAt: now()->toDateTimeImmutable(),
+            metadata: [],
+        );
+
+        $result = app(PaymentWebhookProcessor::class)->process($webhook);
+
+        $this->assertSame('succeeded', $result['status']);
+        $this->assertTrue($payment->fresh()->isLateSettlement());
+        Notification::assertSentTo($adminOne, LateSettlementAdminNotification::class);
+        Notification::assertSentTo($adminTwo, LateSettlementAdminNotification::class);
+        Notification::assertNotSentTo($viewer, LateSettlementAdminNotification::class);
+    }
+
+    public function test_duplicate_webhook_does_not_send_duplicate_late_settlement_alerts(): void
+    {
+        Notification::fake();
+
+        $admin = $this->userWithRole('admin');
+        $payment = $this->payment('LQ-LATE-ALERT-0002', Payment::STATUS_PENDING, [
+            'expires_at' => now()->subMinutes(10),
+        ]);
+
+        $webhook = new VerifiedPaymentWebhook(
+            provider: $payment->provider,
+            eventId: 'evt-late-admin-alert-duplicate',
+            eventType: 'charge.success',
+            paymentReference: $payment->reference,
+            providerTransactionId: 'txn-late-admin-alert-duplicate',
+            amountMinor: $payment->amount_minor,
+            currency: $payment->currency,
+            outcome: 'succeeded',
+            signatureVerifiedAt: now()->toDateTimeImmutable(),
+            metadata: [],
+        );
+
+        $processor = app(PaymentWebhookProcessor::class);
+        $processor->process($webhook);
+        $processor->process($webhook);
+
+        Notification::assertSentToTimes($admin, LateSettlementAdminNotification::class, 1);
+    }
+
+    public function test_admin_alert_dispatch_failure_does_not_undo_a_late_payment(): void
+    {
+        $this->userWithRole('admin');
+        $payment = $this->payment('LQ-LATE-ALERT-0003', Payment::STATUS_PENDING, [
+            'expires_at' => now()->subMinutes(10),
+        ]);
+
+        Notification::shouldReceive('send')
+            ->twice()
+            ->andReturnUsing(function ($notifiables, $notification): void {
+                // The parent receipt is dispatched first; only the operational
+                // admin alert is expected to fail in this test.
+                if ($notification instanceof LateSettlementAdminNotification) {
+                    throw new \RuntimeException('Queue unavailable');
+                }
+            });
+
+        $webhook = new VerifiedPaymentWebhook(
+            provider: $payment->provider,
+            eventId: 'evt-late-admin-alert-failure',
+            eventType: 'charge.success',
+            paymentReference: $payment->reference,
+            providerTransactionId: 'txn-late-admin-alert-failure',
+            amountMinor: $payment->amount_minor,
+            currency: $payment->currency,
+            outcome: 'succeeded',
+            signatureVerifiedAt: now()->toDateTimeImmutable(),
+            metadata: [],
+        );
+
+        $result = app(PaymentWebhookProcessor::class)->process($webhook);
+
+        $this->assertSame('succeeded', $result['status']);
+        $this->assertSame(Payment::STATUS_SUCCEEDED, $payment->fresh()->status);
+        $this->assertTrue($payment->fresh()->isLateSettlement());
     }
 
     public function test_provider_events_show_on_the_payment(): void

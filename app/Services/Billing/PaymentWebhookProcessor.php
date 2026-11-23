@@ -10,6 +10,8 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use App\Notifications\PaymentReceiptNotification;
+use App\Notifications\LateSettlementAdminNotification;
+use Illuminate\Support\Facades\Notification;
 
 /** Applies authenticated, normalized provider events exactly once. */
 class PaymentWebhookProcessor
@@ -186,10 +188,32 @@ class PaymentWebhookProcessor
 
                 // One receipt per settlement, sent only after the transaction commits.
                 // A mail problem must never undo or fail a settled payment.
-                DB::afterCommit(function () use ($payment) {
+                DB::afterCommit(function () use ($payment, $lateSettlement) {
+                    $settledPayment = $payment->fresh();
+
                     try {
-                        $payment->user?->notify(new PaymentReceiptNotification($payment->fresh()));
+                        $settledPayment->user?->notify(new PaymentReceiptNotification($settledPayment));
                     } catch (\Throwable $exception) {
+                        // A parent receipt failure must not suppress the operational admin alert.
+                        report($exception);
+                    }
+
+                    if (!$lateSettlement) {
+                        return;
+                    }
+
+                    try {
+                        // Only users explicitly authorized to manage the payment ledger receive this alert.
+                        $paymentManagers = User::permission('manage payments')->get();
+
+                        if ($paymentManagers->isNotEmpty()) {
+                            Notification::send(
+                                $paymentManagers,
+                                new LateSettlementAdminNotification($settledPayment),
+                            );
+                        }
+                    } catch (\Throwable $exception) {
+                        // Notifications must never roll back a payment that has already settled.
                         report($exception);
                     }
                 });

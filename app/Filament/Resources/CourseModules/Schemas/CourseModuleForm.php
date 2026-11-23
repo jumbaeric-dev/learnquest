@@ -33,6 +33,13 @@ class CourseModuleForm
                             ->required(),
                     ])
                     ->columns(2),
+                Section::make('French Translation')
+                    ->description('Optional French copy. Empty fields fall back to the canonical English content.')
+                    ->schema([
+                        TextInput::make('translations.fr.title')->label('Module title'),
+                        Textarea::make('translations.fr.description')->label('Module description'),
+                    ])
+                    ->columns(2),
             ]);
     }
 }

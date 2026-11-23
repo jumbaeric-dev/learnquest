@@ -36,7 +36,7 @@
                        hover:text-indigo-600"
             >
                 <span>←</span>
-                <span>Explore Worlds</span>
+                <span>{{ __('localization.explore_worlds') }}</span>
             </a>
 
         </div>
@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="text-xs text-slate-500">
-                    Courses
+                    {{ __('localization.world_courses') }}
                 </div>
 
             </div>
@@ -135,11 +135,11 @@
                 </div>
 
                 <div class="mt-1 text-sm font-bold text-slate-900">
-                    {{ $world['difficulty'] ?? 'Beginner' }}
+                    {{ $world['difficulty'] ?? __('localization.beginner') }}
                 </div>
 
                 <div class="text-xs text-slate-500">
-                    Difficulty
+                    {{ __('localization.difficulty') }}
                 </div>
 
             </div>
@@ -160,11 +160,11 @@
                 </div>
 
                 <div class="mt-1 text-sm font-bold text-slate-900">
-                    Level {{ $world['level'] ?? 1 }}
+                    {{ __('localization.level_value', ['level' => $world['level'] ?? 1]) }}
                 </div>
 
                 <div class="text-xs text-slate-500">
-                    Your Level
+                    {{ __('localization.your_level') }}
                 </div>
 
             </div>
@@ -178,7 +178,7 @@
             <div class="mb-2 flex items-center justify-between">
 
                 <span class="text-sm font-bold text-slate-800">
-                    World Progress
+                    {{ __('localization.world_progress_title') }}
                 </span>
 
                 <span class="text-sm font-bold text-indigo-600">
@@ -222,7 +222,7 @@
                     </div>
 
                     <div class="text-xs text-slate-500">
-                        Earned in this world
+                        {{ __('localization.earned_in_world') }}
                     </div>
 
                 </div>
@@ -236,7 +236,7 @@
                 wire:click="continueAdventure"
                 class="w-full sm:w-auto"
             >
-                🚀 {{ $world['action_label'] ?? 'Continue Adventure' }}
+                🚀 {{ $world['action_label'] ?? __('localization.continue_adventure') }}
             </x-lq.button>
 
         </div>

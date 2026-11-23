@@ -7,11 +7,11 @@
             <div class="space-y-2">
 
                 <h1 class="text-3xl font-bold text-gray-800">
-                    🌎 {{ $title ?? 'Explore Universe' }}
+                    🌎 {{ $title ?? __('localization.explore_universe') }}
                 </h1>
 
                 <p class="text-gray-600 text-sm">
-                    {{ $subtitle ?? 'Discover new worlds, challenges and adventures' }}
+                    {{ $subtitle ?? __('localization.discover_worlds_challenges') }}
                 </p>
 
             </div>

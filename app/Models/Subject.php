@@ -2,37 +2,39 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Subject extends Model
 {
     use HasFactory;
+    use HasTranslations;
 
-protected $fillable = [
-    'name',
-    'slug',
-    'description',
-    'icon',
+    protected $casts = ['translations' => 'array'];
 
-    'cover_image',
-    'theme_color',
-    'background_music',
-    'sort_order',
-    'difficulty',
-
-    'tagline',
-    'story_intro',
-    'hero_character',
-    'banner_animation',
-    'unlock_level',
-    'estimated_hours',
-    'badge_icon',
-    'is_featured',
-    'is_seasonal',
-
-    'is_active',
-];
+    protected $fillable = [
+        'translations',
+        'name',
+        'slug',
+        'description',
+        'icon',
+        'cover_image',
+        'theme_color',
+        'background_music',
+        'sort_order',
+        'difficulty',
+        'tagline',
+        'story_intro',
+        'hero_character',
+        'banner_animation',
+        'unlock_level',
+        'estimated_hours',
+        'badge_icon',
+        'is_featured',
+        'is_seasonal',
+        'is_active',
+    ];
 
     public function courses()
     {

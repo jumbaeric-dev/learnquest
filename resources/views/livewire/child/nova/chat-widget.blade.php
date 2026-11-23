@@ -27,7 +27,7 @@
                 <span class="text-2xl">🤖</span>
                 <div>
                     <p class="font-bold leading-tight">Nova</p>
-                    <p class="text-xs text-white/80 leading-tight">Your learning buddy</p>
+                    <p class="text-xs text-white/80 leading-tight">{{ __('localization.nova_learning_buddy') }}</p>
                 </div>
             </div>
 
@@ -35,7 +35,7 @@
                 type="button"
                 wire:click="close"
                 class="rounded-full p-1 text-white/80 hover:bg-white/10 hover:text-white"
-                aria-label="Close chat"
+                aria-label="{{ __('localization.close_chat') }}"
             >
                 ✕
             </button>
@@ -51,7 +51,7 @@
 
             @if(empty($messages))
             <div class="rounded-2xl bg-white p-4 text-sm text-slate-600 shadow">
-                Hi, I'm Nova! 👋 Ask me anything about what you're learning.
+                {{ __('localization.nova_greeting') }}
             </div>
             @endif
 
@@ -72,7 +72,7 @@
 
             <div wire:loading wire:target="send" class="flex justify-start">
                 <div class="rounded-2xl bg-white px-4 py-2 text-sm text-slate-400 shadow">
-                    Nova is thinking
+                    {{ __('localization.nova_thinking') }}
                     <span class="animate-pulse">...</span>
                 </div>
             </div>
@@ -84,7 +84,7 @@
 
             @if($limitReached)
             <p class="px-2 pb-2 text-center text-xs text-slate-400">
-                Nova needs a rest — chat with her again tomorrow! 🌙
+                {{ __('localization.nova_rest_message') }}
             </p>
             @endif
 
@@ -98,7 +98,7 @@
                     wire:loading.attr="disabled"
                     wire:target="send"
                     @disabled($limitReached)
-                    placeholder="Ask Nova something..."
+                    placeholder="{{ __('localization.nova_placeholder') }}"
                     maxlength="500"
                     class="
                         flex-1 rounded-full border border-slate-200
@@ -119,7 +119,7 @@
                         transition hover:bg-indigo-700
                         disabled:cursor-not-allowed disabled:opacity-40
                     "
-                    aria-label="Send message"
+                    aria-label="{{ __('localization.send_message') }}"
                 >
                     ➤
                 </button>

@@ -67,15 +67,15 @@ class WorldService
     ): WorldHeroDTO {
         return new WorldHeroDTO(
             id: $subject->id,
-            name: $subject->name,
-            tagline: $subject->tagline,
-            description: $subject->description,
-            storyIntro: $subject->story_intro,
-            heroCharacter: $subject->hero_character,
+            name: $subject->localized('name'),
+            tagline: $subject->localized('tagline'),
+            description: $subject->localized('description'),
+            storyIntro: $subject->localized('story_intro'),
+            heroCharacter: $subject->localized('hero_character'),
             icon: $subject->icon,
             coverImage: $subject->cover_image,
             themeColor: $subject->theme_color,
-            difficulty: ucfirst($subject->difficulty),
+            difficulty: __("localization.{$subject->difficulty}"),
             courses: $subject->courses_count
                 ?? $subject->courses->count(),
         );
@@ -103,13 +103,13 @@ class WorldService
         $lesson = $this->journey->getCurrentLesson($child);
 
         return new ContinueJourneyDTO(
-            course: $course->title,
-            lesson: $lesson?->title ?? 'Start Learning',
+            course: $course->localized('title'),
+            lesson: $lesson?->localized('title') ?? __('localization.start_learning'),
             progress: $this->journey->getCourseProgressPercentage(
                 $child,
                 $course
             ),
-            buttonText: 'Continue',
+            buttonText: __('localization.continue'),
             buttonAction: 'continue',
         );
     }
@@ -165,8 +165,8 @@ class WorldService
 
                 return new WorldCourseDTO(
                     id: $course->id,
-                    title: $course->title,
-                    description: $course->description,
+                    title: $course->localized('title'),
+                    description: $course->localized('description'),
                     icon: $course->thumbnail,
                     ageGroup: $course->age_group,
                     locked: false,

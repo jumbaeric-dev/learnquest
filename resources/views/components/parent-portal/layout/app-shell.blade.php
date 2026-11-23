@@ -15,12 +15,11 @@
                     LearnQuest
                 </span>
 
-                <span class="hidden text-xs font-semibold uppercase tracking-wider text-slate-400 sm:inline">
-                    Parent
+                <span class="hidden text-xs font-semibold uppercase tracking-wider text-slate                    {{ __('localization.parent') }}
                 </span>
             </a>
 
-            <nav class="flex items-center gap-1" aria-label="Parent navigation">
+            <nav class="flex items-center gap-1" aria-label="{{ __('localization.parent_navigation') }}">
                 <a
                     href="{{ route('parent.dashboard') }}"
                     @class([ 'rounded-xl px-3 py-2 text-sm font-semibold transition' , 'bg-white/10 text-white'=> $active === 'overview',
@@ -28,14 +27,14 @@
                     ])
                     @if($active === 'overview') aria-current="page" @endif
                     >
-                    Overview
+                    {{ __('localization.overview') }}
                 </a>
                 <a
                     href="{{ route('parent.children.index') }}"
                     @class([ 'rounded-xl px-3 py-2 text-sm font-semibold transition' , 'bg-white/10 text-white'=> $active === 'children', 'text-slate-300 hover:bg-white/5 hover:text-white' => $active !== 'children' ])
                     @if($active === 'children') aria-current="page" @endif
                     >
-                    Children
+                    {{ __('localization.children') }}
                 </a>
                 <a
                     href="{{ route('parent.account') }}"
@@ -44,18 +43,22 @@
                     ])
                     @if($active === 'account') aria-current="page" @endif
                     >
-                    Account
+                    {{ __('localization.account') }}
                 </a>
                 <a
                     href="{{ route('parent.billing') }}"
                     @class([ 'rounded-xl px-3 py-2 text-sm font-semibold transition' , 'bg-white/10 text-white'=> $active === 'billing', 'text-slate-300 hover:bg-white/5 hover:text-white' => $active !== 'billing' ])
                     @if($active === 'billing') aria-current="page" @endif
                     >
-                    Billing
+                    {{ __('localization.billing') }}
                 </a>
             </nav>
 
             <div class="flex items-center gap-3">
+                <x-localization.language-switcher />
+
+            <div class="flex items-center gap-3">
+<div class="flex items-center gap-3">
                 <span class="hidden text-sm text-slate-300 sm:inline">
                     {{ auth()->user()->name }}
                 </span>
@@ -65,6 +68,7 @@
         </div>
     </header>
     <x-parent-portal.subscription-banner :hide="$active === 'billing'" />
+    <x-parent-portal.verify-email-banner />
     <main class="mx-auto w-full max-w-6xl px-4 py-8">
         {{ $slot }}
     </main>

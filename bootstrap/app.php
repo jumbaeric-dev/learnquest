@@ -13,6 +13,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up'
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [\App\Http\Middleware\SetLocale::class]);
         // Trust the forwarding headers supplied by the local Ngrok tunnel.
         $middleware->trustProxies(at: '*');
 

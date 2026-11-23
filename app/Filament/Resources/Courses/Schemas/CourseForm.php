@@ -55,6 +55,13 @@ class CourseForm
                             ->default(false),
                     ])
                     ->columns(2),
+                Section::make('French Translation')
+                    ->description('Optional French copy. Empty fields fall back to the canonical English content.')
+                    ->schema([
+                        TextInput::make('translations.fr.title')->label('Course title'),
+                        Textarea::make('translations.fr.description')->label('Course description')->columnSpanFull(),
+                    ])
+                    ->columns(2),
             ]);
     }
 }

@@ -5,7 +5,7 @@
 >
 
     @php
-        $content = $activity->content ?? [];
+        $content = $activity->localizedContent();
 
         $options = is_array($content['options'] ?? null)
             ? $content['options']
@@ -22,12 +22,12 @@
             : null;
 
         [$typeIcon, $typeLabel] = match ($activity->activity_type) {
-            'quiz' => ['❓', 'Quiz'],
-            'story' => ['📖', 'Story'],
-            'project' => ['🛠️', 'Project'],
-            'ai_chat' => ['🤖', 'Chat with AI'],
-            'coding_challenge' => ['💻', 'Coding Challenge'],
-            'video' => ['🎬', 'Video'],
+            'quiz' => ['❓', __('localization.quiz') ],
+            'story' => ['📖', __('localization.story') ],
+            'project' => ['🛠️', __('localization.project') ],
+            'ai_chat' => ['🤖', __('localization.chat_with_ai') ],
+            'coding_challenge' => ['💻', __('localization.coding_challenge') ],
+            'video' => ['🎬', __('localization.video') ],
             default => ['🎯', ucfirst(str_replace('_', ' ', (string) $activity->activity_type))],
         };
 
@@ -49,7 +49,7 @@
                 variant="secondary"
                 size="sm"
             >
-                ← Back to Lesson
+                ← {{ __('localization.back_to_lesson') }}
             </x-lq.button>
         </div>
 
@@ -73,7 +73,7 @@
                         <div class="lq-course-hero__tags">
 
                             <span class="lq-course-hero__tag">
-                                📘 {{ $activity->lesson->title }}
+                                📘 {{ $activity->lesson->localized('title') }}
                             </span>
 
                             <span class="lq-course-hero__tag">
@@ -83,7 +83,7 @@
                         </div>
 
                         <h1 class="lq-course-hero__title">
-                            {{ $activity->title }}
+                            {{ $activity->localized('title') }}
                         </h1>
 
                     </div>
@@ -96,7 +96,7 @@
 
                     <div class="lq-course-hero__progress-head">
                         <span class="lq-course-hero__progress-label">
-                            Reward
+                            {{ __('localization.reward') }}
                         </span>
 
                         <strong class="lq-course-hero__progress-value">
@@ -106,11 +106,11 @@
 
                     <p class="lq-course-hero__meta">
                         @if ($completed)
-                            ✓ Completed — great job!
+                            {{ __('localization.completed_great_job') }}
                         @elseif ($hasQuestion)
-                            Score {{ $passScore }}% or more to earn it.
+                            {{ __('localization.score_threshold', ['score' => $passScore]) }}
                         @else
-                            Finish the activity to earn it.
+                            {{ __('localization.finish_activity_reward') }}
                         @endif
                     </p>
 
@@ -128,7 +128,7 @@
 
                 <div class="space-y-2">
                     <x-lq.badge variant="primary" size="sm">
-                        Question
+                        {{ __('localization.question') }}
                     </x-lq.badge>
 
                     <h2 class="text-2xl font-extrabold leading-snug text-slate-800">
@@ -206,12 +206,12 @@
                 </x-lq.badge>
 
                 <p class="text-lg leading-relaxed text-slate-700">
-                    {{ $body ?? 'Complete this activity to continue your learning journey.' }}
+                    {{ $body ?? __('localization.complete_activity_prompt') }}
                 </p>
 
                 @if (! empty($content['difficulty']))
                     <x-lq.badge variant="warning" size="sm">
-                        Difficulty: {{ ucfirst($content['difficulty']) }}
+                        {{ __('localization.difficulty') }}: {{ ucfirst($content['difficulty']) }}
                     </x-lq.badge>
                 @endif
 
@@ -224,7 +224,7 @@
                             wire:target="complete"
                             variant="primary"
                         >
-                            ✅ Complete Activity
+                            {{ __('localization.complete_activity') }}
                         </x-lq.button>
                     </div>
                 @endif
@@ -246,7 +246,7 @@
                         <div class="text-6xl">🎉</div>
 
                         <h2 class="text-2xl font-extrabold text-slate-800">
-                            Activity Complete!
+                            {{ __('localization.activity_complete') }}
                         </h2>
 
                         <div class="grid grid-cols-2 gap-4">
@@ -254,14 +254,14 @@
                             <x-lq.stat-chip
                                 icon="🎯"
                                 :value="($progress->score ?? 0) . '%'"
-                                label="Score"
+                                label="{{ __('localization.score') }}"
                                 variant="success"
                             />
 
                             <x-lq.stat-chip
                                 icon="⭐"
                                 :value="($progress->xp_earned ?? 0) . ' XP'"
-                                label="XP Earned"
+                                label="{{ __('localization.xp_earned') }}"
                                 variant="reward"
                             />
 
@@ -272,7 +272,7 @@
                             href="{{ route('learn.lesson', $activity->lesson) }}"
                             variant="primary"
                         >
-                            ← Back to Lesson
+                            ← {{ __('localization.back_to_lesson') }}
                         </x-lq.button>
 
                     @else
@@ -280,21 +280,20 @@
                         <div class="text-6xl">🚀</div>
 
                         <h2 class="text-2xl font-extrabold text-slate-800">
-                            Keep Exploring!
+                            {{ __('localization.keep_exploring') }}
                         </h2>
 
                         <div class="mx-auto max-w-[12rem]">
                             <x-lq.stat-chip
                                 icon="🎯"
                                 :value="($progress?->score ?? $score ?? 0) . '%'"
-                                label="Your Score"
+                                label="{{ __('localization.your_score') }}"
                                 variant="warning"
                             />
                         </div>
 
                         <p class="text-slate-600">
-                            You need {{ $passScore }}% to complete this activity.
-                            You can do it — give it another go!
+                            {{ __('localization.need_score_retry', ['score' => $passScore]) }}
                         </p>
 
                         <x-lq.button
@@ -302,7 +301,7 @@
                             wire:click="retry"
                             variant="primary"
                         >
-                            🔄 Try Again
+                            {{ __('localization.try_again') }}
                         </x-lq.button>
 
                     @endif

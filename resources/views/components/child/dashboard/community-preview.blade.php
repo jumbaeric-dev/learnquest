@@ -3,7 +3,7 @@
 
     <x-lq.section-title>
 
-        🌍 Community
+        {{ __('localization.community') }}
 
     </x-lq.section-title>
 

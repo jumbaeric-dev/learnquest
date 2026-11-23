@@ -58,7 +58,7 @@ final class PayPalGateway extends AbstractUnavailablePaymentGateway
                     ],
                 ]);
         } catch (ConnectionException $exception) {
-            throw new PaymentGatewayException('PayPal checkout initialization could not be reached.', previous: $exception);
+            throw new PaymentGatewayUnavailableException('PayPal checkout initialization could not be reached.', previous: $exception);
         }
 
         $data = $this->successfulJson($response->status(), $response->json(), 'PayPal order creation');
@@ -196,10 +196,17 @@ final class PayPalGateway extends AbstractUnavailablePaymentGateway
                 ->withBody($verificationBody, 'application/json')
                 ->send('POST', $this->baseUrl() . '/v1/notifications/verify-webhook-signature');
         } catch (ConnectionException $exception) {
-            throw new PaymentGatewayException('PayPal webhook signature verification could not be reached.', previous: $exception);
+            throw new PaymentGatewayUnavailableException('PayPal webhook signature verification could not be reached.', previous: $exception);
         }
 
-        if (! $verification->successful() || data_get($verification->json(), 'verification_status') !== 'SUCCESS') {
+        if (! $verification->successful()) {
+            Log::warning('PayPal webhook signature verification API rejected the request.', [
+                'http_status' => $verification->status(),
+            ]);
+            throw new PaymentGatewayUnavailableException('PayPal webhook signature verification service is unavailable.');
+        }
+
+        if (data_get($verification->json(), 'verification_status') !== 'SUCCESS') {
             throw new WebhookAuthenticationException('PayPal webhook signature verification failed.');
         }
 
@@ -279,7 +286,7 @@ final class PayPalGateway extends AbstractUnavailablePaymentGateway
                 ->timeout(20)
                 ->get($this->baseUrl() . '/v2/checkout/orders/' . rawurlencode($orderId));
         } catch (ConnectionException $exception) {
-            throw new PaymentGatewayException('PayPal order status could not be reached.', previous: $exception);
+            throw new PaymentGatewayUnavailableException('PayPal order status could not be reached.', previous: $exception);
         }
 
         return $this->successfulJson($response->status(), $response->json(), 'PayPal order retrieval');
@@ -302,7 +309,7 @@ final class PayPalGateway extends AbstractUnavailablePaymentGateway
         } catch (ConnectionException $exception) {
             // A timed-out capture is ambiguous. A later reconciliation first GETs
             // the order and will observe an already-completed capture if it landed.
-            throw new PaymentGatewayException('PayPal capture could not be confirmed. Please retry payment verification shortly.', previous: $exception);
+            throw new PaymentGatewayUnavailableException('PayPal capture could not be confirmed. Please retry payment verification shortly.', previous: $exception);
         }
 
         return $this->successfulJson($response->status(), $response->json(), 'PayPal order capture');
@@ -344,13 +351,17 @@ final class PayPalGateway extends AbstractUnavailablePaymentGateway
                 ->timeout(20)
                 ->post($this->baseUrl() . '/v1/oauth2/token', ['grant_type' => 'client_credentials']);
         } catch (ConnectionException $exception) {
-            throw new PaymentGatewayException('PayPal authentication could not be reached.', previous: $exception);
+            throw new PaymentGatewayUnavailableException('PayPal authentication could not be reached.', previous: $exception);
         }
 
         $data = $response->json();
+        if (! $response->successful()) {
+            Log::warning('PayPal OAuth request failed', ['http_status' => $response->status()]);
+            throw new PaymentGatewayUnavailableException('PayPal authentication service is unavailable.');
+        }
+
         if (
-            ! $response->successful()
-            || ! is_array($data)
+            ! is_array($data)
             || ! is_string($data['access_token'] ?? null)
             || $data['access_token'] === ''
             || ! is_string($data['token_type'] ?? null)
@@ -390,12 +401,26 @@ final class PayPalGateway extends AbstractUnavailablePaymentGateway
 
     private function successfulJson(int $status, mixed $data, string $operation): array
     {
-        if ($status < 200 || $status >= 300 || ! is_array($data)) {
+        if ($status < 200 || $status >= 300) {
             Log::warning('PayPal API request failed', ['operation' => $operation, 'http_status' => $status]);
-            throw new PaymentGatewayException('PayPal request failed or returned an invalid response.');
+            $this->throwIfProviderUnavailable($status, $operation);
+            throw new PaymentGatewayException('PayPal request was rejected.');
+        }
+
+        if (! is_array($data)) {
+            Log::warning('PayPal API returned an invalid response', ['operation' => $operation]);
+            throw new PaymentGatewayException('PayPal returned an invalid response.');
         }
 
         return $data;
+    }
+
+    /** Treat rate limits and provider-side server errors as retryable outages. */
+    private function throwIfProviderUnavailable(int $status, string $operation): void
+    {
+        if ($status === 429 || $status >= 500) {
+            throw new PaymentGatewayUnavailableException(sprintf('%s is temporarily unavailable (HTTP %d).', $operation, $status));
+        }
     }
 
     private function isTrustedApprovalUrl(mixed $url): bool

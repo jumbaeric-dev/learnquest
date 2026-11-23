@@ -3,11 +3,11 @@
     <div class="flex items-center justify-between">
 
         <h3 class="font-bold text-slate-800">
-            🗺️ World Progress
+            🗺️ {{ __('localization.world_progress') }}
         </h3>
 
         <span class="text-sm font-semibold text-slate-500">
-            {{ $progress['completedCourses'] }} / {{ $progress['totalCourses'] }} courses
+            {{ __('localization.courses_count_progress', ['completed' => $progress['completedCourses'], 'total' => $progress['totalCourses']]) }}
         </span>
 
     </div>
@@ -19,7 +19,7 @@
         </div>
 
         <p class="mt-1 text-right text-xs text-slate-400">
-            {{ $progress['percentage'] }}% complete
+            {{ __('localization.percent_complete', ['percent' => $progress['percentage']]) }}
         </p>
 
     </div>

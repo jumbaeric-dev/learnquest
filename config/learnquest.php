@@ -19,6 +19,7 @@ return [
             'max_attempts' => (int) env('LEARNQUEST_PARENT_LOGIN_MAX_ATTEMPTS', 5),
             'decay_seconds' => (int) env('LEARNQUEST_PARENT_LOGIN_DECAY_SECONDS', 60),
         ],
+        'verification_minutes' => (int) env('LEARNQUEST_VERIFICATION_MINUTES', 1440),
     ],
 
     /*
@@ -264,7 +265,8 @@ return [
 
         'trial' => [
             'plan' => 'premium',
-            'days' => (int) env('LEARNQUEST_TRIAL_DAYS', 14),
+            'days' => (int) env('LEARNQUEST_TRIAL_DAYS', 14),        // Inside the 'trial' array:
+            'requires_verified_email' => (bool) env('LEARNQUEST_TRIAL_REQUIRES_VERIFIED_EMAIL', false),
         ],
 
         // Reminders before access ends. M-Pesa and card payments are prepaid
@@ -332,4 +334,25 @@ return [
             ],
         ],
     ],
+    
+    'sms' => [
+        'enabled' => env('LEARNQUEST_SMS_ENABLED', false),
+
+        'default_provider' => env(
+            'LEARNQUEST_SMS_PROVIDER',
+            'africastalking'
+        ),
+
+        'providers' => [
+            'africastalking' => [
+                'enabled' => env('LEARNQUEST_SMS_AT_ENABLED', false),
+            ],
+
+            'infobip' => [
+                'enabled' => env('LEARNQUEST_SMS_INFOBIP_ENABLED', false),
+            ],
+        ],
+    ],
+
+    'require_verified_email_for_checkout' => (bool) env('LEARNQUEST_CHECKOUT_REQUIRES_VERIFIED_EMAIL', true),
 ];

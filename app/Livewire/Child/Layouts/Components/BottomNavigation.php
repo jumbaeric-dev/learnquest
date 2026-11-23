@@ -17,31 +17,31 @@ class BottomNavigation extends Component
         $this->items = [
 
             [
-                'title' => 'Universe',
+                'title' => __('localization.my_universe'),
                 'icon' => '🌌',
                 'route' => '/child/my-universe',
             ],
 
             [
-                'title' => 'Explore',
+                'title' => __('localization.explorer'),
                 'icon' => '🗺',
                 'route' => '/child/explore',
             ],
 
             [
-                'title' => 'Missions',
+                'title' => __('localization.missions'),
                 'icon' => '🎯',
                 'route' => '/child/missions',
             ],
 
             [
-                'title' => 'Backpack',
+                'title' => __('localization.backpack'),
                 'icon' => '🎒',
                 'route' => '#',
             ],
 
             [
-                'title' => 'Profile',
+                'title' => __('localization.my_profile'),
                 'icon' => '⭐',
                 'route' => '#',
             ],

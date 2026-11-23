@@ -6,12 +6,12 @@
         <div>
 
             <h1 class="text-3xl font-bold text-gray-800">
-                🚀 Missions
+                🚀 {{ __('localization.missions') }}
             </h1>
 
             <p class="text-gray-600 mt-2">
-                Your next adventure awaits,
-                {{ $childName }}!
+                {{ __('localization.mission_greeting', ['name' => $childName]) }}
+                
             </p>
 
         </div>
@@ -21,20 +21,20 @@
 
             <x-lq.stat-chip
                 icon="⭐"
-                label="Level"
+                :label="__('localization.level')"
                 :value="$level"
             />
 
             <x-lq.stat-chip
                 icon="✨"
-                label="XP"
+                :label="__('localization.xp')"
                 :value="$xp"
             />
 
             <x-lq.stat-chip
                 icon="🔥"
-                label="Streak"
-                :value="$streak . ' days'"
+                :label="__('localization.streak')"
+                :value="__('localization.days', ['count' => $streak])"
             />
 
         </div>

@@ -1,7 +1,7 @@
 <x-lq.glass-card animate>
 
     <x-lq.section-title>
-        🧭 Recommended Adventures
+        🧭 {{ __('localization.recommended_adventures') }}
     </x-lq.section-title>
 
     <div
@@ -53,12 +53,12 @@
             </p>
 
             <x-lq.badge>
-                Ages {{ $adventure['ageGroup'] }}
+                {{ __('localization.ages', ['ages' => $adventure['ageGroup']]) }}
             </x-lq.badge>
 
             <x-lq.button
                 wire:click="explore({{ $adventure['id'] }})">
-                Explore
+                {{ __('localization.explore') }}
             </x-lq.button>
 
         </div>
@@ -66,7 +66,7 @@
         @empty
 
         <p class="text-slate-500">
-            More adventures are coming soon!
+            {{ __('localization.more_adventures') }}
         </p>
 
         @endforelse

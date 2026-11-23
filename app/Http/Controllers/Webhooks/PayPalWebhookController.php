@@ -44,6 +44,14 @@ final class PayPalWebhookController
         try {
             $result = $reconciler->reconcile($payment);
             return response()->json(['status' => $result['status']]);
+        } catch (PaymentGatewayUnavailableException $exception) {
+            Log::warning('PayPal webhook processing is temporarily unavailable; requesting provider retry.', [
+                'reference' => $payment->reference,
+                'exception' => get_class($exception),
+                'message' => mb_substr($exception->getMessage(), 0, 180),
+            ]);
+
+            return response()->json(['message' => 'Webhook processing is temporarily unavailable.'], 503);
         } catch (PaymentGatewayException | ValidationException $exception) {
             Log::warning('PayPal webhook accepted; independent status check deferred.', [
                 'reference' => $payment->reference, 'exception' => get_class($exception),

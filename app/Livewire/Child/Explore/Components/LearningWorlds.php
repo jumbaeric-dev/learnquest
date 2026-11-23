@@ -25,8 +25,8 @@ class LearningWorlds extends Component
             ->orderBy('sort_order')
             ->get()
             ->map(fn(Subject $subject) => [
-                'title' => $subject->name,
-                'description' => $subject->tagline ?? $subject->description,
+                'title' => $subject->localized('name'),
+                'description' => $subject->localized('tagline') ?? $subject->localized('description'),
                 'icon' => $subject->icon ?? '🌎',
                 'theme' => $subject->theme_color,
                 'progress' => $this->progressFor($child, $subject),

@@ -40,7 +40,7 @@ space-y-8
 
             <x-lq.badge>
 
-                +{{ $mission['xp'] }} XP Reward
+                +{{ $mission['xp'] }} {{ __('localization.xp_reward') }}
 
             </x-lq.badge>
 

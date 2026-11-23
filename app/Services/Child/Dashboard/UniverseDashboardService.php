@@ -65,34 +65,40 @@ class UniverseDashboardService
       $greeting = "Still Exploring";
     }
 
-    return "{$greeting}, {$child->first_name}!";
+    $key = match ($greeting) {
+      'Good Morning' => 'greeting_morning',
+      'Good Afternoon' => 'greeting_afternoon',
+      'Good Evening' => 'greeting_evening',
+      default => 'greeting_late',
+    };
+
+    return __("localization.{$key}", ['name' => $child->first_name]);
   }
 
   protected function headline(?array $mission): string
   {
     if ($mission) {
-      return "Ready to continue your mission?";
+      return __('localization.welcome_continue_headline');
     }
 
-    return "Ready for your first adventure?";
+    return __('localization.welcome_first_headline');
   }
 
   protected function message(?array $mission): string
   {
     if (!$mission) {
-      return "Choose your first learning adventure and begin earning XP.";
+      return __('localization.welcome_first_message');
     }
 
-    return sprintf(
-      'Continue "%s" and earn %d XP.',
-      $mission["activity"]->title,
-      $mission["xp"]
-    );
+    return __('localization.welcome_continue_message', [
+      'activity' => $mission['activity']->localized('title'),
+      'xp' => $mission['xp'],
+    ]);
   }
 
   protected function buttonText(?array $mission): string
   {
-    return $mission ? "Continue Mission" : "Start Adventure";
+    return $mission ? __('localization.continue_mission') : __('localization.start_adventure_plain');
   }
 
   public function explorerHeader(Child $child): ?ExplorerHeaderDTO
@@ -129,11 +135,11 @@ class UniverseDashboardService
     }
 
     return new CurrentMissionDTO(
-      course: $mission["course"]->title,
+      course: $mission["course"]->localized('title'),
 
-      lesson: $mission["lesson"]->title,
+      lesson: $mission["lesson"]->localized('title'),
 
-      activity: $mission["activity"]->title,
+      activity: $mission["activity"]->localized('title'),
 
       progress: $mission["progress"],
 
@@ -141,7 +147,7 @@ class UniverseDashboardService
 
       estimatedMinutes: $mission["minutes"],
 
-      buttonText: "Continue",
+      buttonText: __('localization.continue'),
 
       buttonAction: "continue"
     );
@@ -158,16 +164,16 @@ class UniverseDashboardService
     }
 
     return new ContinueLearningDTO(
-      course: $course->title,
+      course: $course->localized('title'),
 
-      lesson: $lesson->title,
+      lesson: $lesson->localized('title'),
 
       progress: $this->learningJourney->getCourseProgressPercentage(
         $child,
         $course
       ),
 
-      buttonText: "Continue",
+      buttonText: __('localization.continue'),
 
       buttonAction: "continue"
     );
@@ -191,7 +197,7 @@ class UniverseDashboardService
         fn(Subject $subject) => new LearningWorldDTO(
           id: $subject->id,
 
-          name: $subject->name,
+          name: $subject->localized('name'),
 
           icon: $subject->icon,
 
@@ -283,8 +289,8 @@ class UniverseDashboardService
       ->map(function (Course $course) {
         return new RecommendedAdventureDTO(
           id: $course->id,
-          title: $course->title,
-          description: $course->description,
+          title: $course->localized('title'),
+          description: $course->localized('description'),
           icon: $course->subject?->icon,
           ageGroup: $course->age_group,
         );
@@ -306,9 +312,9 @@ class UniverseDashboardService
       ->count();
 
     return new DailyChallengeDTO(
-      title: "Daily Explorer",
+      title: __('localization.daily_explorer'),
 
-      description: "Complete 3 learning activities today",
+      description: __('localization.complete_three_activities'),
 
       current: $completedToday,
 
@@ -316,46 +322,46 @@ class UniverseDashboardService
 
       xpReward: 30,
 
-      buttonText: $completedToday >= 3 ? "Completed 🎉" : "Start Challenge"
+      buttonText: $completedToday >= 3 ? __('localization.completed_celebration') : __('localization.start_challenge')
     );
   }
 
   public function communityPreview(): CommunityPreviewDTO
   {
     return new CommunityPreviewDTO(
-      title: "Explore Together",
+      title: __('localization.explore_together'),
 
-      message: "Learning is more fun when adventures are shared.",
+      message: __('localization.shared_adventures'),
 
       features: [
         [
           "icon" => "heroicon-o-user-group",
-          "text" => "Meet other explorers",
+          "text" => __('localization.meet_explorers'),
         ],
 
         [
           "icon" => "heroicon-o-trophy",
-          "text" => "Celebrate achievements",
+          "text" => __('localization.celebrate_achievements'),
         ],
 
         [
           "icon" => "heroicon-o-rocket-launch",
-          "text" => "Join team missions",
+          "text" => __('localization.join_team_missions'),
         ],
       ],
 
-      buttonText: "Coming Soon"
+      buttonText: __('localization.coming_soon')
     );
   }
 
   public function novaWidget(Child $child): NovaWidgetDTO
   {
     return new NovaWidgetDTO(
-      greeting: "Hi {$child->first_name}! 👋",
+      greeting: __('localization.nova_hi', ['name' => $child->first_name]),
 
-      message: "I'm Nova. Ready for your next adventure?",
+      message: __('localization.nova_ready'),
 
-      buttonText: "Ask Nova",
+      buttonText: __('localization.ask_nova_plain'),
 
       action: "open-nova",
 

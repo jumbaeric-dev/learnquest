@@ -18,15 +18,15 @@
         <section class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <p class="text-sm font-semibold uppercase tracking-widest text-sky-600">
-                    Your journey so far
+                    {{ __('localization.your_journey_so_far') }}
                 </p>
 
                 <h1 class="mt-1 text-3xl font-extrabold tracking-tight">
-                    My Explorer Profile
+                    {{ __('localization.my_explorer_profile') }}
                 </h1>
 
                 <p class="mt-2 text-sm opacity-75">
-                    Your explorer identity and learning achievements, all in one place.
+                    {{ __('localization.explorer_identity_description') }}
                 </p>
             </div>
 
@@ -34,7 +34,7 @@
                 href="{{ url('/child/profile/edit') }}"
                 class="inline-flex min-h-11 items-center justify-center gap-2 self-start rounded-xl bg-sky-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 sm:self-auto">
                 <span aria-hidden="true">✏️</span>
-                <span>Edit Profile</span>
+                <span>{{ __('localization.edit_profile') }}</span>
                 <span aria-hidden="true">→</span>
             </a>
         </section>
@@ -61,7 +61,7 @@
                 <div class="min-w-0 flex-1 text-center sm:text-left">
                     <div class="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                         <span class="inline-flex items-center gap-2 rounded-full bg-sky-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-sky-800">
-                            🚀 LearnQuest Explorer
+                            🚀 {{ __('localization.learnquest_explorer') }}
                         </span>
                     </div>
 
@@ -77,12 +77,12 @@
 
                     <div class="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                         <span class="inline-flex items-center gap-2 rounded-xl border border-sky-100 bg-white/70 px-3 py-2 text-sm font-semibold">
-                            ⭐ Level {{ $profile['level'] }} Explorer
+                            ⭐ {{ __('localization.level_explorer_profile', ['level' => $profile['level']]) }}
                         </span>
 
                         @if (! is_null($profile['age']))
                         <span class="inline-flex items-center gap-2 rounded-xl border border-sky-100 bg-white/70 px-3 py-2 text-sm font-semibold">
-                            🎂 {{ $profile['age'] }} years old
+                            🎂 {{ __('localization.years_old', ['age' => $profile['age']]) }}
                         </span>
                         @endif
                     </div>
@@ -91,7 +91,7 @@
                 {{-- XP summary --}}
                 <div class="rounded-2xl border border-sky-100 bg-sky-50/80 px-5 py-4 text-center sm:min-w-36">
                     <p class="text-xs font-bold uppercase tracking-wider text-sky-700">
-                        Total XP
+                        {{ __('localization.total_xp') }}
                     </p>
 
                     <p class="mt-1 text-3xl font-extrabold text-sky-800">
@@ -99,7 +99,7 @@
                     </p>
 
                     <p class="mt-1 text-xs text-sky-700">
-                        Keep exploring!
+                        {{ __('localization.keep_exploring') }}
                     </p>
                 </div>
 
@@ -111,11 +111,11 @@
             <div class="mb-5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
                 <div>
                     <h2 class="text-xl font-extrabold tracking-tight sm:text-2xl">
-                        My Learning Journey
+                        {{ __('localization.my_learning_journey') }}
                     </h2>
 
                     <p class="mt-1 text-sm opacity-70">
-                        Every activity is another step forward.
+                        {{ __('localization.every_activity_step_forward') }}
                     </p>
                 </div>
             </div>
@@ -127,7 +127,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <p class="text-sm font-medium opacity-75">
-                                Total Experience
+                                {{ __('localization.total_experience') }}
                             </p>
 
                             <p class="mt-3 text-3xl font-extrabold tracking-tight">
@@ -135,7 +135,7 @@
                             </p>
 
                             <p class="mt-2 text-xs opacity-65">
-                                Experience points earned
+                                {{ __('localization.experience_points_earned') }}
                             </p>
                         </div>
 
@@ -150,7 +150,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <p class="text-sm font-medium opacity-75">
-                                Activities Completed
+                                {{ __('localization.activities_completed') }}
                             </p>
 
                             <p class="mt-3 text-3xl font-extrabold tracking-tight">
@@ -158,7 +158,7 @@
                             </p>
 
                             <p class="mt-2 text-xs opacity-65">
-                                Learning wins achieved
+                                {{ __('localization.learning_wins_achieved') }}
                             </p>
                         </div>
 
@@ -173,7 +173,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <p class="text-sm font-medium opacity-75">
-                                Current Streak
+                                {{ __('localization.current_streak') }}
                             </p>
 
                             <p class="mt-3 text-3xl font-extrabold tracking-tight">
@@ -181,7 +181,7 @@
                             </p>
 
                             <p class="mt-2 text-xs opacity-65">
-                                Keep your learning going
+                                {{ __('localization.keep_learning_going') }}
                             </p>
                         </div>
 
@@ -196,7 +196,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <p class="text-sm font-medium opacity-75">
-                                Badges Earned
+                                {{ __('localization.badges_earned') }}
                             </p>
 
                             <p class="mt-3 text-3xl font-extrabold tracking-tight">
@@ -204,7 +204,7 @@
                             </p>
 
                             <p class="mt-2 text-xs opacity-65">
-                                Milestones celebrated
+                                {{ __('localization.milestones_celebrated') }}
                             </p>
                         </div>
 
@@ -219,7 +219,7 @@
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <p class="text-sm font-medium opacity-75">
-                                Skills in Progress
+                                {{ __('localization.skills_in_progress') }}
                             </p>
 
                             <p class="mt-3 text-3xl font-extrabold tracking-tight">
@@ -227,7 +227,7 @@
                             </p>
 
                             <p class="mt-2 text-xs opacity-65">
-                                Skills you're developing
+                                {{ __('localization.skills_developing') }}
                             </p>
                         </div>
 
@@ -250,11 +250,11 @@
 
                     <div>
                         <h2 class="text-lg font-extrabold">
-                            Ready for your next adventure?
+                            {{ __('localization.ready_next_adventure') }}
                         </h2>
 
                         <p class="mt-1 text-sm opacity-75">
-                            Discover new worlds, build skills and earn more XP.
+                            {{ __('localization.discover_worlds_skills_xp') }}
                         </p>
                     </div>
                 </div>
@@ -262,7 +262,7 @@
                 <a
                     href="{{ route('child.explore') }}"
                     class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-sky-600 px-5 py-3 font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2">
-                    Explore Learning
+                    {{ __('localization.explore_learning') }}
                     <span aria-hidden="true">→</span>
                 </a>
             </div>
@@ -274,7 +274,7 @@
                 href="{{ route('child.dashboard') }}"
                 class="inline-flex min-h-11 items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold opacity-75 transition hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-sky-500">
                 <span aria-hidden="true">←</span>
-                Back to My Universe
+                {{ __('localization.back_to_my_universe') }}
             </a>
         </div>
 

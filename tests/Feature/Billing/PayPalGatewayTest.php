@@ -10,6 +10,7 @@ use App\Services\Billing\Gateways\PayPalGateway;
 use Database\Seeders\PlanSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -34,7 +35,8 @@ class PayPalGatewayTest extends TestCase
 
     private function payment(string $currency = 'USD'): Payment
     {
-        $parent = User::factory()->create(['name' => 'Jane Parent', 'email' => 'jane@example.test']);
+        $unique = Str::uuid()->toString();
+        $parent = User::factory()->create(['name' => 'Jane Parent', 'email' => 'jane+' . $unique . '@example.test']);
         $parent->assignRole('parent');
         $price = PlanPrice::query()->where('currency', $currency)->where('months', 1)
             ->whereHas('plan', fn ($query) => $query->where('key', 'premium'))->firstOrFail();
@@ -45,7 +47,7 @@ class PayPalGatewayTest extends TestCase
             'plan_price_id' => $price->id,
             'plan_key' => 'premium',
             'duration_months' => 1,
-            'reference' => 'LQ-PAYPAL-TEST-0001',
+            'reference' => 'LQ-PAYPAL-TEST-' . strtoupper(Str::random(12)),
             'provider' => 'paypal',
             'amount_minor' => $price->amount_minor,
             'currency' => $currency,
@@ -242,6 +244,102 @@ class PayPalGatewayTest extends TestCase
         Http::assertSentCount(2);
     }
 
+
+
+    public function test_pending_capture_is_not_reported_as_success(): void
+    {
+        $this->assertCaptureOutcome('PENDING', 'pending');
+    }
+
+    public function test_declined_capture_is_reported_as_failed(): void
+    {
+        $this->assertCaptureOutcome('DECLINED', 'failed');
+    }
+
+    private function assertCaptureOutcome(string $captureStatus, string $expectedOutcome): void
+    {
+        $payment = $this->payment();
+        $payment->forceFill(['metadata' => ['paypal_order_id' => '5O190127TN364715T']])->save();
+        $amount = intdiv($payment->amount_minor, 100) . '.' . str_pad((string) ($payment->amount_minor % 100), 2, '0', STR_PAD_LEFT);
+
+        Http::fakeSequence()
+            ->push(['access_token' => 'sandbox-access-token', 'token_type' => 'Bearer'], 200)
+            ->push([
+                'id' => '5O190127TN364715T',
+                'status' => 'COMPLETED',
+                'purchase_units' => [[
+                    'custom_id' => $payment->reference,
+                    'amount' => ['currency_code' => 'USD', 'value' => $amount],
+                    'payments' => ['captures' => [[
+                        'id' => 'PAYPAL-CAPTURE-STATUS',
+                        'status' => $captureStatus,
+                        'amount' => ['currency_code' => 'USD', 'value' => $amount],
+                    ]]],
+                ]],
+            ], 200);
+
+        $result = app(PayPalGateway::class)->verifyPayment($payment);
+
+        $this->assertSame($expectedOutcome, $result->outcome);
+        $this->assertSame($captureStatus, $result->providerState);
+        Http::assertSentCount(2);
+    }
+
+    public function test_capture_amount_mismatch_is_rejected(): void
+    {
+        $this->assertCaptureMismatch(['value' => '1.00', 'currency_code' => 'USD']);
+    }
+
+    public function test_capture_currency_mismatch_is_rejected(): void
+    {
+        $this->assertCaptureMismatch(['currency_code' => 'EUR']);
+    }
+
+    private function assertCaptureMismatch(array $captureAmount): void
+    {
+        $payment = $this->payment();
+        $payment->forceFill(['metadata' => ['paypal_order_id' => '5O190127TN364715T']])->save();
+        $expectedAmount = intdiv($payment->amount_minor, 100) . '.' . str_pad((string) ($payment->amount_minor % 100), 2, '0', STR_PAD_LEFT);
+        $captureAmount['value'] ??= $expectedAmount;
+
+        Http::fakeSequence()
+            ->push(['access_token' => 'sandbox-access-token', 'token_type' => 'Bearer'], 200)
+            ->push([
+                'id' => '5O190127TN364715T',
+                'status' => 'COMPLETED',
+                'purchase_units' => [[
+                    'custom_id' => $payment->reference,
+                    'amount' => ['currency_code' => 'USD', 'value' => $expectedAmount],
+                    'payments' => ['captures' => [[
+                        'id' => 'PAYPAL-CAPTURE-MISMATCH',
+                        'status' => 'COMPLETED',
+                        'amount' => $captureAmount,
+                    ]]],
+                ]],
+            ], 200);
+
+        try {
+            app(PayPalGateway::class)->verifyPayment($payment);
+            $this->fail('A mismatched capture amount or currency must be rejected.');
+        } catch (PaymentGatewayException) {
+            $this->assertTrue(true);
+        }
+
+        Http::assertSentCount(2);
+    }
+
+    public function test_paypal_server_errors_are_classified_as_temporary_gateway_unavailability(): void
+    {
+        $payment = $this->payment();
+        $payment->forceFill(['metadata' => ['paypal_order_id' => '5O190127TN364715T']])->save();
+
+        Http::fakeSequence()
+            ->push(['access_token' => 'sandbox-access-token', 'token_type' => 'Bearer'], 200)
+            ->push(['message' => 'temporarily unavailable'], 503);
+
+        $this->expectException(\App\Exceptions\Billing\PaymentGatewayUnavailableException::class);
+        app(PayPalGateway::class)->verifyPayment($payment);
+    }
 
     public function test_capture_webhook_verifies_signature_and_resolves_reference_from_paypal_order(): void
     {

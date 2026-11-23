@@ -76,7 +76,7 @@ class PayPalWebhookControllerTest extends TestCase
         ], $overrides);
     }
 
-    private function order(Payment $payment, string $orderId = self::ORDER_ID): array
+    private function order(Payment $payment, string $orderId = self::ORDER_ID, string $captureStatus = 'COMPLETED'): array
     {
         $amount = intdiv($payment->amount_minor, 100) . '.' . str_pad((string) ($payment->amount_minor % 100), 2, '0', STR_PAD_LEFT);
 
@@ -88,18 +88,18 @@ class PayPalWebhookControllerTest extends TestCase
                 'amount' => ['currency_code' => 'USD', 'value' => $amount],
                 'payments' => ['captures' => [[
                     'id' => 'CAPTURE-CONTROLLER-0001',
-                    'status' => 'COMPLETED',
+                    'status' => $captureStatus,
                     'amount' => ['currency_code' => 'USD', 'value' => $amount],
                 ]]],
             ]],
         ];
     }
 
-    private function fakePayPal(Payment $payment, string $signatureStatus = 'SUCCESS', ?string $orderId = null): void
+    private function fakePayPal(Payment $payment, string $signatureStatus = 'SUCCESS', ?string $orderId = null, string $captureStatus = 'COMPLETED'): void
     {
         $orderId ??= self::ORDER_ID;
 
-        Http::fake(function ($request) use ($payment, $signatureStatus, $orderId) {
+        Http::fake(function ($request) use ($payment, $signatureStatus, $orderId, $captureStatus) {
             if (str_ends_with($request->url(), '/v1/oauth2/token')) {
                 return Http::response(['access_token' => 'sandbox-access-token', 'token_type' => 'Bearer', 'expires_in' => 900], 200);
             }
@@ -109,7 +109,7 @@ class PayPalWebhookControllerTest extends TestCase
             }
 
             if (str_ends_with($request->url(), '/v2/checkout/orders/' . $orderId)) {
-                return Http::response($this->order($payment, $orderId), 200);
+                return Http::response($this->order($payment, $orderId, $captureStatus), 200);
             }
 
             return Http::response(['message' => 'Unexpected PayPal test request.'], 500);
@@ -205,6 +205,94 @@ class PayPalWebhookControllerTest extends TestCase
         $this->sendWebhook($this->event($payment, [], $otherOrderId))
             ->assertOk()
             ->assertJson(['status' => 'ignored']);
+
+        $this->assertSame(Payment::STATUS_PENDING, $payment->fresh()->status);
+        $this->assertSame(0, Subscription::where('user_id', $payment->user_id)->count());
+    }
+
+
+    public function test_pending_capture_webhook_does_not_activate_subscription(): void
+    {
+        $payment = $this->payment(metadata: ['paypal_order_id' => self::ORDER_ID]);
+        $this->fakePayPal($payment, 'SUCCESS', null, 'PENDING');
+
+        $event = $this->event($payment, [
+            'event_type' => 'PAYMENT.CAPTURE.PENDING',
+            'resource' => ['status' => 'PENDING'],
+        ]);
+
+        $this->sendWebhook($event)->assertOk()->assertJson(['status' => 'pending']);
+
+        $this->assertSame(Payment::STATUS_PROCESSING, $payment->fresh()->status);
+        $this->assertSame(0, Subscription::where('user_id', $payment->user_id)->count());
+    }
+
+    public function test_denied_capture_webhook_marks_payment_failed_without_subscription(): void
+    {
+        $payment = $this->payment(metadata: ['paypal_order_id' => self::ORDER_ID]);
+        $this->fakePayPal($payment, 'SUCCESS', null, 'DECLINED');
+
+        $event = $this->event($payment, [
+            'event_type' => 'PAYMENT.CAPTURE.DENIED',
+            'resource' => ['status' => 'DECLINED'],
+        ]);
+
+        $this->sendWebhook($event)->assertOk()->assertJson(['status' => 'failed']);
+
+        $this->assertSame(Payment::STATUS_FAILED, $payment->fresh()->status);
+        $this->assertSame(0, Subscription::where('user_id', $payment->user_id)->count());
+    }
+
+    public function test_temporary_paypal_signature_verification_outage_returns_retryable_503(): void
+    {
+        $payment = $this->payment(metadata: ['paypal_order_id' => self::ORDER_ID]);
+        Http::fake(function ($request) {
+            if (str_ends_with($request->url(), '/v1/oauth2/token')) {
+                return Http::response(['access_token' => 'sandbox-access-token', 'token_type' => 'Bearer'], 200);
+            }
+
+            if (str_ends_with($request->url(), '/v1/notifications/verify-webhook-signature')) {
+                return Http::response(['message' => 'temporarily unavailable'], 503);
+            }
+
+            return Http::response([], 500);
+        });
+
+        $this->sendWebhook($this->event($payment))
+            ->assertStatus(503)
+            ->assertJson(['message' => 'Webhook receiver unavailable.']);
+
+        $this->assertSame(Payment::STATUS_PENDING, $payment->fresh()->status);
+        $this->assertSame(0, Subscription::where('user_id', $payment->user_id)->count());
+    }
+
+    public function test_temporary_paypal_reconciliation_outage_returns_retryable_503(): void
+    {
+        $payment = $this->payment(metadata: ['paypal_order_id' => self::ORDER_ID]);
+        $orderRequests = 0;
+
+        Http::fake(function ($request) use ($payment, &$orderRequests) {
+            if (str_ends_with($request->url(), '/v1/oauth2/token')) {
+                return Http::response(['access_token' => 'sandbox-access-token', 'token_type' => 'Bearer'], 200);
+            }
+
+            if (str_ends_with($request->url(), '/v1/notifications/verify-webhook-signature')) {
+                return Http::response(['verification_status' => 'SUCCESS'], 200);
+            }
+
+            if (str_ends_with($request->url(), '/v2/checkout/orders/' . self::ORDER_ID)) {
+                $orderRequests++;
+                return $orderRequests === 1
+                    ? Http::response($this->order($payment), 200)
+                    : Http::response(['message' => 'temporarily unavailable'], 503);
+            }
+
+            return Http::response([], 500);
+        });
+
+        $this->sendWebhook($this->event($payment))
+            ->assertStatus(503)
+            ->assertJson(['message' => 'Webhook processing is temporarily unavailable.']);
 
         $this->assertSame(Payment::STATUS_PENDING, $payment->fresh()->status);
         $this->assertSame(0, Subscription::where('user_id', $payment->user_id)->count());

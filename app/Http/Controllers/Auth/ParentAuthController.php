@@ -122,13 +122,24 @@ class ParentAuthController extends Controller
     });
 
     Auth::login($user);
-    $trial = app(\App\Services\Billing\SubscriptionService::class)->startTrialIfEligible($user);
+
+    try {
+      $user->sendEmailVerificationNotification();
+    } catch (\Throwable $exception) {
+      report($exception);
+    }
+
+    // With the switch on, the trial starts when the email is verified instead.
+    $trial = config("learnquest.billing.trial.requires_verified_email")
+      ? null
+      : app(\App\Services\Billing\SubscriptionService::class)->startTrialIfEligible($user);
 
     try {
       $user->notify(new WelcomeParentNotification($trial?->ends_at));
     } catch (\Throwable $exception) {
       report($exception);
     }
+    
     $request->session()->regenerate();
     $request->session()->forget("active_child_id");
 

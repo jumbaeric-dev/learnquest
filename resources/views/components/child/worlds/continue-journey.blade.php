@@ -5,7 +5,7 @@
         <div class="min-w-0">
 
             <p class="text-xs font-semibold uppercase tracking-wide text-indigo-500">
-                Continue where you left off
+                {{ __('localization.continue_where_left_off') }}
             </p>
 
             <h3 class="mt-1 truncate text-lg font-bold text-slate-800">

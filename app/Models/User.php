@@ -13,10 +13,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-#[Fillable(["name", "email", "password", "free_plan_grandfathered"])]
+#[Fillable(["name", "email", "password", "free_plan_grandfathered", "locale"])]
 #[Hidden(["password", "remember_token"])]
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 {
   /** @use HasFactory<UserFactory> */
   use HasApiTokens, HasFactory, Notifiable;
@@ -90,5 +91,10 @@ class User extends Authenticatable implements FilamentUser
     }
 
     parent::sendPasswordResetNotification($token);
+  }
+
+    public function sendEmailVerificationNotification(): void
+  {
+    $this->notify(new \App\Notifications\ParentVerifyEmailNotification());
   }
 }

@@ -9,19 +9,19 @@
                 class="inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:underline"
             >
                 <span aria-hidden="true">←</span>
-                Back to My Universe
+                {{ __('localization.back_to_my_universe') }}
             </a>
 
             <p class="mt-5 text-sm font-semibold uppercase tracking-widest text-sky-600">
-                Make learning yours
+                {{ __('localization.make_learning_yours') }}
             </p>
 
             <h1 class="mt-1 text-3xl font-extrabold tracking-tight">
-                Settings
+                {{ __('localization.settings') }}
             </h1>
 
             <p class="mt-2 text-sm opacity-75">
-                Choose how you'd like your LearnQuest adventures to feel.
+                {{ __('localization.settings_description') }}
             </p>
         </section>
 
@@ -49,11 +49,11 @@
 
                     <div>
                         <h2 class="text-xl font-extrabold">
-                            Learning Experience
+                            {{ __('localization.learning_experience') }}
                         </h2>
 
                         <p class="mt-1 text-sm opacity-70">
-                            Personalise some of your learning preferences.
+                            {{ __('localization.learning_preferences_description') }}
                         </p>
                     </div>
                 </div>
@@ -65,11 +65,11 @@
                             for="soundEffects"
                             class="font-semibold"
                         >
-                            🔊 Sound effects
+                            {{ __('localization.sound_effects') }}
                         </label>
 
                         <p class="mt-1 text-sm opacity-70">
-                            Choose whether you'd like sound effects in supported activities.
+                            {{ __('localization.sound_effects_description') }}
                         </p>
                     </div>
 
@@ -89,11 +89,11 @@
                             for="reducedAnimations"
                             class="font-semibold"
                         >
-                            ✨ Reduce animations
+                            {{ __('localization.reduce_animations') }}
                         </label>
 
                         <p class="mt-1 text-sm opacity-70">
-                            Save your preference for simpler movement and transitions.
+                            {{ __('localization.reduced_animations_description') }}
                         </p>
                     </div>
 
@@ -119,19 +119,19 @@
 
                     <div class="flex-1">
                         <h2 class="text-xl font-extrabold">
-                            Account & Privacy
+                            {{ __('localization.account_privacy') }}
                         </h2>
 
                         <p class="mt-2 text-sm leading-6 opacity-75">
-                            Some account and privacy changes need help from your parent or caregiver.
-                            Your login details and account security cannot be changed here.
+                            {{ __('localization.parent_caregiver_help') }}
+                            {{ __('localization.account_security_notice') }}
                         </p>
 
                         <a
                             href="{{ route('child.profile') }}"
                             class="mt-4 inline-flex items-center gap-2 font-semibold text-sky-700 hover:underline"
                         >
-                            View My Profile
+                            {{ __('localization.view_my_profile') }}
                             <span aria-hidden="true">→</span>
                         </a>
                     </div>
@@ -144,7 +144,7 @@
                     href="{{ route('child.dashboard') }}"
                     class="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white/70 px-6 py-3 font-semibold transition hover:bg-white"
                 >
-                    Cancel
+                    {{ __('localization.cancel') }}
                 </a>
 
                 <button
@@ -154,11 +154,11 @@
                     class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-sky-600 px-6 py-3 font-semibold text-white shadow-sm transition hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                     <span wire:loading.remove wire:target="save">
-                        Save Settings
+                        {{ __('localization.save_settings') }}
                     </span>
 
                     <span wire:loading wire:target="save">
-                        Saving...
+                        {{ __('localization.saving') }}
                     </span>
                 </button>
             </div>

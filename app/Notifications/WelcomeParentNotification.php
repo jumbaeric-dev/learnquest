@@ -46,8 +46,10 @@ class WelcomeParentNotification extends Notification implements ShouldQueue
 
             $message->line(
                 'You also have a free Premium trial, no card needed. It runs until '
-                . $this->trialEndsAt->copy()->setTimezone($timezone)->format('F j, Y') . '.'
+                    . $this->trialEndsAt->copy()->setTimezone($timezone)->format('F j, Y') . '.'
             );
+        } elseif (config('learnquest.billing.enforced') && config('learnquest.billing.trial.requires_verified_email')) {
+            $message->line('Verify your email address using the message we just sent, and your free Premium trial will start right away.');
         }
 
         return $this->withSupportReply(

@@ -3,15 +3,20 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 
 class Lesson extends Model
 {
     use HasFactory;
+    use HasTranslations;
+
+    protected $casts = ['translations' => 'array'];
 
     public const FOREIGN_KEY = 'learning_module_id';
 
     protected $fillable = [
+        'translations',
         'learning_module_id',
         'title',
         'description',

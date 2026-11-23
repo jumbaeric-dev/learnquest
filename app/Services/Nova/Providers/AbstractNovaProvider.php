@@ -29,9 +29,11 @@ abstract class AbstractNovaProvider implements NovaAiProviderContract
             ? $this->journey->getCurrentLesson($child)
             : null;
 
+        $responseLanguage = app()->getLocale() === 'fr' ? 'French' : 'English';
+
         $context = $course
-            ? "{$child->first_name} is currently working on the course \"{$course->title}\""
-                .($lesson ? ", lesson \"{$lesson->title}\"." : '.')
+            ? "{$child->first_name} is currently working on the course \"{$course->localized('title')}\""
+                .($lesson ? ", lesson \"{$lesson->localized('title')}\"." : '.')
             : "{$child->first_name} hasn't started a course yet.";
 
         return <<<PROMPT
@@ -40,6 +42,8 @@ abstract class AbstractNovaProvider implements NovaAiProviderContract
 
             You are talking with {$child->first_name}, who is Level
             {$child->level} with {$child->xp} XP. {$context}
+
+            Reply in {$responseLanguage}. Keep the language consistent unless the child explicitly asks to practise another language.
 
             How to talk:
             - Keep replies short: 2 to 4 sentences.

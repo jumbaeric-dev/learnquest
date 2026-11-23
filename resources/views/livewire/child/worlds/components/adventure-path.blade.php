@@ -3,11 +3,11 @@
     <div class="px-1">
 
         <h2 class="text-2xl font-black tracking-tight text-white">
-            🗺️ Your Adventure
+            {{ __('localization.your_adventure') }}
         </h2>
 
         <p class="mt-1 text-sm text-white/70">
-            Keep exploring to unlock the galaxy.
+            {{ __('localization.unlock_galaxy_prompt') }}
         </p>
 
     </div>
@@ -93,7 +93,7 @@
                         @if($node['status'] === 'completed')
 
                         <div class="mt-3 text-xs font-semibold text-emerald-600">
-                            ✓ Completed
+                            {{ __('localization.completed_status') }}
                         </div>
 
                         @elseif($node['status'] === 'current')
@@ -103,7 +103,7 @@
                             <x-lq.button
                                 type="button"
                                 wire:click="startCourse({{ $node['id'] }})">
-                                🚀 Start Adventure
+                                {{ __('localization.start_adventure') }}
                             </x-lq.button>
 
                         </div>
@@ -111,13 +111,13 @@
                         @elseif($node['status'] === 'locked')
 
                         <div class="mt-3 text-xs font-semibold text-slate-400">
-                            🔒 Complete the previous adventure
+                            {{ __('localization.complete_previous_adventure') }}
                         </div>
 
                         @elseif($node['status'] === 'reward')
 
                         <div class="mt-3 text-xs font-semibold text-purple-600">
-                            🏆 Special Reward
+                            {{ __('localization.special_reward') }}
                         </div>
 
                         @endif

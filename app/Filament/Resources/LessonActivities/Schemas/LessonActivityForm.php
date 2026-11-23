@@ -174,6 +174,28 @@ class LessonActivityForm
                     ])
                     ->columnSpanFull(),
 
+                Section::make('French Translation')
+                    ->description('Optional French learner-facing content. Leave a field empty to use its English version. The correct quiz answer remains managed in the main activity content.')
+                    ->schema([
+                        TextInput::make('translations.fr.title')->label('Activity title'),
+                        Textarea::make('translations.fr.content.instructions')->label('Instructions')->rows(3),
+                        Textarea::make('translations.fr.content.story_text')->label('Story')->rows(6),
+                        Textarea::make('translations.fr.content.question')->label('Quiz question')->rows(3),
+                        Repeater::make('translations.fr.content.options')
+                            ->label('Translated answer options (same order as English)')
+                            ->schema([
+                                TextInput::make('option')->label('French option text')->required()->maxLength(255),
+                            ])
+                            ->addActionLabel('Add translated option')
+                            ->maxItems(6),
+                        Textarea::make('translations.fr.content.project_description')->label('Project instructions')->rows(5),
+                        Textarea::make('translations.fr.content.challenge')->label('Coding challenge')->rows(5),
+                        TextInput::make('translations.fr.content.goal')->label('Learning goal'),
+                        Textarea::make('translations.fr.content.system_prompt')->label('AI system prompt')->rows(4),
+                    ])
+                    ->columns(2)
+                    ->columnSpanFull(),
+
                 Section::make('Rewards & Publishing')
                     ->schema([
                         TextInput::make('position')

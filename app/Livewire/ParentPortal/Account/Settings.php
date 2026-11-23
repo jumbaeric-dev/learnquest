@@ -42,11 +42,32 @@ class Settings extends Component
             ],
         ]);
 
+        $newEmail = mb_strtolower(trim($validated['email']));
+        $emailChanged = $newEmail !== mb_strtolower((string) $parent->email);
+
         $parent->name = trim($validated['name']);
-        $parent->email = mb_strtolower(trim($validated['email']));
+        $parent->email = $newEmail;
+
+        if ($emailChanged) {
+            // A new address must be proven before it is used for receipts or checkout.
+            $parent->email_verified_at = null;
+        }
+
         $parent->save();
 
-        session()->flash('parent_profile_saved', 'Your profile information has been updated.');
+        if ($emailChanged) {
+            try {
+                $parent->sendEmailVerificationNotification();
+            } catch (\Throwable $exception) {
+                report($exception);
+            }
+        }
+
+        session()->flash(
+            'parent_profile_saved',
+            'Your profile information has been updated.'
+                . ($emailChanged ? ' We’ve sent a link to your new email address to verify it.' : '')
+        );
     }
 
     public function updatePassword(): void

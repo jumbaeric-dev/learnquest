@@ -10,7 +10,7 @@
 
                 <div>
                     <p class="text-sm text-indigo-600 font-semibold">
-                        Featured Adventure
+                        {{ __('localization.featured_adventure') }}
                     </p>
 
                     <h2 class="text-2xl font-bold text-gray-800">
@@ -32,19 +32,19 @@
             <div class="flex flex-wrap gap-3">
                 <x-lq.stat-chip
                     icon="⭐"
-                    label="Reward"
+                    :label="__('localization.reward')"
                     :value="$mission['xp'].' XP'"
                 />
 
                 <x-lq.stat-chip
                     icon="⏱"
-                    label="Time"
+                    :label="__('localization.time')"
                     :value="$mission['time']"
                 />
 
                 <x-lq.stat-chip
                     icon="🏆"
-                    label="Level"
+                    :label="__('localization.level')"
                     :value="$mission['difficulty']"
                 />
             </div>
@@ -54,14 +54,14 @@
                 <x-lq.button
                     wire:click="startMission"
                 >
-                    🚀 Start Mission
+                    {{ __('localization.start_mission') }}
                 </x-lq.button>
             </div>
 
         </div>
     @else
         <div class="text-center text-gray-500 py-6">
-            No featured mission available right now — check back soon!
+            {{ __('localization.no_featured_mission') }}
         </div>
     @endif
 </x-lq.glass-card>

@@ -6,7 +6,7 @@
     id="child-navigation"
     class="lq-sidebar"
     :class="{ 'is-mobile-open': mobileMenuOpen }"
-    aria-label="LearnQuest navigation"
+    aria-label="{{ __('localization.child_navigation') }}"
 >
 
     {{-- Brand --}}
@@ -29,7 +29,7 @@
     {{-- Navigation --}}
     <nav
         class="lq-sidebar-nav"
-        aria-label="Main navigation"
+        aria-label="{{ __('localization.main_navigation') }}"
     >
 
         <a
@@ -48,7 +48,7 @@
             </span>
 
             <span>
-                My Universe
+                {{ __('localization.my_universe') }}
             </span>
         </a>
 
@@ -69,7 +69,7 @@
             </span>
 
             <span>
-                Explorer
+                {{ __('localization.explorer') }}
             </span>
         </a>
 
@@ -90,7 +90,7 @@
             </span>
 
             <span>
-                Worlds
+                {{ __('localization.worlds') }}
             </span>
         </a>
 
@@ -111,7 +111,7 @@
             </span>
 
             <span>
-                Courses
+                {{ __('localization.courses') }}
             </span>
         </a>
 
@@ -139,7 +139,7 @@
                     </div>
 
                     <div class="lq-card-meta">
-                        Ready to help
+                        {{ __('localization.ready_to_help') }}
                     </div>
 
                 </div>

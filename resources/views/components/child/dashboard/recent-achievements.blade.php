@@ -3,7 +3,7 @@
 
     <x-lq.section-title>
 
-        🏆 Recent Achievements
+        🏆 {{ __('localization.recent_achievements') }}
 
     </x-lq.section-title>
 
@@ -84,7 +84,7 @@
 
         <p class="text-slate-500">
 
-            Complete activities to unlock achievements.
+            {{ __('localization.unlock_achievements_prompt') }}
 
         </p>
 

@@ -6,7 +6,7 @@
 
             <x-lq.section-title
                 subtitle="{{ $mission['course'] }}">
-                🚀 Current Mission
+                🚀 {{ __('localization.current_mission') }}
             </x-lq.section-title>
 
             <x-lq.badge variant="primary">
@@ -65,13 +65,13 @@
 
         <x-lq.section-title>
 
-            🎉 You're all caught up!
+            {{ __('localization.all_caught_up') }}
 
         </x-lq.section-title>
 
         <p class="text-slate-500 mt-2">
 
-            Great work! Come back tomorrow for a new mission.
+            {{ __('localization.come_back_tomorrow') }}
 
         </p>
 

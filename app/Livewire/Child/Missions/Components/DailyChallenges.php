@@ -45,7 +45,7 @@ class DailyChallenges extends Component
         if ($currentChild->isParentPreview()) {
             session()->flash(
                 'message',
-                'Preview mode: challenge rewards are only earned when your child plays.'
+                __('localization.preview_challenge_notice')
             );
 
             return $this->redirectRoute('child.missions');
@@ -60,10 +60,10 @@ class DailyChallenges extends Component
             return;
         }
 
-        $message = "+{$result['awarded']} XP earned 🎉";
+        $message = __('localization.xp_earned_notice', ['xp' => $result['awarded']]);
 
         if ($result['leveled_up']) {
-            $message .= ' Level up!';
+            $message .= ' '.__('localization.level_up_notice');
         }
 
         session()->flash('message', $message);

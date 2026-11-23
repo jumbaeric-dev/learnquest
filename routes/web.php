@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\ChildLoginController;
+use App\Http\Controllers\LocaleController;
 use App\Livewire\Child\Dashboard\Index as Dashboard;
 use App\Livewire\Child\Explore\Index as Explore;
 use App\Livewire\Child\Learning\Activity as LearningActivity;
@@ -25,6 +26,10 @@ use App\Http\Controllers\Auth\ParentPasswordResetController;
 Route::get("/", function () {
   return view("welcome");
 });
+
+Route::post('/locale', [LocaleController::class, 'update'])
+  ->middleware('throttle:30,1')
+  ->name('locale.update');
 
 // Guest Login Routes
 Route::get("/login", [ChildLoginController::class, "showLoginForm"])->name(
@@ -148,16 +153,23 @@ Route::post("/parent/reset-password", [ParentPasswordResetController::class, "re
   ->middleware("throttle:10,1")
   ->name("parent.password.update");
 
+Route::get("/parent/verify-email/{id}/{hash}", [ParentEmailVerificationController::class, "verify"])
+  ->middleware(["signed", "throttle:6,1"])
+  ->whereNumber("id")
+  ->name("parent.verification.verify");
+
 Route::middleware(["parent", "auth.session"])
   ->prefix("parent")
   ->name("parent.")
   ->group(function () {
+        Route::post("/email/verification-notification", [ParentEmailVerificationController::class, "send"])
+      ->middleware("throttle:3,1")
+      ->name("verification.send");
     Route::get("/", ParentDashboard::class)->name("dashboard");
     Route::get("/children/{child}", ParentChildShow::class)->whereNumber("child")->name("children.show");
     Route::get("/children", ParentChildren::class)->name("children.index");
     Route::post("/return", function (CurrentChildService $currentChild) {
       $currentChild->leaveParentPreview();
-
       return redirect()->route("parent.dashboard");
     })->name("return");
     Route::get("/account", ParentAccountSettings::class)->name("account");

@@ -3,9 +3,9 @@
 <x-lq.glass-card class="space-y-5" animate>
 
     <x-lq.section-title
-        subtitle="Continue where you left off"
+        subtitle="{{ __('localization.continue_where_left') }}"
     >
-        📚 Continue Learning
+        📚 {{ __('localization.continue_learning') }}
     </x-lq.section-title>
 
     <div>
@@ -34,7 +34,7 @@
 
         <span class="text-sm text-slate-500">
 
-            {{ $learning['progress'] }}% Complete
+            {{ __('localization.complete_percent', ['percent' => $learning['progress']]) }}
 
         </span>
 
@@ -54,13 +54,13 @@
 
     <x-lq.section-title>
 
-        📚 Continue Learning
+        📚 {{ __('localization.continue_learning') }}
 
     </x-lq.section-title>
 
     <p class="text-slate-500">
 
-        Start your first course to begin learning.
+        {{ __('localization.start_first_course') }}
 
     </p>
 

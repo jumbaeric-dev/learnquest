@@ -4,7 +4,7 @@
     <button
         type="submit"
         class="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-slate-900/40 px-3 py-2 text-sm font-semibold text-slate-300 backdrop-blur-sm transition hover:border-white/20 hover:bg-slate-800/60 hover:text-white focus:outline-none focus:ring-2 focus:ring-cyan-400/60 active:scale-95"
-        aria-label="Log out of LearnQuest"
+        aria-label="{{ __('localization.log_out_learnquest') }}"
     >
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -27,6 +27,6 @@
             />
         </svg>
 
-        <span>Logout</span>
+        <span>{{ __('localization.log_out') }}</span>
     </button>
 </form>

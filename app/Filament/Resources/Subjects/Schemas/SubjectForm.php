@@ -47,6 +47,17 @@ class SubjectForm
                     ])
                     ->columns(2),
 
+                Section::make('French Translation')
+                    ->description('Optional French copy. Empty fields fall back to the canonical English content.')
+                    ->schema([
+                        TextInput::make('translations.fr.name')->label('World name'),
+                        Textarea::make('translations.fr.description')->label('World description')->rows(3),
+                        TextInput::make('translations.fr.tagline')->label('Tagline'),
+                        Textarea::make('translations.fr.story_intro')->label('Story introduction')->rows(4),
+                        TextInput::make('translations.fr.hero_character')->label('Hero character'),
+                    ])
+                    ->columns(2),
+
                 Section::make('Visual Identity')
                     ->schema([
 

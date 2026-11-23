@@ -1,4 +1,4 @@
-<x-child.layout.guest-layout title="Explorer Login">
+<x-child.layout.guest-layout title="{{ __('auth.explorer_login') }}">
     <div class="min-h-screen flex flex-col justify-center items-center bg-slate-900 text-white relative overflow-hidden px-4">
 
         {{-- Background Glows --}}
@@ -14,7 +14,7 @@
 
         <p class="mt-6 text-center text-sm text-slate-400">
             <a href="{{ route('parent.login') }}" class="hover:text-slate-200">
-                Are you a parent? Sign in here →
+                {{ __('auth.parent_sign_in_link') }}
             </a>
         </p>
 
@@ -35,11 +35,11 @@
                     class="text-3xl font-extrabold
                            text-transparent bg-clip-text
                            bg-gradient-to-r from-cyan-400 to-purple-400">
-                    Explorer Login
+                    {{ __('auth.explorer_login') }}
                 </h1>
 
                 <p class="text-slate-400 text-sm mt-1">
-                    Enter your Explorer Name and 4-digit PIN
+                    {{ __('auth.explorer_login_help') }}
                 </p>
             </div>
 
@@ -57,7 +57,7 @@
                         class="block text-xs font-semibold
                                uppercase tracking-wider
                                text-slate-300 mb-2">
-                        Explorer Username
+                        {{ __('auth.explorer_username') }}
                     </label>
 
                     <input
@@ -78,7 +78,7 @@
                                focus:ring-2 focus:ring-cyan-400
                                focus:border-transparent
                                transition"
-                        placeholder="e.g. StarCaptain99">
+                        placeholder="{{ __('auth.username_placeholder') }}">
 
                     @error('username')
                     <span class="text-xs text-rose-400 mt-1 block">
@@ -94,7 +94,7 @@
                         class="block text-xs font-semibold
                                uppercase tracking-wider
                                text-slate-300 mb-2">
-                        4-Digit Secret PIN
+                        {{ __('auth.secret_pin') }}
                     </label>
 
                     <input
@@ -144,7 +144,7 @@
                            transition duration-150
                            shadow-lg
                            shadow-cyan-500/25">
-                    Launch My Universe 🌌
+                    {{ __('auth.launch_universe') }}
                 </button>
             </form>
 

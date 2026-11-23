@@ -20,13 +20,13 @@
 
             <x-lq.stat-chip
                 icon="heroicon-o-star"
-                label="XP"
+                :label="__('localization.xp')"
                 :value="$explorer['xp']"
             />
 
             <x-lq.stat-chip
                 icon="heroicon-o-fire"
-                label="Streak"
+                :label="__('localization.streak')"
                 :value="$explorer['streak']"
             />
 

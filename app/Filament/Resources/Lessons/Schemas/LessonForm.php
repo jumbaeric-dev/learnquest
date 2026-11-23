@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Lessons\Schemas;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class LessonForm
@@ -20,6 +21,13 @@ class LessonForm
                     ->required(),
                 Textarea::make('description')
                     ->columnSpanFull(),
+                Section::make('French Translation')
+                    ->description('Optional French copy. Empty fields fall back to the canonical English content.')
+                    ->schema([
+                        TextInput::make('translations.fr.title')->label('Lesson title'),
+                        Textarea::make('translations.fr.description')->label('Lesson description')->columnSpanFull(),
+                    ])
+                    ->columns(2),
                 TextInput::make('position')
                     ->required()
                     ->numeric()

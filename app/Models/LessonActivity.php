@@ -2,16 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasLocalizedActivityContent;
+use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class LessonActivity extends Model
 {
   use HasFactory;
+  use HasTranslations;
+  use HasLocalizedActivityContent;
 
   protected $table = "activities"; // existing table
 
   protected $fillable = [
+    "translations",
     "lesson_id",
     "title",
     "activity_type",
@@ -23,6 +28,7 @@ class LessonActivity extends Model
 
   protected $casts = [
     "content" => "array",
+    "translations" => "array",
     "is_published" => "boolean",
   ];
 

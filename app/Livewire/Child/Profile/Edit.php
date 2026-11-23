@@ -93,7 +93,7 @@ class Edit extends Component
         $child->avatar = $validated['avatar'];
         $child->save();
 
-        session()->flash('profile_saved', 'Your explorer profile has been updated!');
+        session()->flash('profile_saved', __('localization.profile_saved'));
 
         return $this->redirectRoute('child.profile', navigate: true);
     }

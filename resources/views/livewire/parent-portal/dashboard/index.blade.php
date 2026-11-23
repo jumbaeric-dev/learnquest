@@ -3,11 +3,11 @@
 
         <div>
             <h1 class="text-3xl font-extrabold">
-                Welcome back, {{ Str::before(auth()->user()->name, ' ') }}
+                {{ __('parent_dashboard.welcome_back', ['name' => Str::before(auth()->user()->name, ' ')]) }}
             </h1>
 
             <p class="mt-1 text-sm text-slate-400">
-                How your explorers did over the last {{ $overview['window_days'] }} days.
+                {{ __('parent_dashboard.activity_summary', ['days' => $overview['window_days']]) }}
             </p>
         </div>
 
@@ -15,8 +15,8 @@
 
         <x-lq.empty-state
             icon="🧑‍🚀"
-            title="No explorers yet"
-            message="Your children's profiles will appear here once they've been added." />
+            title="{{ __('parent_dashboard.no_explorers_title') }}"
+            message="{{ __('parent_dashboard.no_explorers_message') }}" />
 
         @else
 
@@ -24,41 +24,41 @@
         <div class="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
             <x-lq.stat-chip
                 icon="🧑‍🚀"
-                label="Explorers"
+                label="{{ __('parent_dashboard.explorers') }}"
                 :value="$overview['family']['children']" />
 
             <x-lq.stat-chip
                 icon="⚡"
-                label="Active this week"
+                label="{{ __('parent_dashboard.active_this_week') }}"
                 :value="$overview['family']['active_children']"
                 variant="success" />
 
             <x-lq.stat-chip
                 icon="✅"
-                label="Activities done"
+                label="{{ __('parent_dashboard.activities_done') }}"
                 :value="$overview['family']['activities']"
                 variant="primary" />
 
             <x-lq.stat-chip
                 icon="📘"
-                label="Lessons done"
+                label="{{ __('parent_dashboard.lessons_done') }}"
                 :value="$overview['family']['lessons']"
                 variant="primary" />
 
             <x-lq.stat-chip
                 icon="🌟"
-                label="Family XP"
+                label="{{ __('parent_dashboard.family_xp') }}"
                 :value="number_format($overview['family']['xp'])"
                 variant="reward" />
 
             <x-lq.stat-chip
                 icon="📅"
-                label="Family active days"
+                label="{{ __('parent_dashboard.family_active_days') }}"
                 :value="$overview['family']['active_days'] . '/' . $overview['window_days']" />
 
             <x-lq.stat-chip
                 icon="🏅"
-                label="Badges earned"
+                label="{{ __('parent_dashboard.badges_earned') }}"
                 :value="$overview['family']['badges']"
                 variant="reward" />
         </div>
@@ -80,49 +80,49 @@
                             </h3>
 
                             <p class="text-xs font-medium text-slate-600">
-                                Level {{ $child['level'] }} · {{ number_format($child['xp']) }} XP
+                                {{ __('parent_dashboard.level_xp', ['level' => $child['level'], 'xp' => number_format($child['xp'])]) }}
                             </p>
                         </div>
                     </div>
 
                     @if (! $child['is_active'])
-                    <x-lq.badge variant="locked">Paused</x-lq.badge>
+                    <x-lq.badge variant="locked">{{ __('parent_dashboard.paused') }}</x-lq.badge>
                     @elseif ($child['week']['activities'] > 0)
-                    <x-lq.badge variant="success">Active this week</x-lq.badge>
+                    <x-lq.badge variant="success">{{ __('parent_dashboard.active_this_week') }}</x-lq.badge>
                     @else
-                    <x-lq.badge variant="neutral">Quiet week</x-lq.badge>
+                    <x-lq.badge variant="neutral">{{ __('parent_dashboard.quiet_week') }}</x-lq.badge>
                     @endif
                 </div>
 
                 <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <x-lq.stat-chip
                         icon="🔥"
-                        label="Day streak"
+                        label="{{ __('parent_dashboard.day_streak') }}"
                         :value="$child['streak']['current']"
                         size="sm" />
 
                     <x-lq.stat-chip
                         icon="✅"
-                        label="Activities"
+                        label="{{ __('parent_dashboard.activities') }}"
                         :value="$child['week']['activities']"
                         size="sm" />
 
                     <x-lq.stat-chip
                         icon="📘"
-                        label="Lessons"
+                        label="{{ __('parent_dashboard.lessons') }}"
                         :value="$child['week']['lessons']"
                         size="sm" />
 
                     <x-lq.stat-chip
                         icon="📅"
-                        label="Active days"
+                        label="{{ __('parent_dashboard.active_days') }}"
                         :value="$child['week']['active_days'] . '/' . $overview['window_days']"
                         size="sm" />
                 </div>
 
                 <div class="space-y-3">
                     <h4 class="text-xs font-semibold uppercase tracking-wider text-slate-400">
-                        Currently learning
+                        {{ __('parent_dashboard.currently_learning') }}
                     </h4>
 
                     @forelse ($child['courses'] as $course)
@@ -147,19 +147,19 @@
                             :show-label="false" />
                     </div>
                     @empty
-                    <p class="text-sm text-slate-500">No courses in progress yet.</p>
+                    <p class="text-sm text-slate-500">{{ __('parent_dashboard.no_courses') }}</p>
                     @endforelse
                 </div>
 
                 <div class="flex items-center justify-between gap-3">
                     <p class="text-xs font-medium text-slate-600">
-                        Last active: {{ $child['last_active_label'] }}
+                        {{ __('parent_dashboard.last_active', ['date' => $child['last_active_label']]) }}
                     </p>
 
                     <a
                         href="{{ route('parent.children.show', $child['id']) }}"
                         class="inline-flex items-center gap-1 rounded-lg bg-cyan-50 px-3 py-2 text-sm font-bold !text-cyan-800 transition hover:bg-cyan-100 hover:!text-cyan-950">
-                        View details
+                        {{ __('parent_dashboard.view_details') }}
                         <span aria-hidden="true">→</span>
                     </a>
                 </div>

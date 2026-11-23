@@ -12,19 +12,19 @@ class FloatingActions extends Component
     {
         $this->actions = [
             [
-                'title' => 'Ask Nova',
+                'title' => __('localization.ask_nova_plain'),
                 'icon' => '🤖',
                 'action' => 'nova',
             ],
 
             [
-                'title' => 'Mission',
+                'title' => __('localization.mission'),
                 'icon' => '🚀',
                 'action' => 'mission',
             ],
 
             [
-                'title' => 'Create',
+                'title' => __('localization.create'),
                 'icon' => '🎨',
                 'action' => 'create',
             ],
@@ -59,7 +59,7 @@ class FloatingActions extends Component
     {
         session()->flash(
             'message',
-            '🎨 The Creator tool is coming soon!'
+            __('localization.creator_coming_soon')
         );
     }
 

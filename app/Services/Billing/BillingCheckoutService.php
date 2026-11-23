@@ -49,6 +49,15 @@ final class BillingCheckoutService
             ]);
         }
 
+        if (
+            config('learnquest.billing.require_verified_email_for_checkout', true)
+            && ! $parent->hasVerifiedEmail()
+        ) {
+            throw ValidationException::withMessages([
+                'checkout' => 'Please verify your email address before upgrading, so we can send your receipt. Use the banner at the top to resend the link.',
+            ]);
+        }
+
         $price = PlanPrice::query()
             ->with('plan')
             ->whereKey($priceId)
@@ -66,7 +75,7 @@ final class BillingCheckoutService
                 'checkout' => 'The Free plan does not require checkout.',
             ]);
         }
-        
+
         $provider ??= $this->gateways->providerForCurrency($price->currency);
 
         // Resolve before creating a payment so disabled or unsupported gateways

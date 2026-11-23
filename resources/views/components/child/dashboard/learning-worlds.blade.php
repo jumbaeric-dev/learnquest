@@ -1,7 +1,7 @@
 <x-lq.glass-card animate>
 
     <x-lq.section-title>
-        🌍 Learning Worlds
+        🌍 {{ __('localization.learning_worlds') }}
     </x-lq.section-title>
 
     <div class="grid
@@ -37,7 +37,7 @@ gap-4">
 
             <p class="text-sm text-slate-500">
                 {{ $world['courses'] }}
-                Courses
+                {{ __('localization.world_courses') }}
             </p>
 
         </a>

@@ -1,0 +1,26 @@
+<?php
+
+return [
+    'welcome_back' => 'Welcome back, :name',
+    'activity_summary' => 'How your explorers did over the last :days days.',
+    'no_explorers_title' => 'No explorers yet',
+    'no_explorers_message' => 'Your children\'s profiles will appear here once they\'ve been added.',
+    'explorers' => 'Explorers',
+    'active_this_week' => 'Active this week',
+    'activities_done' => 'Activities done',
+    'lessons_done' => 'Lessons done',
+    'family_xp' => 'Family XP',
+    'family_active_days' => 'Family active days',
+    'badges_earned' => 'Badges earned',
+    'level_xp' => 'Level :level · :xp XP',
+    'paused' => 'Paused',
+    'quiet_week' => 'Quiet week',
+    'day_streak' => 'Day streak',
+    'activities' => 'Activities',
+    'lessons' => 'Lessons',
+    'active_days' => 'Active days',
+    'currently_learning' => 'Currently learning',
+    'no_courses' => 'No courses in progress yet.',
+    'last_active' => 'Last active: :date',
+    'view_details' => 'View details',
+];

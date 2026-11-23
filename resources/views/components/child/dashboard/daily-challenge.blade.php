@@ -3,7 +3,7 @@
 
     <x-lq.section-title>
 
-        🎯 Daily Challenge
+        🎯 {{ __('localization.daily_challenge') }}
 
     </x-lq.section-title>
 
