@@ -3,7 +3,15 @@ $url = fn (string $name, string $fallback) => \Illuminate\Support\Facades\Route:
 
 $childLogin = $url('child.login', '/child/login');
 $parentLogin = $url('parent.login', '/parent/login');
-$register = $url('register', '/register');
+
+// Parent signup: first matching named route wins, otherwise the fallback path
+$parentSignup = url('/parent/register'); // <-- set your real parent signup path here
+foreach (['parent.register', 'parent.signup', 'register.parent', 'register'] as $name) {
+    if (\Illuminate\Support\Facades\Route::has($name)) {
+        $parentSignup = route($name);
+        break;
+    }
+}
 
 $price = config('learnquest.marketing.premium_price', '$4.99');
 $period = config('learnquest.marketing.premium_period', 'per month');
@@ -1258,7 +1266,7 @@ $schema = [
                     <h1>Turn every lesson into a <span class="grad">learning adventure</span></h1>
                     <p class="lead">LearnQuest is the kids' learning app where children explore magical worlds, complete missions, earn XP and badges, and build real skills, while parents follow their progress every step of the way.</p>
                     <div class="hero-ctas">
-                        <a href="{{ $register }}" class="btn btn-accent btn-lg">Start free today</a>
+                        <a href="{{ $parentSignup }}" class="btn btn-accent btn-lg">Start free today</a>
                         <a href="{{ $childLogin }}" class="btn btn-ghost btn-lg">I'm a student</a>
                     </div>
                     <div class="hero-note">
@@ -1408,7 +1416,7 @@ $schema = [
                         <ul>
                             @foreach ($plan['features'] as $f)<li>{{ $f }}</li>@endforeach
                         </ul>
-                        <a href="{{ $register }}" class="btn {{ $plan['featured'] ? 'btn-primary' : 'btn-ghost' }} btn-lg">{{ $plan['cta'] }}</a>
+                        <a href="{{ $parentSignup }}" class="btn {{ $plan['featured'] ? 'btn-primary' : 'btn-ghost' }} btn-lg">{{ $plan['cta'] }}</a>
                     </article>
                     @endforeach
                 </div>
@@ -1440,7 +1448,7 @@ $schema = [
                 <div class="cta reveal">
                     <h2>Ready to start your child's quest?</h2>
                     <p>Join LearnQuest free and give your child a reason to say "just one more lesson!"</p>
-                    <a href="{{ $register }}" class="btn btn-accent btn-lg">Create free account</a>
+                    <a href="{{ $parentSignup }}" class="btn btn-accent btn-lg">Create free account</a>
                 </div>
             </div>
         </div>
@@ -1512,7 +1520,7 @@ $schema = [
                     <ul>
                         <li><a href="{{ $childLogin }}">Child login</a></li>
                         <li><a href="{{ $parentLogin }}">Parent login</a></li>
-                        <li><a href="{{ $register }}">Sign up free</a></li>
+                        <li><a href="{{ $parentSignup }}">Sign up free</a></li>
                     </ul>
                 </div>
                 <div>
