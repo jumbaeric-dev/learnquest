@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\ChildLoginController;
+use App\Http\Controllers\Auth\ParentAuthController;
+use App\Http\Controllers\Auth\ParentPasswordResetController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LocaleController;
 use App\Livewire\Child\Dashboard\Index as Dashboard;
 use App\Livewire\Child\Explore\Index as Explore;
@@ -9,24 +12,24 @@ use App\Livewire\Child\Learning\Course as LearningCourse;
 use App\Livewire\Child\Learning\Lesson as LearningLesson;
 use App\Livewire\Child\Missions\Index as Missions;
 use App\Livewire\Child\Missions\Journey\Show as MissionJourneyShow;
-use App\Livewire\Child\Worlds\Show as SubjectsWorld;
-use App\Livewire\Child\Profile\Show as ChildProfile;
 use App\Livewire\Child\Profile\Edit as ChildProfileEdit;
-use Illuminate\Support\Facades\Route;
+use App\Livewire\Child\Profile\Show as ChildProfile;
 use App\Livewire\Child\Settings\Index as ChildSettings;
-use App\Http\Controllers\Auth\ParentAuthController;
-use App\Livewire\ParentPortal\Dashboard\Index as ParentDashboard;
-use App\Livewire\ParentPortal\Children\Show as ParentChildShow;
-use App\Livewire\ParentPortal\Children\Index as ParentChildren;
-use App\Services\Child\Context\CurrentChildService;
+use App\Livewire\Child\Worlds\Show as SubjectsWorld;
 use App\Livewire\ParentPortal\Account\Settings as ParentAccountSettings;
 use App\Livewire\ParentPortal\Billing\Index as ParentBilling;
-use App\Http\Controllers\Auth\ParentPasswordResetController;
+use App\Livewire\ParentPortal\Children\Index as ParentChildren;
+use App\Livewire\ParentPortal\Children\Show as ParentChildShow;
+use App\Livewire\ParentPortal\Dashboard\Index as ParentDashboard;
+use App\Services\Child\Context\CurrentChildService;
+use Illuminate\Support\Facades\Route;
 
-Route::get("/", function () {
-  return view("welcome");
-});
+Route::view('/', 'home')->name('home');
 
+Route::post('/contact', [ContactController::class, 'send'])
+    ->middleware('throttle:5,1')
+    ->name('contact.send');
+    
 Route::post('/locale', [LocaleController::class, 'update'])
   ->middleware('throttle:30,1')
   ->name('locale.update');

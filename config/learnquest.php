@@ -4,6 +4,11 @@ return [
     // Where parents can reach you. Used as the Reply-To on parent emails.
     'support_email' => env('LEARNQUEST_SUPPORT_EMAIL', env('MAIL_FROM_ADDRESS')),
 
+    'marketing' => [
+        'premium_price'  => env('LQ_PREMIUM_PRICE', '$4.99'),
+        'premium_period' => 'per month',
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Child Authentication
@@ -334,7 +339,7 @@ return [
             ],
         ],
     ],
-    
+
     'sms' => [
         'enabled' => env('LEARNQUEST_SMS_ENABLED', false),
 
