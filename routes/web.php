@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\ChildLoginController;
 use App\Http\Controllers\Auth\ParentAuthController;
+use App\Http\Controllers\Auth\ParentEmailVerificationController;
 use App\Http\Controllers\Auth\ParentPasswordResetController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\LocaleController;
