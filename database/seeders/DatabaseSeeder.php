@@ -58,15 +58,14 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SubjectSeeder::class,
             SkillSeeder::class,
+            WorldSkillsSeeder::class,
             BadgeSeeder::class,
+            MilestoneBadgeSeeder::class,
             LearnQuestCurriculumSeeder::class,
+            LearnQuestWorldContentSeeder::class,
 
             PlanSeeder::class,
-            // Preserve the old course without restoring legacy activity
-            // types, duplicated activities, or published unreviewed content.
             LegacyAiCoursePreservationSeeder::class,
-
-            // Demo child accounts; learning progress starts empty.
             ChildrenSeeder::class,
         ]);
     }
